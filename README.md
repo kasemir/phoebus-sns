@@ -23,3 +23,9 @@ java -jar phoebus-sns/target/phoebus-sns-0.0.1-SNAPSHOT.jar
 ```
 ant run
 ```
+
+## Develop with Eclipse
+ * Import Generic phoebus projects as described in ../phoebus/README.md
+ * Import phoebus-sns project (one project)
+ * After running the generic "Launcher" once, edit the run configuration
+   to add the "phoebus-sns" Project to the classpath. 
