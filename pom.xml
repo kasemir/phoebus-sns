@@ -40,6 +40,6 @@
 
   <modules>
     <module>../phoebus</module>
-    <module>sns-product</module>
+    <module>phoebus-sns</module>
   </modules>
 </project>

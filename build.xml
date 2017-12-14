@@ -1,0 +1,22 @@
+<!-- Ant build file for building Phoebus-SNS
+
+     All external dependencies need to be
+     provided as jar files ../dependencies/lib
+  -->
+<project name="Phoebus-SNS" default="sns-product">
+
+  <target name="clean" description="Remove all artifacts">
+    <ant target="clean" dir="../phoebus"/>
+    <ant target="clean" dir="phoebus-sns"/>
+  </target>
+	
+  <target name="sns-product" description="Assemble product">
+    <ant target="product" dir="../phoebus"/>
+    <ant target="module-sns" dir="phoebus-sns"/>
+  </target>
+
+  <target name="run" depends="sns-product">
+    <ant target="run" dir="phoebus-sns"/>
+  </target>
+	
+</project>

@@ -1,0 +1,47 @@
+<project default="module-sns">
+  <import file="../../phoebus/dependencies/ant_settings.xml"/>
+
+  <target name="module-sns">
+    <mkdir dir="${classes}"/>
+    <javac srcdir="${src}" destdir="${classes}" classpathref="app-classpath"/>
+
+    <!-- Assemble lib/ -->
+    <copy todir="${build}/lib" flatten="true">
+      <!-- Copy all application dependencies -->
+      <path refid="app-classpath" />
+      <!-- Copy all applications -->
+      <fileset dir="../../phoebus">
+        <include name="applications/**/*.jar"/>
+        <include name="phoebus-product/target/*.jar"/>
+      </fileset>
+    </copy>
+
+    <!-- Create classpath for lib/*jar -->
+    <manifestclasspath property="manifest-classpath"
+                       jarfile="${build}/phoebus-sns-${version}.jar">
+      <classpath>
+        <path>
+          <fileset dir="${build}/lib">
+            <include name="*.jar"/>
+          </fileset>
+        </path>
+      </classpath>
+    </manifestclasspath>
+
+    <!-- <echo message="Manifest classpath: ${manifest-classpath}"/> -->
+
+  	<jar destfile="${build}/phoebus-sns-${version}.jar">
+      <fileset dir="${classes}"/>
+      <fileset dir="${resources}"/>
+      <manifest>
+        <attribute name="Main-Class" value="org.phoebus.product.Launcher" />
+        <attribute name="Class-Path" value="${manifest-classpath}" />
+      </manifest>
+    </jar>
+  </target>
+
+  <target name="run" depends="module-sns">
+    <java jar="${build}/phoebus-sns-${version}.jar" fork="true"/>
+  </target>
+	
+</project>

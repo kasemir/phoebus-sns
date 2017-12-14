@@ -8,6 +8,7 @@
 package org.phoebus.sns.completion;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.phoebus.framework.autocomplete.Proposal;
 import org.phoebus.framework.spi.PVProposalProvider;
@@ -19,6 +20,20 @@ import org.phoebus.framework.spi.PVProposalProvider;
 public class SNSPVProposals implements PVProposalProvider
 {
     public static final String NAME = "SNS PVs";
+
+    final List<String> bogus_implementation = List.of(
+            "DTL_LLRF:IOC1:Load",
+            "DTL_LLRF:IOC2:Load",
+            "DTL_LLRF:IOC3:Load",
+            "DTL_LLRF:IOC4:Load",
+            "DTL_LLRF:IOC5:Load",
+            "DTL_LLRF:IOC6:Load",
+            "CCL_LLRF:IOC1:Load",
+            "CCL_LLRF:IOC2:Load",
+            "CCL_LLRF:IOC3:Load",
+            "CCL_LLRF:IOC4:Load",
+            "SCL_LLRF:IOC01a:Load"
+            );
 
     @Override
     public String getName()
@@ -32,18 +47,10 @@ public class SNSPVProposals implements PVProposalProvider
         if (text.isEmpty())
             return List.of();
 
-        return List.of(
-            new Proposal("DTL_LLRF:IOC1:Load"),
-            new Proposal("DTL_LLRF:IOC2:Load"),
-            new Proposal("DTL_LLRF:IOC3:Load"),
-            new Proposal("DTL_LLRF:IOC4:Load"),
-            new Proposal("DTL_LLRF:IOC5:Load"),
-            new Proposal("DTL_LLRF:IOC6:Load"),
-            new Proposal("CCL_LLRF:IOC1:Load"),
-            new Proposal("CCL_LLRF:IOC2:Load"),
-            new Proposal("CCL_LLRF:IOC3:Load"),
-            new Proposal("CCL_LLRF:IOC4:Load"),
-            new Proposal("SCL_LLRF:IOC01a:Load")
-                );
+        // TODO: Lookup names in Oracle
+        return bogus_implementation.stream()
+                                   .filter(pv -> pv.indexOf(text) >= 0)
+                                   .map(Proposal::new)
+                                   .collect(Collectors.toList());
     }
 }
