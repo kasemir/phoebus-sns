@@ -14,6 +14,12 @@
       <artifactId>product</artifactId>
       <version>0.0.1-SNAPSHOT</version>
     </dependency>
+    <!-- Add _all_ dependencies, incl. JDBC drivers etc. which may not be used by generic product -->
+    <dependency>
+      <groupId>org.phoebus</groupId>
+      <artifactId>dependencies</artifactId>
+      <version>0.0.1-SNAPSHOT</version>
+    </dependency>
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>

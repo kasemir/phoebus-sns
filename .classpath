@@ -6,5 +6,7 @@
 	<classpathentry kind="src" path="phoebus-sns/src/test/java"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/core-framework"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/dependencies"/>
+	<classpathentry kind="lib" path="/dependencies/target/lib/ojdbc8-12.2.0.1.jar"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>
