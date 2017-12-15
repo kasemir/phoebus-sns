@@ -39,7 +39,7 @@ public class RDBConnectionPool
 
     private final AtomicReference<Future<?>> cleanup = new AtomicReference<>();
 
-    private final int timeout = 2;
+    private volatile int timeout = 10;
 
     /** Create conneciton pool
     *
@@ -61,13 +61,18 @@ public class RDBConnectionPool
     public RDBConnectionPool(final String url, final String user, final String password) throws Exception
     {
         this.info = new RDBInfo(url, user, password);
-
     }
 
     /** @return Database dialect */
     public Dialect getDialect()
     {
         return info.getDialect();
+    }
+
+    /** @param seconds Duration for keeping idle connections in pool */
+    public void setTimeout(final int seconds)
+    {
+        timeout = seconds;
     }
 
     /** @return Time for which idle connections are cached */

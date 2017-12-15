@@ -27,7 +27,7 @@ import org.junit.Test;
  *  @author Kay Kasemir
  */
 @SuppressWarnings("nls")
-public class RDBConnectionDemo
+public class RDBConnectionTest
 {
     private static final String PASS = "sns";
     private static final String USER = "sns_reports";
@@ -101,7 +101,7 @@ public class RDBConnectionDemo
         connection1.close();
         // Release
         pool.releaseConnection(connection1);
-        // Will NOT get it back becasue it's been closed
+        // Will NOT get it back because it's been closed
         connection = pool.getConnection();
         assertThat(connection, not(sameInstance(connection1)));
         pool.releaseConnection(connection);
@@ -112,6 +112,8 @@ public class RDBConnectionDemo
     {
         System.out.println("Timeout Test");
         final RDBConnectionPool pool = new RDBConnectionPool(MYSQL_URL, USER, PASS);
+        pool.setTimeout(2);
+
         Connection connection1 = pool.getConnection();
         pool.releaseConnection(connection1);
 
