@@ -1,7 +1,7 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
-  <artifactId>phoebus-sns</artifactId>
+  <artifactId>product-sns</artifactId>
   <parent>
     <groupId>org.phoebus</groupId>
     <artifactId>sns</artifactId>
@@ -63,7 +63,54 @@
           </archive>
         </configuration>
       </plugin>
-      <!-- TODO: Bundle phoebus-doc -->
+
+      <!-- Above commands built the product.jar.
+           Need to add the doc/ (if phoebus-doc is available)
+           and the dependency jar files
+           and then list all lib/* jars in the manifest classpath
+           (this adds for example the ojdbc.jar
+            if it's in lib/, even though that's not
+            a dependency of any other pom)
+        -->
+      <plugin>
+        <artifactId>maven-antrun-plugin</artifactId>
+        <executions>
+          <execution>
+            <phase>verify</phase>
+            <configuration>
+              <failOnError>true</failOnError>
+              <tasks>
+                <echo message="Copying doc/"/>
+                <ant antfile="build.xml" target="copy-doc"/>
+                <echo message="Adding dependencies to product"/>
+                <manifestclasspath property="manifest-classpath"
+                                   jarfile="${project.build.directory}/product-sns-${project.version}.jar">
+                  <classpath>
+                    <path>
+                      <fileset dir="${project.build.directory}/lib">
+                        <include name="*.jar"/>
+                      </fileset>
+                    </path>
+                  </classpath>
+                </manifestclasspath>
+            
+                <!-- <echo message="Manifest classpath: ${manifest-classpath}"/> -->
+                <jar update="true" destfile="${project.build.directory}/product-sns-${project.version}.jar">
+                  <manifest>
+                    <attribute name="Class-Path" value="${manifest-classpath}" />
+                  </manifest>
+                </jar>
+              </tasks>
+            </configuration>
+            <goals>
+              <goal>run</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+
+      
+      
     </plugins>
   </build>
 </project>

@@ -1,6 +1,18 @@
 <project default="module-sns">
   <import file="../../phoebus/dependencies/ant_settings.xml"/>
 
+  <!-- If the manual has been built... -->
+  <target name="-check-doc">
+    <available property="have.doc" file="../../phoebus-doc/build/html/index.html"/>
+  </target>
+  
+  <!-- .. copy manual into product/doc -->
+  <target name="copy-doc" depends="-check-doc" if="have.doc">
+    <copy todir="${build}/doc">
+      <fileset dir="../../phoebus-doc/build/html"/>
+    </copy>
+  </target>
+
   <target name="module-sns">
     <mkdir dir="${classes}"/>
     <javac srcdir="${src}" destdir="${classes}" classpathref="app-classpath"/>
@@ -18,7 +30,7 @@
 
     <!-- Create classpath for lib/*jar -->
     <manifestclasspath property="manifest-classpath"
-                       jarfile="${build}/phoebus-sns-${version}.jar">
+                       jarfile="${build}/product-sns-${version}.jar">
       <classpath>
         <path>
           <fileset dir="${build}/lib">
@@ -30,7 +42,7 @@
 
     <!-- <echo message="Manifest classpath: ${manifest-classpath}"/> -->
 
-  	<jar destfile="${build}/phoebus-sns-${version}.jar">
+    <jar destfile="${build}/product-sns-${version}.jar">
       <fileset dir="${classes}"/>
       <fileset dir="${resources}"/>
       <manifest>
@@ -40,8 +52,18 @@
     </jar>
   </target>
 
+  <!-- Create ZIP of the product.jar, lib/, [doc/,] phoebus.sh launcher -->
+  <target name="dist" depends="module-sns" description="Pack for distribution">
+    <zip destfile="${build}/product-sns-${version}.zip">
+      <zipfileset dir="${build}" includes="**/*.jar" prefix="product-sns-${version}"/>
+      <zipfileset dir="." includes="phoebus.sh" fullpath="product-sns-${version}/phoebus.sh" filemode="755"/>
+      <zipfileset dir="." includes="phoebus.bat" fullpath="product-sns-${version}/phoebus.bat"/>
+      <zipfileset dir="${build}" includes="doc/**" prefix="product-sns-${version}"/>
+    </zip>
+  </target>
+
   <target name="run" depends="module-sns">
-    <java jar="${build}/phoebus-sns-${version}.jar" fork="true"/>
+    <java jar="${build}/product-sns-${version}.jar" fork="true"/>
   </target>
 	
 </project>

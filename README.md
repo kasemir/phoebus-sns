@@ -16,7 +16,7 @@ Phoebus product for SNS
 ## Build & Run with Maven
 ```
 mvn -DskipTests clean install
-java -jar phoebus-sns/target/phoebus-sns-0.0.1-SNAPSHOT.jar 
+java -jar product-sns/target/product-sns-0.0.1-SNAPSHOT.jar 
 ```
 
 ## Build & Run with Ant
