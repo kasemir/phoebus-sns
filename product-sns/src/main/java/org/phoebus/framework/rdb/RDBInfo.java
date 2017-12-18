@@ -11,9 +11,11 @@ import static org.phoebus.framework.rdb.RDBConnectionPool.logger;
 
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
+import java.sql.Driver;
 import java.sql.DriverManager;
 import java.util.Properties;
 import java.util.logging.Level;
+
 
 /** Information about an RDB connection
  *
@@ -72,7 +74,8 @@ public class RDBInfo
 
     Connection connect() throws Exception
     {
-        final Connection connection;
+        Connection connection = null;
+
         final Properties prop = new Properties();
         if (user != null)
             prop.put("user", user);
@@ -87,7 +90,33 @@ public class RDBInfo
             // BINARY_FLOAT resp. BINARY_DOUBLE
             prop.put("SetFloatAndDoubleUseBinary", "true");
         }
-        connection = DriverManager.getConnection(url, prop);
+        else if (dialect == Dialect.MySQL)
+        {
+            if (url.startsWith("jdbc:mysql:replication"))
+            {
+                // Use ReplicationDriver based on code by Laurent Philippe
+                // in org.csstudio.platform.utility.rdb.internal.MySQL_RDB
+                Driver driver = (Driver)Class.forName("com.mysql.jdbc.ReplicationDriver").getDeclaredConstructor().newInstance();
+
+                // We want this for failover on the slaves
+                prop.put("autoReconnect", "true");
+
+                // We want to load balance between the slaves
+                prop.put("roundRobinLoadBalance", "true");
+
+                connection = driver.connect(url, prop);
+            }
+        }
+        else if (dialect == Dialect.PostgreSQL)
+        {
+            // Required to locate driver?
+            Class.forName("org.postgresql.Driver").getDeclaredConstructor().newInstance();
+        }
+
+        // Unless connection was created by dialect-specific code,
+        // use generic driver manager
+        if (connection == null)
+            connection = DriverManager.getConnection(url, prop);
 
         // Basic database info
         if (logger.isLoggable(Level.FINE))
