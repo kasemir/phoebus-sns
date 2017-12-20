@@ -18,6 +18,7 @@ import java.util.prefs.Preferences;
 import org.junit.Before;
 import org.junit.Test;
 import org.phoebus.archive.reader.ArchiveReader;
+import org.phoebus.archive.reader.ArchiveReaders;
 import org.phoebus.archive.reader.ValueIterator;
 import org.phoebus.vtype.VType;
 
@@ -39,7 +40,7 @@ public class RDBArchiveReaderTest
     @Test
     public void testReader() throws Exception
     {
-        ArchiveReader reader = new RDBArchiveReader("Instruments", "jdbc:oracle:thin:@snsoroda-scan.sns.gov:1521/scprod_controls");
+        ArchiveReader reader = ArchiveReaders.createReader("jdbc:oracle:thin:@snsoroda-scan.sns.gov:1521/scprod_controls");
 
         List<String> names = reader.getNamesByPattern("");
         System.out.println(names);
