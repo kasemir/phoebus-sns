@@ -56,6 +56,7 @@
   <target name="dist" depends="module-sns" description="Pack for distribution">
     <zip destfile="${build}/product-sns-${version}.zip">
       <zipfileset dir="${build}" includes="**/*.jar" prefix="product-sns-${version}"/>
+      <zipfileset dir="." includes="settings.ini" fullpath="product-sns-${version}/settings.ini"/>
       <zipfileset dir="." includes="phoebus.sh" fullpath="product-sns-${version}/phoebus.sh" filemode="755"/>
       <zipfileset dir="." includes="phoebus.bat" fullpath="product-sns-${version}/phoebus.bat"/>
       <zipfileset dir="${build}" includes="doc/**" prefix="product-sns-${version}"/>
