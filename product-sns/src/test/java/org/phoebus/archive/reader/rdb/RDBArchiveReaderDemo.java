@@ -30,11 +30,11 @@ public class RDBArchiveReaderDemo
     public void setup()
     {
         final Preferences prefs = Preferences.userNodeForPackage(RDBArchiveReader.class);
-        prefs.put(RDBArchiveReader.USER, "sns_reports");
-        prefs.put(RDBArchiveReader.PASSWORD, "sns");
-        prefs.put(RDBArchiveReader.PREFIX, "chan_arch.");
-        prefs.put(RDBArchiveReader.STORED_PROCEDURE, "chan_arch.archive_reader_pkg.get_browser_data");
-        prefs.put(RDBArchiveReader.STARTTIME_FUNCTION, "SELECT chan_arch.archive_reader_pkg.get_actual_start_time (?, ?, ?)  FROM DUAL");
+        prefs.put(RDBPreferences.USER, "sns_reports");
+        prefs.put(RDBPreferences.PASSWORD, "sns");
+        prefs.put(RDBPreferences.PREFIX, "chan_arch.");
+        prefs.put(RDBPreferences.STORED_PROCEDURE, "chan_arch.archive_reader_pkg.get_browser_data");
+        prefs.put(RDBPreferences.STARTTIME_FUNCTION, "SELECT chan_arch.archive_reader_pkg.get_actual_start_time (?, ?, ?)  FROM DUAL");
     }
 
     @Test
