@@ -24,7 +24,7 @@ import org.phoebus.vtype.VType;
 
 
 @SuppressWarnings("nls")
-public class RDBArchiveReaderTest
+public class RDBArchiveReaderDemo
 {
     @Before
     public void setup()

@@ -28,7 +28,7 @@ import org.phoebus.framework.rdb.RDBConnectionPool;
  *  @author Kay Kasemir
  */
 @SuppressWarnings("nls")
-public class RDBConnectionTest
+public class RDBConnectionDemo
 {
     private static final String PASS = "sns";
     private static final String USER = "sns_reports";
