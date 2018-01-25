@@ -10,7 +10,7 @@ import org.phoebus.framework.autocomplete.PVProposalService;
 import org.phoebus.framework.autocomplete.ProposalService.Handler;
 
 @SuppressWarnings("nls")
-public class SNSPVProposalsTest
+public class SNSPVProposalsDemo
 {
     @Test
     public void testLookup() throws Exception
@@ -19,7 +19,7 @@ public class SNSPVProposalsTest
 
         final Handler response_handler = (name, priority, proposals) ->
         {
-            synchronized (SNSPVProposalsTest.class)
+            synchronized (SNSPVProposalsDemo.class)
             {
                 if (name.equals(SNSPVProposals.NAME))
                     got_SNS_response.set(true);
