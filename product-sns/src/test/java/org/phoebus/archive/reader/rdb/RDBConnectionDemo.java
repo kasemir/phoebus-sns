@@ -5,7 +5,7 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  ******************************************************************************/
-package org.phoebus.framework.rdb;
+package org.phoebus.archive.reader.rdb;
 
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.sameInstance;
@@ -21,13 +21,14 @@ import java.util.logging.Logger;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.phoebus.framework.rdb.RDBConnectionPool;
 
 /** Demo of the {@link RDBConnectionPool}
  *
  *  @author Kay Kasemir
  */
 @SuppressWarnings("nls")
-public class RDBConnectionTest
+public class RDBConnectionDemo
 {
     private static final String PASS = "sns";
     private static final String USER = "sns_reports";

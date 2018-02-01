@@ -9,7 +9,7 @@ Phoebus product for SNS
  * `( cd ..; git clone https://github.com/shroffk/phoebus.git )`
 
 ## Optional: Add documentation
- * `pip install Spinx`
+ * `pip install Sphinx` or `yum install python-sphinx`
  * `( cd ..; git clone https://github.com/kasemir/phoebus-doc.git )`
  * `( cd ../phoebus-doc; make clean html )`
 
