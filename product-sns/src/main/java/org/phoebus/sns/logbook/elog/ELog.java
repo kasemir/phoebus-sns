@@ -31,10 +31,22 @@ import oracle.jdbc.OracleTypes;
 /** SNS 'ELog' support
  *  @author Delphy Nypaver Armstrong - Original version
  *  @author Kay Kasemir
+ *  @author Evan Smith - Adapted to use RDBCollectionPool
  */
 @SuppressWarnings("nls")
 public class ELog implements Closeable
 {
+    /**
+     *  NOTE:
+     *  
+     *  When requesting connections, it is important to keep the Connection out of try with resource 
+     *  blocks. The RDBConnectionPool keeps all the connections in its pool open and expects the connection
+     *  to be released, _not_ closed, when it is done being used. The connections in the pool are all closed 
+     *  when the RDBCollectionPool.clear() method is called.
+     *  
+     *  If the connections are put in try with resource blocks they will be closed automatically,
+     *  which the connection pool does not expect.
+     */
     final private RDBConnectionPool rdb;
 
     /** Maximum allowed size for title and text entry */
@@ -78,9 +90,10 @@ public class ELog implements Closeable
      */
     private String getBadgeNumber(final String user) throws Exception
     { 
+        final Connection connection = rdb.getConnection();
         try
         (
-            final PreparedStatement statement = rdb.getConnection().prepareStatement(
+            final PreparedStatement statement = connection.prepareStatement(
                "SELECT bn FROM OPER.EMPLOYEE_V WHERE user_id=?");
         )
         {
@@ -96,6 +109,11 @@ public class ELog implements Closeable
             }
             // No error, but also not found: fall through
         }
+        finally
+        {
+            rdb.releaseConnection(connection);
+        }
+        
         return DEFAULT_BADGE_NUMBER;
     }
 
@@ -106,11 +124,14 @@ public class ELog implements Closeable
      */
     private int getMaxEntryColumnLength(final String column) throws Exception
     {
-        final ResultSet tables = rdb.getConnection().getMetaData()
+        final Connection connection = rdb.getConnection();
+        final ResultSet tables = connection.getMetaData()
                 .getColumns(null, "LOGBOOK", "LOG_ENTRY", column);
         if (!tables.next())
             throw new Exception("Unable to locate LOGBOOK.LOG_ENTRY." + column);
         final int max_elog_text = tables.getInt("COLUMN_SIZE");
+        rdb.releaseConnection(connection);
+        
         return max_elog_text;
     }
     
@@ -121,10 +142,10 @@ public class ELog implements Closeable
     private List<ELogbook> readLogbooks() throws Exception
     {
         final List<ELogbook> logbooks = new ArrayList<>();
-        
+        final Connection connection = rdb.getConnection();
         try
         (
-            final PreparedStatement statement = rdb.getConnection().prepareStatement(
+            final PreparedStatement statement = connection.prepareStatement(
                 "SELECT logbook_nm, logbook_id FROM LOGBOOK.logbook_v");
         )
         {
@@ -132,6 +153,11 @@ public class ELog implements Closeable
             while (result.next())
                 logbooks.add(new ELogbook(result.getString(1), result.getString(2)));
         }
+        finally
+        {
+            rdb.releaseConnection(connection);
+        }
+        
         return logbooks;
     }
     
@@ -166,9 +192,10 @@ public class ELog implements Closeable
     private List<ELogCategory> readCategories() throws Exception
     {
         final List<ELogCategory> tags = new ArrayList<>();
+        final Connection connection = rdb.getConnection();
         try
         (
-            final Statement statement = rdb.getConnection().createStatement();
+            final Statement statement = connection.createStatement();
         )
         {
             final ResultSet result = statement.executeQuery(
@@ -176,6 +203,8 @@ public class ELog implements Closeable
             while (result.next())
                 tags.add(new ELogCategory(result.getString(1), result.getString(2)));
         }
+        rdb.releaseConnection(connection);
+        
         return tags;
     }
 
@@ -197,9 +226,12 @@ public class ELog implements Closeable
         final Date date;
         final String title;
         final String text;
+        
+        final Connection connection = rdb.getConnection();
+        
         try
         (
-            final PreparedStatement statement = rdb.getConnection().prepareStatement(
+            final PreparedStatement statement = connection.prepareStatement(
                 "SELECT e.log_entry_id, p.prior_nm, d.pref_first_nm, d.pref_last_nm," +
                 "  e.orig_post, e.title, e.content " +
                 " FROM LOGBOOK.log_entry e" +
@@ -219,14 +251,18 @@ public class ELog implements Closeable
             title = result.getString(6);
             text = result.getString(7);
         }
-
+        finally
+        {
+            rdb.releaseConnection(connection);
+        }
+        
         final List<String> logbooks = getLogbooks(entry_id);
         final List<ELogCategory> categories = getCategories(entry_id);
         
         // Get attachments
         final List<ELogAttachment> images = getImageAttachments(entry_id);
         final List<ELogAttachment> attachments = getOtherAttachments(entry_id);
-        
+
         // Return entry        
         return new ELogEntry(entry_id, prio, user, date, title, text, logbooks, categories, images, attachments);
     }
@@ -240,9 +276,10 @@ public class ELog implements Closeable
     public List<ELogEntry> getEntries(final Date start, final Date end) throws Exception
     {
         final List<ELogEntry> entries = new ArrayList<>();
+        final Connection connection = rdb.getConnection();
         try
         (
-            final PreparedStatement statement = rdb.getConnection().prepareStatement(
+            final PreparedStatement statement = connection.prepareStatement(
                 "SELECT e.log_entry_id, p.prior_nm, d.pref_first_nm, d.pref_last_nm," +
                 "  e.orig_post, e.title, e.content " +
                 " FROM LOGBOOK.log_entry e" +
@@ -271,6 +308,11 @@ public class ELog implements Closeable
                 entries.add(new ELogEntry(entry_id, prio, user, date, title, text, logbooks, categories, images, attachments));
             }
         }
+        finally
+        {
+            rdb.releaseConnection(connection);
+        }
+        
         return entries;
     }
     
@@ -281,6 +323,7 @@ public class ELog implements Closeable
     private List<String> getLogbooks(final long entry_id) throws Exception
     {
         final List<String> logbooks = new ArrayList<>();
+        final Connection connection = rdb.getConnection();
         try
         (
             final PreparedStatement statement = rdb.getConnection().prepareStatement(
@@ -296,6 +339,11 @@ public class ELog implements Closeable
                 logbooks.add(result.getString(1));
             result.close();
         }
+        finally
+        {
+            rdb.releaseConnection(connection);
+        }
+        
         return logbooks;
     }
 
@@ -306,9 +354,10 @@ public class ELog implements Closeable
     private List<ELogCategory> getCategories(final long entry_id) throws Exception
     {
         final List<ELogCategory> logbooks = new ArrayList<>();
+        final Connection connection = rdb.getConnection();
         try
         (
-            final PreparedStatement statement = rdb.getConnection().prepareStatement(
+            final PreparedStatement statement = connection.prepareStatement(
                 "SELECT e.cat_id, c.cat_nm" +
                 " FROM LOGBOOK.log_categories_v c" +
                 " JOIN LOGBOOK.LOG_ENTRY_CATEGORIES e ON e.cat_id = c.cat_id" +
@@ -321,6 +370,11 @@ public class ELog implements Closeable
                 logbooks.add(new ELogCategory(result.getString(1), result.getString(2)));
             result.close();
         }
+        finally
+        {
+            rdb.releaseConnection(connection);
+        }
+        
         return logbooks;
     }
 
@@ -365,10 +419,11 @@ public class ELog implements Closeable
             addAttachment(entry_id, "FullEntry.txt", "Full Text", stream);
             stream.close();
         }
-
+        
+        final Connection connection = rdb.getConnection();
         try
         (
-            final PreparedStatement statement = rdb.getConnection().prepareStatement(
+            final PreparedStatement statement = connection.prepareStatement(
                 "UPDATE LOGBOOK.log_entry SET prior_id=? WHERE log_entry_id=?");
         )
         {
@@ -380,6 +435,10 @@ public class ELog implements Closeable
         {
             Logger.getLogger(getClass().getName()).log(Level.WARNING,
                 "Cannot set priority of log entry " + entry_id + " to " + priority, ex);
+        }
+        finally
+        {
+            rdb.releaseConnection(connection);
         }
         
         return entry_id;
@@ -396,9 +455,11 @@ public class ELog implements Closeable
     private long createBasicEntry(final String logbook, final String title, final String text)
             throws Exception
     {
+        final Connection connection = rdb.getConnection();
+        final long result;
         try
         (
-            final CallableStatement statement = rdb.getConnection().prepareCall(
+            final CallableStatement statement = connection.prepareCall(
                 "call logbook.logbook_pkg.insert_logbook_entry(?, ?, ?, ?, ?, ?)");
         )
         {
@@ -409,8 +470,15 @@ public class ELog implements Closeable
             statement.setString(5, text);
             statement.registerOutParameter(6, OracleTypes.NUMBER);
             statement.executeQuery();
-            return statement.getLong(6);
+            
+            result = statement.getLong(6);
         }
+        finally 
+        {
+            rdb.releaseConnection(connection);
+        }
+        
+        return result;
     }
 
     /** Fetch type ID for image
@@ -420,10 +488,14 @@ public class ELog implements Closeable
      */
     private long fetchImageTypes(final String extension) throws Exception
     {
-        final PreparedStatement statement = rdb.getConnection().prepareStatement(
+        final Connection connection = rdb.getConnection();
+        final PreparedStatement statement = connection.prepareStatement(
             "SELECT image_type_id FROM LOGBOOK.IMAGE_TYPE WHERE ?=UPPER(file_extension)");
         statement.setString(1, extension.toUpperCase());
-        return fetchLongResult(statement);
+        long result = fetchLongResult(statement);
+        rdb.releaseConnection(connection);
+        
+        return result;
     }
 
     /** Execute statement and return the first 'long' result
@@ -457,10 +529,14 @@ public class ELog implements Closeable
      */
     private long fetchAttachmentTypes(final String extension) throws Exception
     {
-        final PreparedStatement statement = rdb.getConnection().prepareStatement(
+        Connection connection = rdb.getConnection();
+        final PreparedStatement statement = connection.prepareStatement(
             "SELECT attachment_type_id FROM LOGBOOK.ATTACHMENT_TYPE WHERE ?=UPPER(file_extension)");
         statement.setString(1, extension.toUpperCase());
-        return fetchLongResult(statement);
+        long result = fetchLongResult(statement);
+        rdb.releaseConnection(connection);
+
+        return result;
     }
 
     /** Add another logbook reference to existing entry.
@@ -482,6 +558,10 @@ public class ELog implements Closeable
             statement.setLong(1, entry_id);
             statement.setString(2, logbook.getId());
             statement.executeUpdate();
+        }
+        finally
+        {
+            rdb.releaseConnection(connection);
         }
     }
     
@@ -537,7 +617,11 @@ public class ELog implements Closeable
             statement.setBinaryStream(5, new ByteArrayInputStream(data));
             statement.executeQuery();
         }
-        
+        finally
+        {
+            rdb.releaseConnection(connection);
+        }
+
         return new ELogAttachment(is_image, fname, caption, data);
     }
 
@@ -571,6 +655,11 @@ public class ELog implements Closeable
                 images.add(new ELogAttachment(true, name, type, data));
             }
         }
+        finally
+        {
+            rdb.releaseConnection(connection);
+        }
+        
         return images;
     }
 
@@ -604,6 +693,11 @@ public class ELog implements Closeable
                 attachments.add(new ELogAttachment(false, name, type, data));
             }
         }
+        finally
+        {
+            rdb.releaseConnection(connection);
+        }
+        
         return attachments;
     }
     
@@ -626,6 +720,10 @@ public class ELog implements Closeable
             statement.setLong(1, entry_id);
             statement.setString(2, tag_id);
             statement.executeUpdate();
+        }
+        finally
+        {
+            rdb.releaseConnection(connection);
         }
     }
     
