@@ -24,6 +24,8 @@
       <!-- Copy all applications -->
       <fileset dir="../../phoebus">
         <include name="applications/**/*.jar"/>
+      	<exclude name="applications/**/greeting*.jar"/>
+      	<exclude name="applications/**/channel*.jar"/>
         <include name="phoebus-product/target/*.jar"/>
       </fileset>
     </copy>
