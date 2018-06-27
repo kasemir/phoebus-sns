@@ -108,6 +108,19 @@ public class DemoELog
     {
         try
         {
+            /**
+             * Credential File "test_cred" is a file containing the following.
+             * 
+             * # URL of relational database.
+             * url=url_to_rdb
+             * 
+             * # User credentials
+             * user=user_name
+             * password=user_password
+             * 
+             * Any lines beginning with # will be ignored.
+             * The terms after the "=" should be replaced with the user's specific information.
+             */
             File credentialFile = new File("test_cred");
 
             try
