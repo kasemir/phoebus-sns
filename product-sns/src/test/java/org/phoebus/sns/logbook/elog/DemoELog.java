@@ -108,7 +108,7 @@ public class DemoELog
     {
         try
         {
-            File credentialFile = new File("./product-sns/src/test/java/org/phoebus/sns/logbook/elog/test_cred");
+            File credentialFile = new File("test_cred");
 
             try
             (
