@@ -73,14 +73,6 @@ public class SNSLogEntry implements LogEntry
     }
 
     @Override
-    public Collection<String> getTagNames()
-    {
-        Collection<Tag> tags = getTags();
-        // Collect and return a list of all the tag names.
-        return tags.stream().map(Tag::getName).collect(Collectors.toList());
-    }
-
-    @Override
     public Tag getTag(String tagName)
     {
         Map<String, Object> tags = getTags().stream().collect(Collectors.toMap(Tag::getName, tag -> tag));
@@ -94,12 +86,6 @@ public class SNSLogEntry implements LogEntry
     }
 
     @Override
-    public Collection<String> getLogbookNames()
-    {
-        return entry.getLogbooks();
-    }
-
-    @Override
     public Collection<Attachment> getAttachments()
     {
         return Converter.convertAttachments(entry.getImages(), entry.getAttachments());
@@ -107,12 +93,6 @@ public class SNSLogEntry implements LogEntry
 
     @Override
     public Collection<Property> getProperties()
-    {
-        return Collections.emptyList();
-    }
-
-    @Override
-    public Collection<String> getPropertyNames()
     {
         return Collections.emptyList();
     }
