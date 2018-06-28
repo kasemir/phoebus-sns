@@ -1,6 +1,8 @@
 package org.phoebus.sns.logbook.ui;
 
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.phoebus.util.time.TimestampFormats;
@@ -17,9 +19,11 @@ import javafx.scene.control.CheckMenuItem;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.MenuButton;
+import javafx.scene.control.MenuItem;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
@@ -43,11 +47,12 @@ public class LogbookEntryView extends VBox
     private final TextField titleField;
     private final TextArea  textArea;
     
-    private final Label                   logbooksLabel, tagsLabel;
-    private final TextField               logbooksField, tagsField;
-    private final MenuButton              logbooksSelector, tagsSelector;
-    private final ObservableList<String>  logbooks, tags;
-    private final Button                  addLogbooksButton, addTagsButton;
+    private final Label                  logbooksLabel, tagsLabel;
+    private final TextField              logbooksField, tagsField;
+    private final MenuButton             logbooksSelector, tagsSelector;
+    private final ArrayList<String>      logbooks, tags;
+    private final ObservableList<String> selectedLogbooks, selectedTags;
+    private final Button                 addLogbooksButton, addTagsButton;
     
     public LogbookEntryView()
     {
@@ -81,13 +86,15 @@ public class LogbookEntryView extends VBox
        logbooksLabel     = new Label("Logbooks:");
        logbooksField     = new TextField();
        logbooksSelector  = new MenuButton();
-       logbooks          = FXCollections.observableArrayList();
+       selectedLogbooks  = FXCollections.observableArrayList();
+       logbooks          = new ArrayList<String>();
        addLogbooksButton = new Button();
        
        tagsLabel     = new Label("Tags:       ");
        tagsField     = new TextField();
        tagsSelector  = new MenuButton();
-       tags          = FXCollections.observableArrayList();
+       selectedTags  = FXCollections.observableArrayList();
+       tags          = new ArrayList<String>();
        addTagsButton = new Button();
 
        VBox logbooksAndTags = formatLogbooksAndTagsView();
@@ -176,27 +183,29 @@ public class LogbookEntryView extends VBox
      */
     private VBox formatLogbooksAndTagsView()
     {
-
-        logbooks.addListener(
+        createLogbooksFieldEventHandler();
+        createTagsFieldEventHandler();
+        
+        selectedLogbooks.addListener(
                 (ListChangeListener.Change<? extends String> listener) -> 
         {
-            String selectedLogbooks = "";
-            for (final String logbookName : logbooks)
+            String fieldText = "";
+            for (final String logbookName : selectedLogbooks)
             {
-                selectedLogbooks += (selectedLogbooks.isEmpty() ? "" : ", ") +  logbookName;
+                fieldText += (fieldText.isEmpty() ? "" : ", ") +  logbookName;
             }
-            logbooksField.setText(selectedLogbooks);
+            logbooksField.setText(fieldText);
         });
         
-        tags.addListener(
+        selectedTags.addListener(
                 (ListChangeListener.Change<? extends String> listener) -> 
         {
-            String selectedTags = "";
-            for (final String tagName : tags)
+            String fieldText = "";
+            for (final String tagName : selectedTags)
             {
-                selectedTags += (selectedTags.isEmpty() ? "" : ", ") +  tagName;
+                fieldText += (fieldText.isEmpty() ? "" : ", ") +  tagName;
             }
-            tagsField.setText(selectedTags);
+            tagsField.setText(fieldText);
         });
         
         HBox logbooksBox = new HBox();
@@ -218,8 +227,145 @@ public class LogbookEntryView extends VBox
         return logbooksAndTags;
     }
     
+    private void createLogbooksFieldEventHandler()
+    {
+        // Listen to key released events. Listening to textProperty would not work as the 
+        // log book selector also changes that. It would result in an infinite loop.
+        logbooksField.setOnKeyReleased(new EventHandler<KeyEvent>(){
+            @Override
+            public void handle(KeyEvent event)
+            {
+                int caretPos = logbooksField.getCaretPosition();
+                TextField source = (TextField) event.getSource();
+                String[] tokens = source.getText().split(",(\\s)*");
+                boolean tokenNotFound = false;
+                for (String token : tokens)
+                {
+                    if (logbooks.contains(token))
+                    {
+                        if (! selectedLogbooks.contains(token))
+                        {
+                            for (MenuItem item : logbooksSelector.getItems())
+                            {
+                                 CheckMenuItem menuItem = (CheckMenuItem) item;
+                                 if (menuItem.getText().equals(token))
+                                 {
+                                     if (! menuItem.isSelected())
+                                     {
+                                         menuItem.setSelected(true);
+                                         menuItem.fire();
+                                     }
+                                 }
+                            }
+                        }
+                    }
+                    else
+                    {
+                        tokenNotFound |= true;
+                        List<String> strings = Arrays.asList(tokens);
+                        for (MenuItem item : logbooksSelector.getItems())
+                        {
+                             CheckMenuItem menuItem = (CheckMenuItem) item;
+                             if (! strings.contains(menuItem.getText()))
+                             {
+                                 if (menuItem.isSelected())
+                                 {
+                                     menuItem.setSelected(false);
+                                     menuItem.fire();
+                                 }
+                             }
+                        }
+                    }
+                }
+                
+                if (tokenNotFound)
+                {
+                    logbooksField.setStyle("-fx-text-fill: red;"); // Setting the style sets the cursor to the beginning of the field.
+                    tagsField.selectPositionCaret(caretPos);
+                    logbooksField.deselect();  // Deselect the text.
+
+                }
+                else
+                {
+                    logbooksField.setStyle("-fx-text-fill: black;");
+                    tagsField.selectPositionCaret(caretPos);
+                    logbooksField.deselect();
+                }
+            }          
+        });
+    }
+    
+    private void createTagsFieldEventHandler()
+    {
+        // Listen to key released events. Listening to textProperty would not work as the 
+        // tag selector also changes that. It would result in an infinite loop.
+        tagsField.setOnKeyReleased(new EventHandler<KeyEvent>(){
+            @Override
+            public void handle(KeyEvent event)
+            {
+                int caretPos = tagsField.getCaretPosition();
+                TextField source = (TextField) event.getSource();
+                String[] tokens = source.getText().split(",(\\s)*");
+                boolean tokenNotFound = false;
+                for (String token : tokens)
+                {
+                    if (tags.contains(token))
+                    {
+                        if (! selectedTags.contains(token))
+                        {
+                            for (MenuItem item : tagsSelector.getItems())
+                            {
+                                 CheckMenuItem menuItem = (CheckMenuItem) item;
+                                 if (menuItem.getText().equals(token))
+                                 {
+                                     if (! menuItem.isSelected())
+                                     {
+                                         menuItem.setSelected(true);
+                                         menuItem.fire();
+                                     }
+                                 }
+                            }
+                        }
+                    }
+                    else
+                    {
+                        tokenNotFound |= true;
+                        List<String> strings = Arrays.asList(tokens);
+                        for (MenuItem item : tagsSelector.getItems())
+                        {
+                             CheckMenuItem menuItem = (CheckMenuItem) item;
+                             if (! strings.contains(menuItem.getText()))
+                             {
+                                 //menuItem.setSelected(false);
+                                 if (menuItem.isSelected())
+                                 {
+                                     menuItem.setSelected(false);
+                                     menuItem.fire();
+                                 }
+                             }
+                        }
+                    }
+                }
+                
+                if (tokenNotFound)
+                {
+                    tagsField.setStyle("-fx-text-fill: red;");
+                    tagsField.selectPositionCaret(caretPos);
+                    tagsField.deselect();
+                }
+                else
+                {
+                    tagsField.setStyle("-fx-text-fill: black;");
+                    tagsField.selectPositionCaret(caretPos);
+                    tagsField.deselect();
+                }
+            }          
+        });
+    }
+    
     private void addLogbookToSelector(final String logbook)
     {
+        logbooks.add(logbook);
         CheckMenuItem newLogbook = new CheckMenuItem(logbook);
         newLogbook.setOnAction(new EventHandler<ActionEvent>()
         {
@@ -227,10 +373,10 @@ public class LogbookEntryView extends VBox
             {
                 CheckMenuItem source = (CheckMenuItem) e.getSource();
                 String text = source.getText();
-                if (logbooks.contains(text))
-                    logbooks.remove(text);
+                if (selectedLogbooks.contains(text))
+                    selectedLogbooks.remove(text);
                 else
-                    logbooks.add(text);
+                    selectedLogbooks.add(text);
             }
         });
         logbooksSelector.getItems().add(newLogbook);
@@ -238,6 +384,7 @@ public class LogbookEntryView extends VBox
     
     private void addTagToSelector(final String tag)
     {
+        tags.add(tag);
         CheckMenuItem newTag = new CheckMenuItem(tag);
         newTag.setOnAction(new EventHandler<ActionEvent>()
         {
@@ -245,10 +392,10 @@ public class LogbookEntryView extends VBox
             {
                 CheckMenuItem source = (CheckMenuItem) e.getSource();
                 String text = source.getText();
-                if (tags.contains(text))
-                    tags.remove(text);
+                if (selectedTags.contains(text))
+                    selectedTags.remove(text);
                 else
-                    tags.add(text);
+                    selectedTags.add(text);
             }
         });
         tagsSelector.getItems().add(newTag);
