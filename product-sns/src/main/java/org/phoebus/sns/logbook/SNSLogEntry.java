@@ -100,7 +100,7 @@ public class SNSLogEntry implements LogEntry
     @Override
     public Property getProperty(String propertyName)
     {
-        // TODO Auto-generated method stub
+        // TODO Auto-generated method stub 
         return null;
     }
 
