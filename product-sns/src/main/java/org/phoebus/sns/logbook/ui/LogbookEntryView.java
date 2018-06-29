@@ -26,7 +26,7 @@ public class LogbookEntryView extends VBox
         
         // log books and tags text field, selector, and addition view button
         logbooksAndTags =  new LogbooksTagsView(model);
-       
+        
         getChildren().addAll(credentialEntry, dateAndLevel, logEntryFields, logbooksAndTags);
     }
 }
