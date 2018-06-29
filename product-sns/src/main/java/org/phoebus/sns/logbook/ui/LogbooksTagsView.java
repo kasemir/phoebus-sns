@@ -31,7 +31,6 @@ public class LogbooksTagsView extends VBox
     public LogbooksTagsView(LogEntryModel model)
     {
         this.model = model;
-        funkyTheFunction(model::getLogbooks);
         
         logbooksLabel       = new Label("Logbooks:");
         logbooksField       = new TextField();
