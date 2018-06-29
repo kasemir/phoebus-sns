@@ -30,7 +30,7 @@ public class LogCredentialEntryView extends HBox
     
     private void formatView()
     {
-     // The preferred width is set to zero so that the labels don't minimize themselves to let the fields have their preferred widths.
+        // The preferred width is set to zero so that the labels don't minimize themselves to let the fields have their preferred widths.
         userField.setPrefWidth(0);
         passwordField.setPrefWidth(0);
         HBox.setHgrow(userField, Priority.ALWAYS);
