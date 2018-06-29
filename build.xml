@@ -3,23 +3,23 @@
      All external dependencies need to be
      provided as jar files ../dependencies/lib
   -->
-<project name="Phoebus-SNS" default="product-sns">
+<project name="Phoebus-SNS" default="product">
 
   <target name="clean" description="Remove all artifacts">
     <ant target="clean" dir="../phoebus"/>
     <ant target="clean" dir="product-sns"/>
   </target>
 	
-  <target name="product-sns" description="Assemble product">
+  <target name="product" description="Assemble product">
     <ant target="product" dir="../phoebus"/>
     <ant target="module-sns" dir="product-sns"/>
   </target>
 
-  <target name="dist" depends="product-sns" description="Pack for distribution">
+  <target name="dist" depends="product" description="Pack for distribution">
     <ant target="dist" dir="product-sns"/>
   </target>
 
-  <target name="run" depends="product-sns">
+  <target name="run" depends="product">
     <ant target="run" dir="product-sns"/>
   </target>
 	
