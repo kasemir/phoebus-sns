@@ -1,3 +1,10 @@
+/*******************************************************************************
+ * Copyright (c) 2018 Oak Ridge National Laboratory.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *******************************************************************************/
 package org.phoebus.sns.logbook.ui;
 
 import javafx.geometry.Insets;
@@ -30,13 +37,15 @@ public class LogCredentialEntryView extends HBox
     
     private void formatView()
     {
+        userFieldLabel.setPrefWidth(90);
         // The preferred width is set to zero so that the labels don't minimize themselves to let the fields have their preferred widths.
         userField.setPrefWidth(0);
         passwordField.setPrefWidth(0);
+        HBox.setMargin(passwordFieldLabel, new Insets(0, 5, 0, 15));
         HBox.setHgrow(userField, Priority.ALWAYS);
         HBox.setHgrow(passwordField, Priority.ALWAYS);
         
-        setSpacing(15);
+        //setSpacing(15);
         setAlignment(Pos.CENTER);
         getChildren().addAll(userFieldLabel, userField, passwordFieldLabel, passwordField);
         

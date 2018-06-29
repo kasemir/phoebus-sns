@@ -1,3 +1,10 @@
+/*******************************************************************************
+ * Copyright (c) 2018 Oak Ridge National Laboratory.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *******************************************************************************/
 package org.phoebus.sns.logbook.ui;
 
 import java.time.Instant;
@@ -43,6 +50,7 @@ public class LogDateLevelView extends HBox
     private void formatView()
     {
         dateField.setEditable(false);
+        dateLabel.setPrefWidth(85);
         levelLabel.setAlignment(Pos.CENTER_RIGHT);
         
         // Put log level label and selector in HBox so that they can be right justified.

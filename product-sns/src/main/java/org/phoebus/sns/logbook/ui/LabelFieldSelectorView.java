@@ -1,3 +1,10 @@
+/*******************************************************************************
+ * Copyright (c) 2018 Oak Ridge National Laboratory.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *******************************************************************************/
 package org.phoebus.sns.logbook.ui;
 
 import java.util.Arrays;
@@ -52,7 +59,7 @@ public class LabelFieldSelectorView extends HBox
         
         label    = new Label(labelText);
         field    = new TextField();
-        selector = new ToggleButton("V");
+        selector = new ToggleButton("V"); // TODO: Get a down arrow icon for this.
         addView  = new Button();
         dropDown = new ContextMenu();
         
@@ -61,7 +68,7 @@ public class LabelFieldSelectorView extends HBox
     
     private void formatView()
     {
-        
+        label.setPrefWidth(85);
         selector.setOnAction(actionEvent -> 
         {
             if (selector.isSelected())
@@ -104,6 +111,7 @@ public class LabelFieldSelectorView extends HBox
             public void handle(KeyEvent event)
             {
                 int caretPos = field.getCaretPosition();
+
                 TextField source = (TextField) event.getSource();
                 String[] tokens = source.getText().split("(\\s)*,(\\s)*");
                 boolean tokenNotFound = false;
@@ -115,9 +123,11 @@ public class LabelFieldSelectorView extends HBox
                     {
                         if (! hasSelected.test(token))
                         {
+                            // Check all the items in the drop down that are entered.
                             for (MenuItem item : dropDown.getItems())
                             {
                                  CheckMenuItem menuItem = (CheckMenuItem) item;
+                                 // Only check the typed items if they aren't already.
                                  if (menuItem.getText().equals(token))
                                  {
                                      if (! menuItem.isSelected())
@@ -151,6 +161,7 @@ public class LabelFieldSelectorView extends HBox
                     }
                 }
                 
+                // Indicate erroneous entry with red text.
                 if (tokenNotFound)
                 {
                     field.setStyle("-fx-text-fill: red;");
