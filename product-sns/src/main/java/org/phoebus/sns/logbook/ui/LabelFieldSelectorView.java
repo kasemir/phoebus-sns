@@ -29,6 +29,16 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 
+/**
+ * View that handles user input in regards to passed lists of items.
+ * <p> The view will check if the items the user has typed are contained in the 
+ * lists accessible from the passed suppliers. Should they not be correct, the
+ * input will be flagged. 
+ * <p> Any correct items in the input string will be moved in front
+ * of the incorrect items.
+ * @author Evan Smith
+ *
+ */
 public class LabelFieldSelectorView extends HBox
 {
 
@@ -66,6 +76,7 @@ public class LabelFieldSelectorView extends HBox
         formatView();
     }
     
+     /** Format the view  */
     private void formatView()
     {
         label.setPrefWidth(85);
@@ -94,6 +105,7 @@ public class LabelFieldSelectorView extends HBox
         VBox.setMargin(this, new Insets(5));
     }
     
+    /** Initialize the drop down context menu. */
     private void initializeSelector()
     {
         for (final String item : known.get())
@@ -102,6 +114,9 @@ public class LabelFieldSelectorView extends HBox
         }
     }
     
+    /**
+     * Create an event handler for parsing and then reacting to user input.
+     */
     private void createFieldEventHandler()
     {
         // Listen to key released events. Listening to textProperty would not work as the 
@@ -178,6 +193,10 @@ public class LabelFieldSelectorView extends HBox
         });
     }
     
+    /**
+     * Add a new CheckMenuItem to the drop down ContextMenu.
+     * @param item - Item to be added.
+     */
     private void addToDropDown(String item)
     {
         CheckMenuItem newLogbook = new CheckMenuItem(item);
@@ -204,23 +223,45 @@ public class LabelFieldSelectorView extends HBox
         dropDown.getItems().add(newLogbook);        
     }
     
-    private String handleInput(String prev,List<String> selectedItems, List<String> knownItems)
+    /**
+     * Parse the user's input. 
+     * <ol>
+     * <li> Isolate incorrect text.
+     * <li> Build correct string of items.
+     * <li> Flag incorrect input and put it at the end of the correct string.
+     * </ol>
+     * @param incorrect - String containing possibly incorrect text.
+     * @param selectedItems - The items currently selected in the drop down.
+     * @param knownItems - All known items.
+     * @return String containing new text.
+     */
+    private String handleInput(String incorrect,List<String> selectedItems, List<String> knownItems)
     {
         String text = "";
+        // Isolate the incorrect text by removing the correct item entries.
         for (String item : knownItems)
-            prev = prev.replaceAll(item + "(,)*", "");
+            incorrect = incorrect.replaceAll(item + "(,)*", "");
         
+        // Build the correct text string.
         for (String item : selectedItems)
             text += (text.isEmpty() ? "" : ", ") + item;
         
-        prev = prev.trim();
-        //System.out.println("text: '" + text + "', " + "prev: '" + prev + "'");
-        if (! prev.isEmpty())
+        // If incorrect entry is all whitespace, then delete whitespace.
+        if (incorrect.matches("(\\s)+"))
+            incorrect = incorrect.trim();
+        // Else, only delete the leading whitespace. Maintain trailing white space as to not mess with field caret position.
+        else
+            incorrect = incorrect.replaceAll("\\A\\s+", "");
+
+        
+        if (! incorrect.isEmpty())
         {
+            // If the incorrect text is not empty and text is not empty, append the incorrect text onto the correct text.
             if (! text.isEmpty())
-                text += ", " + prev;
+                text += ", " + incorrect;
+            // Otherwise, incorrect is all there is, so add it to text.
             else 
-                text += prev;   
+                text += incorrect;   
         }
         
         return text;
