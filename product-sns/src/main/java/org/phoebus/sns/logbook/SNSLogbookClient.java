@@ -3,6 +3,7 @@ package org.phoebus.sns.logbook;
 import java.io.File;
 import java.io.InputStream;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 
 import org.phoebus.logging.Attachment;
@@ -215,42 +216,42 @@ public class SNSLogbookClient implements LogClient
     }
 
     @Override
-    public Collection<LogEntry> findLogsBySearch(String pattern)
+    public List<LogEntry> findLogsBySearch(String pattern)
     {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public Collection<LogEntry> findLogsByTag(String pattern)
+    public List<LogEntry> findLogsByTag(String pattern)
     {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public Collection<LogEntry> findLogsByLogbook(String logbook)
+    public List<LogEntry> findLogsByLogbook(String logbook)
     {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public Collection<LogEntry> findLogsByProperty(String propertyName, String attributeName, String attributeValue)
+    public List<LogEntry> findLogsByProperty(String propertyName, String attributeName, String attributeValue)
     {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public Collection<LogEntry> findLogsByProperty(String propertyName)
+    public List<LogEntry> findLogsByProperty(String propertyName)
     {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public Collection<LogEntry> findLogs(Map<String, String> map)
+    public List<LogEntry> findLogs(Map<String, String> map)
     {
         // TODO Auto-generated method stub
         return null;
