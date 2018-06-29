@@ -59,8 +59,8 @@ public class LabelFieldSelectorView extends HBox
         
         label    = new Label(labelText);
         field    = new TextField();
-        selector = new ToggleButton("V"); // TODO: Get a down arrow icon for this.
-        addView  = new Button();
+        selector = new ToggleButton("v"); // TODO: Get a down arrow icon for this.
+        addView  = new Button();          // TODO: Implement add Log books/Tags view. Get a add icon for each.
         dropDown = new ContextMenu();
         
         formatView();
