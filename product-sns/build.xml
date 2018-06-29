@@ -26,6 +26,8 @@
         <include name="applications/**/*.jar"/>
       	<exclude name="applications/**/greeting*.jar"/>
       	<exclude name="applications/**/channel*.jar"/>
+      	<exclude name="applications/**/alarm-server*.jar"/>
+      	<exclude name="applications/**/scan-server*.jar"/>
         <include name="phoebus-product/target/*.jar"/>
       </fileset>
     </copy>
