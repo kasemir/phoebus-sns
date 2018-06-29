@@ -6,11 +6,12 @@ import java.util.List;
 
 public class LogEntryModel
 {
-    // SNSLogClient client;
-    private final List<String> logbooks, selectedLogbooks, tags, selectedTags;
+    // SNSLogClient client; // Source of log and tag data.
+    private final List<String> logbooks, tags, selectedLogbooks, selectedTags;
     
     public LogEntryModel()
     {
+        // TODO : Implement SNSLogClient and use it to retrieve data. Remove dummy data.
         tags     = List.of("Tag 1", "Tag 2", "Tag 3");
         logbooks = List.of("Logbook 1", "Logbook 2", "Logbook 3");
         
@@ -23,6 +24,11 @@ public class LogEntryModel
         return Collections.unmodifiableList(logbooks);
     }
     
+    public List<String> getSelectedLogbooks()
+    {
+        return Collections.unmodifiableList(selectedLogbooks);
+    }
+    
     public boolean hasLogbook (final String logbook)
     {
         return logbooks.contains(logbook);
@@ -33,9 +39,9 @@ public class LogEntryModel
         return selectedLogbooks.contains(logbook);
     }
     
-    public void addSelectedLogbook(final String logbook)
+    public boolean addSelectedLogbook(final String logbook)
     {
-        selectedLogbooks.add(logbook);
+        return selectedLogbooks.add(logbook);
     }
     
     public boolean removeSelectedLogbook(final String logbook)
@@ -48,6 +54,11 @@ public class LogEntryModel
         return Collections.unmodifiableList(tags);
     }
     
+    public List<String> getSelectedTags()
+    {
+        return Collections.unmodifiableList(selectedTags);
+    }
+    
     public boolean hasTag (final String tag) 
     {
         return tags.contains(tag);
@@ -58,9 +69,9 @@ public class LogEntryModel
         return selectedTags.contains(tag);
     }
     
-    public void addSelectedTag(final String tag)
+    public boolean addSelectedTag(final String tag)
     {
-        selectedTags.add(tag);
+        return selectedTags.add(tag);
     }
     
     public boolean removeSelectedTag(final String tag)
