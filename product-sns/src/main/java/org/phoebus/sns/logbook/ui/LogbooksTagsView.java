@@ -22,7 +22,6 @@ public class LogbooksTagsView extends VBox
                                                                       model::getSelectedLogbooks, 
                                                                       model::getLogbooks, 
                                                                       model::hasSelectedLogbook, 
-                                                                      model::hasLogbook, 
                                                                       model::addSelectedLogbook, 
                                                                       model::removeSelectedLogbook);
         
@@ -30,7 +29,6 @@ public class LogbooksTagsView extends VBox
                                                                   model::getSelectedTags, 
                                                                   model::getTags, 
                                                                   model::hasSelectedTag, 
-                                                                  model::hasTag, 
                                                                   model::addSelectedTag, 
                                                                   model::removeSelectedTag);
         
