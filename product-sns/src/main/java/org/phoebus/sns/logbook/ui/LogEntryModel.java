@@ -14,7 +14,7 @@ import java.util.List;
 public class LogEntryModel
 {
     // SNSLogClient client; // Source of log and tag data.
-    private final List<String> logbooks, tags, selectedLogbooks, selectedTags;
+    private final List<String>    logbooks, tags, selectedLogbooks, selectedTags;
     
     public LogEntryModel()
     {
