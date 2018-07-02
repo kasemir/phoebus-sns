@@ -102,7 +102,9 @@ public class ListSelectionView extends HBox
     {
         selectedItems.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
         availableItems.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
-        
+        selectedItems.setStyle("-fx-control-inner-background-alt: white");
+        availableItems.setStyle("-fx-control-inner-background-alt: white");
+
         add.setOnAction(event ->
         {
             // Can't modify list we're iterating over, so make a copy to iterate over.
