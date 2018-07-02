@@ -1,7 +1,7 @@
 package org.phoebus.sns.logbook.ui;
 
 import java.util.ArrayList;
-import java.util.Comparator;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.function.Function;
@@ -22,15 +22,19 @@ import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import javafx.stage.Window;
-
+/**
+ * 
+ * @author Evan Smith
+ *
+ */
 public class ListSelectionView extends HBox
 {
     private final Stage  stage;
     
     @SuppressWarnings("unused") // Used to initialize list views.
-    private final Supplier<List<String>> available;
+    private final Supplier<ObservableList<String>> available;
     @SuppressWarnings("unused") // Used to initialize list views.
-    private final Supplier<List<String>> selected;
+    private final Supplier<ObservableList<String>> selected;
     
     private final Function<String, Boolean> addSelected, removeSelected;
     
@@ -46,8 +50,8 @@ public class ListSelectionView extends HBox
     private final Callable<Void> toCall;
 
     public ListSelectionView(Window parent,
-                              Supplier<List<String>>    available, 
-                              Supplier<List<String>>    selected,
+                              Supplier<ObservableList<String>>    available, 
+                              Supplier<ObservableList<String>>    selected,
                               Function<String, Boolean> addSelected,
                               Function<String, Boolean> removeSelected,
                               Callable<Void>            toCall)
@@ -76,12 +80,11 @@ public class ListSelectionView extends HBox
         selectedLabel = new Label("Selected");
         itemsLabel    = new Label("Available");
         
-        ObservableList<String> selectedCopy  = FXCollections.observableArrayList(new ArrayList<String>(selected.get()));
-        ObservableList<String> availableCopy = FXCollections.observableArrayList(new ArrayList<String>(available.get()));
-        
-        // Initialized with copies so view can add and remove items from list views.
-        selectedItems  = new ListView<String>(selectedCopy);
-        availableItems = new ListView<String>(availableCopy);
+        selectedItems  = new ListView<String>(selected.get());
+        // We wan't to remove items from the available list as they're selected, and add them back as they are unselected. 
+        // Due to this we need a copy as available.get() returns an immutable list.
+        availableItems = new ListView<String>(
+                FXCollections.observableArrayList(List.copyOf(available.get())));
         
         for (String item : selectedItems.getItems())
             availableItems.getItems().remove(item);
@@ -102,47 +105,44 @@ public class ListSelectionView extends HBox
         
         add.setOnAction(event ->
         {
-            for (String item : availableItems.getSelectionModel().getSelectedItems())
+            // Can't modify list we're iterating over, so make a copy to iterate over.
+            List<String> toAdd = new ArrayList<String>(availableItems.getSelectionModel().getSelectedItems());
+            for (String item : toAdd)
             {
-                selectedItems.getItems().add(item);
                 addSelected.apply(item);
+                availableItems.getItems().remove(item);
             }
-            for (String item : selectedItems.getItems())
-            {
-                if (availableItems.getItems().contains(item))
-                    availableItems.getItems().remove(item);
-            }
-            clearSelectionsAndSort();
+            clearSelections();
         });
         
         remove.setOnAction(event ->
         {
-            for (String item : selectedItems.getSelectionModel().getSelectedItems())
+            // Can't modify list we're iterating over, so make a copy to iterate over.
+            List<String> toRemove = new ArrayList<String>(selectedItems.getSelectionModel().getSelectedItems());
+            for (String item : toRemove)
             {
-                availableItems.getItems().add(item);
                 removeSelected.apply(item);
+                availableItems.getItems().add(item);
             }
-            for (String item : availableItems.getItems())
-            {
-                if (selectedItems.getItems().contains(item))
-                    selectedItems.getItems().remove(item);
-            }
-            clearSelectionsAndSort();
-
+            Collections.sort(availableItems.getItems());
+            clearSelections();
         });
         
         clear.setOnAction(event ->
         {
-            for (String item : selectedItems.getItems())
+            // Can't modify list we're iterating over, so make a copy to iterate over.
+            List<String> toRemove = new ArrayList<String>(selectedItems.getItems());
+            for (String item : toRemove)
+            {
+                removeSelected.apply(item);
                 availableItems.getItems().add(item);
-            
-            selectedItems.getItems().clear();
-            clearSelectionsAndSort();
+            }
+            Collections.sort(availableItems.getItems());
+            clearSelections();
         });
         
         apply.setOnAction(event ->
         {
-
             try
             {  toCall.call();  }
             catch (Exception ex)
@@ -191,11 +191,9 @@ public class ListSelectionView extends HBox
         getChildren().addAll(availableBox, buttonsBox, selectedBox);
     }
 
-    private void clearSelectionsAndSort()
+    private void clearSelections()
     {
         selectedItems.getSelectionModel().clearSelection();
-        selectedItems.getItems().sort(Comparator.naturalOrder());
         availableItems.getSelectionModel().clearSelection();
-        availableItems.getItems().sort(Comparator.naturalOrder());
     }
 }

@@ -13,6 +13,7 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
@@ -21,6 +22,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.CheckMenuItem;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
+import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.layout.HBox;
@@ -41,15 +43,15 @@ public class LabelFieldSelectorView extends HBox
     private final Button        addItem;  // Opens a yet to be implemented view.
 
     // Suppliers of selected and known item lists. Selected items is always either an empty set or subset of the known items.
-    private final Supplier<List<String>> selected;
-    private final Supplier<List<String>> known;             
+    private final Supplier<ObservableList<String>> selected;
+    private final Supplier<ObservableList<String>> known;             
     
     private final Predicate<String>         hasSelected;                 // Predicate to test if a specific item is selected.
     private final Function<String, Boolean> addSelected, removeSelected; // Functions to add or remove known items to/from the selected items list.
         
     public LabelFieldSelectorView(final String labelText, 
-                                   Supplier<List<String>> selected, 
-                                   Supplier<List<String>> known, 
+                                   Supplier<ObservableList<String>> selected, 
+                                   Supplier<ObservableList<String>> known, 
                                    Predicate<String> hasSelected, 
                                    Function<String, Boolean> addSelected,
                                    Function<String, Boolean> removeSelected)
@@ -156,6 +158,25 @@ public class LabelFieldSelectorView extends HBox
     {
         List<String> selectedItems = selected.get();
         
+        // Handle drop down menu item checking.
+        for (MenuItem menuItem : dropDown.getItems())
+        {
+            CheckMenuItem check = (CheckMenuItem) menuItem;
+            // If the item is selected make sure it is checked.
+            if (selectedItems.contains(check.getText()))
+            {
+                if (! check.isSelected()) 
+                    check.setSelected(true);
+            }
+            // If the item is not selected, make sure it is not checked.
+            else
+            {
+                if (check.isSelected())
+                    check.setSelected(false);
+            }
+        }
+        
+        // Build the field text string.
         String fieldText = "";
         for (String item : selectedItems)
         {

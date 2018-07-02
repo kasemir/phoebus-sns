@@ -7,33 +7,35 @@
  *******************************************************************************/
 package org.phoebus.sns.logbook.ui;
 
-import java.util.ArrayList;
-import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
+
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 
 public class LogEntryModel
 {
     // SNSLogClient client; // Source of log and tag data.
-    private final List<String>    logbooks, tags, selectedLogbooks, selectedTags;
+    private final ObservableList<String>    logbooks, tags, selectedLogbooks, selectedTags;
     
     public LogEntryModel()
     {
         // TODO : Implement SNSLogClient and use it to retrieve data. Remove dummy data.
-        tags     = List.of("Tag 1", "Tag 2", "Tag 3");
-        logbooks = List.of("Logbook 1", "Logbook 2", "Logbook 3");
+        tags     = FXCollections.observableArrayList(List.of("Tag 1", "Tag 2", "Tag 3"));
+        logbooks = FXCollections.observableArrayList(List.of("Logbook 1", "Logbook 2", "Logbook 3"));
         
-        selectedLogbooks = new ArrayList<String>();
-        selectedTags     = new ArrayList<String>();
+        selectedLogbooks = FXCollections.observableArrayList();
+        selectedTags     = FXCollections.observableArrayList();
     }
     
-    public List<String> getLogbooks()
+    public ObservableList<String> getLogbooks()
     {
-        return Collections.unmodifiableList(logbooks);
+        return FXCollections.unmodifiableObservableList(logbooks);
     }
     
-    public List<String> getSelectedLogbooks()
+    public ObservableList<String> getSelectedLogbooks()
     {
-        return Collections.unmodifiableList(selectedLogbooks);
+        return FXCollections.unmodifiableObservableList(selectedLogbooks);
     }
     
     public boolean hasLogbook (final String logbook)
@@ -48,22 +50,26 @@ public class LogEntryModel
     
     public boolean addSelectedLogbook(final String logbook)
     {
-        return selectedLogbooks.add(logbook);
+        boolean result = selectedLogbooks.add(logbook);
+        selectedLogbooks.sort(Comparator.naturalOrder());
+        return result;
     }
     
     public boolean removeSelectedLogbook(final String logbook)
     {
-        return selectedLogbooks.remove(logbook);
+        boolean result = selectedLogbooks.remove(logbook);
+        selectedLogbooks.sort(Comparator.naturalOrder());
+        return result;    
     }
     
-    public List<String> getTags()
+    public ObservableList<String> getTags()
     {
-        return Collections.unmodifiableList(tags);
+        return FXCollections.unmodifiableObservableList(tags);
     }
     
-    public List<String> getSelectedTags()
+    public ObservableList<String> getSelectedTags()
     {
-        return Collections.unmodifiableList(selectedTags);
+        return FXCollections.unmodifiableObservableList(selectedTags);
     }
     
     public boolean hasTag (final String tag) 
@@ -78,11 +84,15 @@ public class LogEntryModel
     
     public boolean addSelectedTag(final String tag)
     {
-        return selectedTags.add(tag);
+        boolean result = selectedTags.add(tag);
+        selectedTags.sort(Comparator.naturalOrder());
+        return result;    
     }
     
     public boolean removeSelectedTag(final String tag)
     {
-        return selectedTags.remove(tag);
+        boolean result = selectedTags.remove(tag);
+        selectedTags.sort(Comparator.naturalOrder());
+        return result;        
     }
 }
