@@ -15,6 +15,10 @@ import javafx.collections.ObservableList;
 
 public class LogEntryModel
 {
+    private String username, password;
+    private String date, level;
+    private String title, text;
+    
     // SNSLogClient client; // Source of log and tag data.
     private final ObservableList<String>    logbooks, tags, selectedLogbooks, selectedTags;
     
@@ -26,6 +30,36 @@ public class LogEntryModel
         
         selectedLogbooks = FXCollections.observableArrayList();
         selectedTags     = FXCollections.observableArrayList();
+    }
+    
+    public void setUser(final String username)
+    {
+        this.username = username;
+    }
+    
+    public void setPassword(final String password)
+    {
+        this.password = password;
+    }
+    
+    public void setDate(final String date)
+    {
+        this.date = date;
+    }
+    
+    public void setLevel(final String level)
+    {
+        this.level = level;
+    }
+    
+    public void setTitle(final String title)
+    {
+        this.title = title;
+    }
+    
+    public void setText(final String text)
+    {
+        this.text = text;
     }
     
     public ObservableList<String> getLogbooks()
@@ -94,5 +128,16 @@ public class LogEntryModel
         boolean result = selectedTags.remove(tag);
         selectedTags.sort(Comparator.naturalOrder());
         return result;        
+    }
+
+    public void submitEntry()
+    {
+        System.out.println("You pressed submit.");
+        System.out.println("user: " + username);
+        System.out.println("password: " + password);
+        System.out.println("date: " + date);
+        System.out.println("level: " + level);
+        System.out.println("title: " + title);
+        System.out.println("text: " + text);
     }
 }
