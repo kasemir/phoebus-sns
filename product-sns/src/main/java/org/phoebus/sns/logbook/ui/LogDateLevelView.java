@@ -13,14 +13,12 @@ import org.phoebus.util.time.TimestampFormats;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
-import javafx.scene.layout.VBox;
 
 public class LogDateLevelView extends HBox
 {
@@ -50,7 +48,7 @@ public class LogDateLevelView extends HBox
     private void formatView()
     {
         dateField.setEditable(false);
-        dateLabel.setPrefWidth(85);
+        dateLabel.setPrefWidth(LogbookEntryView.labelWidth);
         levelLabel.setAlignment(Pos.CENTER_RIGHT);
         
         // Put log level label and selector in HBox so that they can be right justified.
@@ -63,6 +61,5 @@ public class LogDateLevelView extends HBox
         setAlignment(Pos.CENTER);
         setSpacing(5);
         getChildren().addAll(dateLabel, dateField, levelBox);
-        VBox.setMargin(this, new Insets(40, 5, 10, 5));
     }
 }
