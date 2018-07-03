@@ -14,8 +14,12 @@ import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
-import javafx.scene.layout.VBox;
 
+/**
+ * 
+ * @author Evan Smith
+ *
+ */
 public class LogCredentialEntryView extends HBox
 {
     private final LogEntryModel model;
@@ -37,18 +41,33 @@ public class LogCredentialEntryView extends HBox
     
     private void formatView()
     {
-        userFieldLabel.setPrefWidth(90);
+        setFieldActions();
+        
+        userFieldLabel.setPrefWidth(LogbookEntryView.labelWidth);
+
         // The preferred width is set to zero so that the labels don't minimize themselves to let the fields have their preferred widths.
         userField.setPrefWidth(0);
         passwordField.setPrefWidth(0);
-        HBox.setMargin(passwordFieldLabel, new Insets(0, 5, 0, 15));
+        
+        HBox.setMargin(passwordFieldLabel, new Insets(0, 0, 0, 5));
         HBox.setHgrow(userField, Priority.ALWAYS);
         HBox.setHgrow(passwordField, Priority.ALWAYS);
         
-        //setSpacing(15);
+        setSpacing(5);
         setAlignment(Pos.CENTER);
         getChildren().addAll(userFieldLabel, userField, passwordFieldLabel, passwordField);
+    }
+
+    private void setFieldActions()
+    {
+        userField.setOnKeyReleased(event ->
+        {
+            model.setUser(userField.getText());
+        });
         
-        VBox.setMargin(this, new Insets(20, 5, 20, 5));
+        passwordField.setOnKeyReleased(event ->
+        {
+            model.setPassword(passwordField.getText());
+        });
     }
 }
