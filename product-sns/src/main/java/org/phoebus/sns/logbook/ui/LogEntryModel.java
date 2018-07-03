@@ -13,7 +13,7 @@ import java.util.List;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.Scene;
-import javafx.scene.image.WritableImage;
+import javafx.scene.image.Image;
 
 /**
  * Purveyor of log entry application state.
@@ -29,7 +29,7 @@ public class LogEntryModel
     
     // private final SNSLogClient client; // Source of log and tag data.
     private final ObservableList<String>    logbooks, tags, selectedLogbooks, selectedTags;
-    private final ObservableList<WritableImage> images;
+    private final ObservableList<Image> images;
     
     public LogEntryModel()
     { 
@@ -149,17 +149,17 @@ public class LogEntryModel
         return result;        
     }
     
-    public ObservableList<WritableImage> getImages()
+    public ObservableList<Image> getImages()
     {
         return FXCollections.unmodifiableObservableList(images);
     }
     
-    public boolean addImage(final WritableImage image)
+    public boolean addImage(final Image img)
     {
-        return images.add(image);
+        return images.add(img);
     }
     
-    public boolean removeImage(final WritableImage image)
+    public boolean removeImage(final Image image)
     {
         return images.remove(image);
     }
