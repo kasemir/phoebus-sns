@@ -7,8 +7,14 @@
  *******************************************************************************/
 package org.phoebus.sns.logbook.ui;
 
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
+import javafx.scene.Scene;
+import javafx.scene.control.Button;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
+import javafx.stage.Stage;
 
 /**
  * View for making an entry into a log book.
@@ -17,17 +23,26 @@ import javafx.scene.layout.VBox;
  */
 public class LogbookEntryView extends VBox
 {
-    /** Purveyor of state in the log entry view. */
-    private final LogEntryModel          model;
+    /** Width of labels on views leftmost column. */
+    public static final int labelWidth = 80;
     
-    /** View handles user credential entry for access to log books. */
-    private final LogCredentialEntryView credentialEntry;
+    /** Purveyor of log entry application state. */
+    private final LogEntryModel           model;
+    
+    /** View handles user credential entry for access to log. */
+    private final LogCredentialEntryView  credentialEntry;
     
     /** View handles displaying of date and log entry level selection. */
-    private final LogDateLevelView       dateAndLevel;
+    private final LogDateLevelView        dateAndLevel;
     
     /** View handles the input for creation of the entry. */
-    private final LogEntryFieldsView     logEntryFields;
+    private final LogEntryFieldsView      logEntryFields;
+    
+    /** View handles addition of log entry attachments. */
+    private final LogEntryAttachmentsView attachmentsView;
+    
+    private final HBox buttonBox;
+    private final Button cancel, submit;
     
     public LogbookEntryView()
     {
@@ -37,14 +52,61 @@ public class LogbookEntryView extends VBox
         credentialEntry = new LogCredentialEntryView(model);
         
         // date and level labels, fields, and selectors.
-        dateAndLevel = new LogDateLevelView();
+        dateAndLevel = new LogDateLevelView(model);
         
         // title and text labels and fields.
         logEntryFields = new LogEntryFieldsView(model);
         
+        // Images, Files, Properties
+        attachmentsView = new LogEntryAttachmentsView(model);
+        
+        // Cancel and Submit buttons.
+        buttonBox = new HBox();
+        cancel = new Button("Cancel");
+        submit = new Button("Submit");
+        cancel.setPrefWidth(100);
+        submit.setPrefWidth(100);
+        buttonBox.getChildren().addAll(cancel, submit);
+        buttonBox.setAlignment(Pos.CENTER_RIGHT);
+        buttonBox.setSpacing(10);
+        
+        setButtonActions();
+        
         // Let the Text Area grow to the bottom.
         VBox.setVgrow(logEntryFields, Priority.ALWAYS);
 
-        getChildren().addAll(credentialEntry, dateAndLevel, logEntryFields);
+        VBox.setMargin(credentialEntry, new Insets(10, 10, 10, 10));
+        VBox.setMargin(dateAndLevel,    new Insets( 0, 10, 10, 10));
+        VBox.setMargin(logEntryFields,  new Insets( 0, 10,  0, 10));
+        VBox.setMargin(logEntryFields,  new Insets(10, 10,  0, 10));
+        VBox.setMargin(buttonBox,       new Insets(10, 10, 10, 10));
+        
+        getChildren().addAll(credentialEntry, dateAndLevel, logEntryFields, attachmentsView, buttonBox);
+    }
+
+    private void setButtonActions()
+    {
+        cancel.setOnAction(event ->
+        {
+            close();
+        });
+        
+        submit.setOnAction(event ->
+        {
+            model.submitEntry();
+            close();
+        });
+    }
+    
+    private void close()
+    {
+        Scene scene = this.getScene();
+        Stage stage = (Stage) scene.getWindow();
+        stage.close();
+    }
+    
+    public void setScene(final Scene scene)
+    {
+        model.setScene(scene);
     }
 }
