@@ -7,6 +7,7 @@
  *******************************************************************************/
 package org.phoebus.sns.logbook.ui;
 
+import javafx.geometry.Pos;
 import javafx.scene.layout.VBox;
 
 public class LogbooksTagsView extends VBox
@@ -18,22 +19,24 @@ public class LogbooksTagsView extends VBox
     {
         this.model = model;
         
-        LabelFieldSelectorView logbooks = new LabelFieldSelectorView("Logbooks:", 
-                                                                      model::getSelectedLogbooks, 
+        LabelFieldSelectorView logbooks = new LabelFieldSelectorView("Logbooks", 
                                                                       model::getLogbooks, 
+                                                                      model::getSelectedLogbooks, 
                                                                       model::hasSelectedLogbook, 
                                                                       model::addSelectedLogbook, 
                                                                       model::removeSelectedLogbook);
         
-        LabelFieldSelectorView tags = new LabelFieldSelectorView("Tags:       ", 
+        LabelFieldSelectorView tags = new LabelFieldSelectorView("Tags", 
+                                                                  model::getTags,
                                                                   model::getSelectedTags, 
-                                                                  model::getTags, 
                                                                   model::hasSelectedTag, 
                                                                   model::addSelectedTag, 
                                                                   model::removeSelectedTag);
         
-        //VBox.setMargin(this, new Insets(5));
-
+        setSpacing(10);
+        
+        logbooks.setAlignment(Pos.CENTER);
+        tags.setAlignment(Pos.CENTER);
         getChildren().addAll(logbooks, tags);
     }
 }
