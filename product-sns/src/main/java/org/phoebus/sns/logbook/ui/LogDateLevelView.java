@@ -20,8 +20,13 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 
+/**
+ * View to display the date and select the log entry level.
+ * @author Evan Smith
+ */
 public class LogDateLevelView extends HBox
 {
+    private final LogEntryModel          model;
     private final Label                  dateLabel, levelLabel;
     private final TextField              dateField;
     private final ComboBox<String>       levelSelector;
@@ -29,18 +34,20 @@ public class LogDateLevelView extends HBox
                                                         "Urgent",
                                                         "High",
                                                         "Normal");
-    
-    // private final String Date;
-    // private final String Level;
-    
-    public LogDateLevelView()
+
+    public LogDateLevelView(final LogEntryModel model)
     {
+        this.model = model;
+        
         dateLabel = new Label("Date:");
         dateField = new TextField(TimestampFormats.DATE_FORMAT.format(Instant.now()));
         dateField.setPrefWidth(100);
 
+        this.model.setDate(dateField.getText());
         levelLabel = new Label("Level:");
         levelSelector = new ComboBox<String>(levels);
+        
+        setSelectorAction();
         
         formatView();
     }
@@ -61,5 +68,13 @@ public class LogDateLevelView extends HBox
         setAlignment(Pos.CENTER);
         setSpacing(5);
         getChildren().addAll(dateLabel, dateField, levelBox);
+    }
+   
+    private void setSelectorAction()
+    {
+        levelSelector.setOnAction(event ->
+        {
+            model.setLevel(levelSelector.getSelectionModel().getSelectedItem());
+        });
     }
 }
