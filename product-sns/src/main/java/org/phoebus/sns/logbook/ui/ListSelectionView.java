@@ -1,3 +1,10 @@
+/*******************************************************************************
+ * Copyright (c) 2018 Oak Ridge National Laboratory.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *******************************************************************************/
 package org.phoebus.sns.logbook.ui;
 
 import java.util.ArrayList;
@@ -45,11 +52,14 @@ public class ListSelectionView extends HBox
     private final ListView<String> selectedItems;
     
     private final HBox entryBox;
+    
+    private final int buttonWidth = 75, spacing = 10;
     private final Button add, remove, clear, apply, cancel;
     
     private final Callable<Void> toCall;
 
     public ListSelectionView(Window parent,
+                              String title,
                               Supplier<ObservableList<String>>    available, 
                               Supplier<ObservableList<String>>    selected,
                               Function<String, Boolean> addSelected,
@@ -57,7 +67,7 @@ public class ListSelectionView extends HBox
                               Callable<Void>            toCall)
     {
         stage = new Stage();     
-        stage.initOwner(parent);
+        stage.initOwner(parent); // The stage should die if the main window dies.
         
         this.available      = available;
         this.selected       = selected;
@@ -92,7 +102,7 @@ public class ListSelectionView extends HBox
         formatView();
         
         Scene scene = new Scene(this, 600, 600);
-        
+        stage.setTitle(title);
         stage.setScene(scene);
         
         stage.show();
@@ -159,12 +169,17 @@ public class ListSelectionView extends HBox
         });
         
         setAlignment(Pos.CENTER);
-        setSpacing(5);
-
-        buttonsBox.setSpacing(5);
+        setSpacing(spacing);
+        
+        add.setPrefWidth(buttonWidth);
+        remove.setPrefWidth(buttonWidth);
+        clear.setPrefWidth(buttonWidth);
+        
+        buttonsBox.setSpacing(10);
         buttonsBox.setAlignment(Pos.CENTER);
         buttonsBox.getChildren().addAll(add, remove, clear);
         
+        // For spacing purposes.
         HBox emptyBox = new HBox();
         
         Button hiddenButton = new Button();
@@ -173,22 +188,24 @@ public class ListSelectionView extends HBox
         
         itemsLabel.setFont(labelFont);
         VBox.setVgrow(availableItems, Priority.ALWAYS);
-        availableBox.setSpacing(5);
+        availableBox.setSpacing(spacing);
         availableBox.getChildren().addAll(itemsLabel, availableItems, emptyBox);
         
         selectedLabel.setFont(labelFont);
         VBox.setVgrow(selectedItems, Priority.ALWAYS);
-        selectedBox.setSpacing(5);
+        selectedBox.setSpacing(spacing);
         
+        cancel.setPrefWidth(buttonWidth);
+        apply.setPrefWidth(buttonWidth);
         entryBox.setAlignment(Pos.CENTER_RIGHT);
-        entryBox.setSpacing(5);
+        entryBox.setSpacing(spacing);
         entryBox.getChildren().addAll(cancel, apply);
         
         selectedBox.getChildren().addAll(selectedLabel, selectedItems, entryBox);
 
-        HBox.setMargin(availableBox, new Insets(5, 0, 10, 0));
-        HBox.setMargin(buttonsBox,   new Insets(5, 0, 10, 0));
-        HBox.setMargin(selectedBox,  new Insets(5, 0, 10, 0));
+        HBox.setMargin(availableBox, new Insets(5,  0, 10, 10));
+        HBox.setMargin(buttonsBox,   new Insets(5,  0, 10,  0));
+        HBox.setMargin(selectedBox,  new Insets(5, 10, 10,  0));
         
         getChildren().addAll(availableBox, buttonsBox, selectedBox);
     }
