@@ -12,6 +12,8 @@ import java.util.List;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.scene.Scene;
+import javafx.scene.image.WritableImage;
 
 /**
  * Purveyor of log entry application state.
@@ -20,21 +22,35 @@ import javafx.collections.ObservableList;
  */
 public class LogEntryModel
 {
+    private Scene scene;
     private String username, password;
     private String date, level;
     private String title, text;
     
     // private final SNSLogClient client; // Source of log and tag data.
     private final ObservableList<String>    logbooks, tags, selectedLogbooks, selectedTags;
+    private final ObservableList<WritableImage> images;
     
     public LogEntryModel()
-    {
+    { 
         // TODO : Implement SNSLogClient and use it to retrieve data. Remove dummy data.
         tags     = FXCollections.observableArrayList(List.of("Tag 1", "Tag 2", "Tag 3"));
         logbooks = FXCollections.observableArrayList(List.of("Logbook 1", "Logbook 2", "Logbook 3"));
         
         selectedLogbooks = FXCollections.observableArrayList();
         selectedTags     = FXCollections.observableArrayList();
+        
+        images = FXCollections.observableArrayList();
+    }
+    
+    public void setScene(final Scene scene)
+    {
+        this.scene = scene;
+    }
+
+    public Scene getScene()
+    {
+        return scene;
     }
     
     public void setUser(final String username)
@@ -132,7 +148,22 @@ public class LogEntryModel
         boolean result = selectedTags.remove(tag);
         return result;        
     }
-
+    
+    public ObservableList<WritableImage> getImages()
+    {
+        return FXCollections.unmodifiableObservableList(images);
+    }
+    
+    public boolean addImage(final WritableImage image)
+    {
+        return images.add(image);
+    }
+    
+    public boolean removeImage(final WritableImage image)
+    {
+        return images.remove(image);
+    }
+    
     public void submitEntry()
     {
         // TODO : Submit entry though SNSClient
