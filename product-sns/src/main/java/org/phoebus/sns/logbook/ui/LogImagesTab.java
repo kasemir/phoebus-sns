@@ -1,5 +1,8 @@
 package org.phoebus.sns.logbook.ui;
 
+import java.io.File;
+import java.util.List;
+
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -7,18 +10,21 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.control.Tab;
+import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.image.WritableImage;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
+import javafx.stage.FileChooser;
+import javafx.stage.FileChooser.ExtensionFilter;
 
 /**
  * @author Evan Smith
  */
 public class LogImagesTab extends Tab
 {
-    private class ImageCell extends ListCell<WritableImage>
+    private class ImageCell extends ListCell<Image>
     {
         private ImageView imageView = new ImageView();
          
@@ -39,7 +45,7 @@ public class LogImagesTab extends Tab
         }
         
         @Override
-        public void updateItem(WritableImage image, boolean empty)
+        public void updateItem(Image image, boolean empty)
         {
             super.updateItem(image, empty);
             if (empty)
@@ -54,29 +60,31 @@ public class LogImagesTab extends Tab
     
     private final LogEntryModel model;
     
-    private final VBox      content, removeBox;
-    private final HBox      imageBox, listBox;
-    private final ImageView image;
-    private final ListView<WritableImage>  imageList;
-    private final HBox      buttonBox;
-    private final Button    addImage, addScreenshot, cssWindow, clipboard, removeImage;
-    
+    private final VBox        content, removeBox;
+    private final HBox        imageBox, listBox;
+    private final ImageView   image;
+    private final HBox        buttonBox;
+    private final Button      addImage, addScreenshot, cssWindow, clipboard, removeImage;
+    private final FileChooser addImageDialog;
+    private final ListView<Image>  imageList;
+
     public LogImagesTab(final LogEntryModel model)
     {
         this.model = model;
         
-        content       = new VBox();
-        imageBox      = new HBox();
-        listBox       = new HBox();
-        image         = new ImageView();
-        imageList     = new ListView<WritableImage>(model.getImages());
-        buttonBox     = new HBox();
-        addImage      = new Button("Add Image");
-        addScreenshot = new Button("Add Screenshot");
-        cssWindow     = new Button("CSS Window");
-        clipboard     = new Button("Clipboard");
-        removeBox     = new VBox();
-        removeImage   = new Button("Remove");
+        content        = new VBox();
+        imageBox       = new HBox();
+        listBox        = new HBox();
+        image          = new ImageView();
+        imageList      = new ListView<Image>(model.getImages());
+        buttonBox      = new HBox();
+        addImage       = new Button("Add Image");
+        addScreenshot  = new Button("Add Screenshot");
+        cssWindow      = new Button("CSS Window");
+        clipboard      = new Button("Clipboard");
+        removeBox      = new VBox();
+        removeImage    = new Button("Remove");
+        addImageDialog = new FileChooser();
         
         formatTab();
     }
@@ -86,6 +94,8 @@ public class LogImagesTab extends Tab
         setText("Images");
         setClosable(false);
         
+        addImageDialog.getExtensionFilters().addAll(
+                new ExtensionFilter("Image Files", "*.png", "*.jpg", "*.ppm" , "*.pgm"));
         VBox.setVgrow(imageBox, Priority.ALWAYS);
         imageBox.setPrefSize(1000, 300);
         image.fitHeightProperty().bind(imageBox.heightProperty());
@@ -117,6 +127,16 @@ public class LogImagesTab extends Tab
         
         this.setContent(content);
         
+        addImage.setOnAction(event ->
+        {
+           List<File> imageFiles = addImageDialog.showOpenMultipleDialog(this.getTabPane().getScene().getWindow());
+           for (File imageFile : imageFiles)
+           {
+               Image img = new Image(imageFile.toURI().toString());
+               model.addImage(img);
+           }
+        });
+        
         addScreenshot.setOnAction(event -> 
         {
             model.addImage(takeScreenshot());
@@ -124,16 +144,20 @@ public class LogImagesTab extends Tab
         
         removeImage.setOnAction(event ->
         {
-            int index = model.getImages().indexOf((WritableImage) image.getImage());
-            model.removeImage((WritableImage) image.getImage());
-            int size  = model.getImages().size();
-
-            if (index > 0)
-                image.setImage(model.getImages().get(index - 1));
-            else if (index < size)
-                image.setImage(model.getImages().get(index));
-            else
-                image.setImage(null);
+            Image img = image.getImage();
+            if (img != null)
+            {
+                int index = model.getImages().indexOf(img);
+                model.removeImage(image.getImage());
+                int size  = model.getImages().size();
+    
+                if (index > 0)
+                    image.setImage(model.getImages().get(index - 1));
+                else if (index < size)
+                    image.setImage(model.getImages().get(index));
+                else
+                    image.setImage(null);
+            }
         });
     }
     
