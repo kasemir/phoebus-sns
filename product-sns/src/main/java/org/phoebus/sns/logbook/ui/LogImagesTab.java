@@ -125,10 +125,13 @@ public class LogImagesTab extends Tab
         removeImage.setOnAction(event ->
         {
             int index = model.getImages().indexOf((WritableImage) image.getImage());
-            
             model.removeImage((WritableImage) image.getImage());
-            if (index >= 1)
+            int size  = model.getImages().size();
+
+            if (index > 0)
                 image.setImage(model.getImages().get(index - 1));
+            else if (index < size)
+                image.setImage(model.getImages().get(index));
             else
                 image.setImage(null);
         });

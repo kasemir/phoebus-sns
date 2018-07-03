@@ -5,6 +5,7 @@ import javafx.scene.control.TabPane;
 
 public class LogEntryAttachmentsView extends TabPane
 {
+    @SuppressWarnings("unused")
     private final LogEntryModel model;
     private final LogImagesTab  images;
     private final Tab           files, properties;
