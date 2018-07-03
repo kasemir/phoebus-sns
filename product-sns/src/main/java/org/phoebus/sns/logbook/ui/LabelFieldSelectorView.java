@@ -16,7 +16,6 @@ import java.util.function.Supplier;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
-import javafx.geometry.Insets;
 import javafx.geometry.Side;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckMenuItem;
@@ -27,15 +26,15 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
-import javafx.scene.layout.VBox;
 
 /**
- * View that handles user input in regards to passed lists of selectable items.
+ * View that handles user input in regards to selecting items of passed lists.
  * @author Evan Smith
  */
 public class LabelFieldSelectorView extends HBox
 {
 
+    private final String        labelText;
     private final Label         label;
     private final TextField     field;
     private final ContextMenu   dropDown;
@@ -50,23 +49,24 @@ public class LabelFieldSelectorView extends HBox
     private final Function<String, Boolean> addSelected, removeSelected; // Functions to add or remove known items to/from the selected items list.
         
     public LabelFieldSelectorView(final String labelText, 
-                                   Supplier<ObservableList<String>> selected, 
                                    Supplier<ObservableList<String>> known, 
+                                   Supplier<ObservableList<String>> selected, 
                                    Predicate<String> hasSelected, 
                                    Function<String, Boolean> addSelected,
                                    Function<String, Boolean> removeSelected)
     {
-        this.selected       = selected;
+        this.labelText      = labelText;
         this.known          = known;
+        this.selected       = selected;
         this.hasSelected    = hasSelected;
         this.addSelected    = addSelected;
         this.removeSelected = removeSelected;
         
-        label    = new Label(labelText);
-        field    = new TextField();
-        selector = new ToggleButton("v"); // TODO: Get a down arrow icon for this.
-        addItem  = new Button();          // TODO: Implement add Log books/Tags view. Get a add icon for each.
-        dropDown = new ContextMenu();
+        label     = new Label(labelText + ":");
+        field     = new TextField();
+        selector  = new ToggleButton("v"); // TODO: Get a down arrow icon for this.
+        addItem   = new Button();          // TODO: Implement add Log books/Tags view. Get a add icon for each.
+        dropDown  = new ContextMenu();
         
         formatView();
     }
@@ -74,7 +74,7 @@ public class LabelFieldSelectorView extends HBox
      /** Format the view  */
     private void formatView()
     {
-        label.setPrefWidth(85);
+        label.setPrefWidth(LogbookEntryView.labelWidth);
         selector.setOnAction(actionEvent -> 
         {
             if (selector.isSelected())
@@ -93,9 +93,10 @@ public class LabelFieldSelectorView extends HBox
         
         HBox.setHgrow(field, Priority.ALWAYS);
         
+        final String title = "Select " + labelText;
         addItem.setOnAction(event ->
         {
-            new ListSelectionView(getScene().getWindow(), known, selected, addSelected, removeSelected, new Callable<Void> ()
+            new ListSelectionView(getScene().getWindow(), title, known, selected, addSelected, removeSelected, new Callable<Void> ()
             {
                 @Override
                 public Void call() throws Exception
@@ -111,7 +112,6 @@ public class LabelFieldSelectorView extends HBox
         initializeSelector();
         
         setSpacing(5);
-        VBox.setMargin(this, new Insets(5));
     }
     
     /** Initialize the drop down context menu. */
