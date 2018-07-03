@@ -16,9 +16,8 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 
 /**
- * 
+ * View to facilitate user credential entry.
  * @author Evan Smith
- *
  */
 public class LogCredentialEntryView extends HBox
 {
