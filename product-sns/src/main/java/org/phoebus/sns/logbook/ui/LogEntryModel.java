@@ -13,13 +13,18 @@ import java.util.List;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
+/**
+ * Purveyor of log entry application state.
+ * <p> Provides methods to set log entry data and to submit log entries.
+ * @author Evan Smith
+ */
 public class LogEntryModel
 {
     private String username, password;
     private String date, level;
     private String title, text;
     
-    // SNSLogClient client; // Source of log and tag data.
+    // private final SNSLogClient client; // Source of log and tag data.
     private final ObservableList<String>    logbooks, tags, selectedLogbooks, selectedTags;
     
     public LogEntryModel()
@@ -92,7 +97,6 @@ public class LogEntryModel
     public boolean removeSelectedLogbook(final String logbook)
     {
         boolean result = selectedLogbooks.remove(logbook);
-        selectedLogbooks.sort(Comparator.naturalOrder());
         return result;    
     }
     
@@ -126,18 +130,24 @@ public class LogEntryModel
     public boolean removeSelectedTag(final String tag)
     {
         boolean result = selectedTags.remove(tag);
-        selectedTags.sort(Comparator.naturalOrder());
         return result;        
     }
 
     public void submitEntry()
     {
+        // TODO : Submit entry though SNSClient
         System.out.println("You pressed submit.");
         System.out.println("user: " + username);
         System.out.println("password: " + password);
         System.out.println("date: " + date);
         System.out.println("level: " + level);
         System.out.println("title: " + title);
+        System.out.println("logbooks: ");
+        for (String logbook : selectedLogbooks)
+            System.out.println("\t" + logbook);
+        System.out.println("tags: ");
+        for (String tag : selectedTags)
+            System.out.println("\t" + tag);
         System.out.println("text: " + text);
     }
 }
