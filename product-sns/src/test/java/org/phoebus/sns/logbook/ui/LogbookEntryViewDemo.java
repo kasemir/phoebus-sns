@@ -11,7 +11,10 @@ public class LogbookEntryViewDemo extends Application
     {
         LogbookEntryView view = new LogbookEntryView();
         
-        final Scene scene = new Scene(view, 600, 800);
+        final Scene scene = new Scene(view, 1000, 1000);
+        
+        view.setScene(scene);
+        
         stage.setTitle("Logbook Entry Demo");
         stage.setScene(scene);
         stage.show();
