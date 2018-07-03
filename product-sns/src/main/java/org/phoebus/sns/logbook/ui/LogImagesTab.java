@@ -37,10 +37,7 @@ public class LogImagesTab extends Tab
             
             this.setOnMouseClicked(click ->
             {
-                if (click.getClickCount() == 2)
-                {
-                    image.setImage(imageView.getImage());
-                }
+                image.setImage(imageView.getImage());
             });
         }
         
@@ -147,16 +144,9 @@ public class LogImagesTab extends Tab
             Image img = image.getImage();
             if (img != null)
             {
-                int index = model.getImages().indexOf(img);
                 model.removeImage(image.getImage());
-                int size  = model.getImages().size();
-    
-                if (index > 0)
-                    image.setImage(model.getImages().get(index - 1));
-                else if (index < size)
-                    image.setImage(model.getImages().get(index));
-                else
-                    image.setImage(null);
+                img = imageList.getSelectionModel().getSelectedItem();
+                image.setImage(img);
             }
         });
     }
