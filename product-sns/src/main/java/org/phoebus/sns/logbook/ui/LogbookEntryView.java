@@ -83,15 +83,16 @@ public class LogbookEntryView extends VBox
         // Let the Text Area grow to the bottom.
         VBox.setVgrow(logEntryFields, Priority.ALWAYS);
 
-        VBox.setMargin(credentialEntry, new Insets(10, 10, 10, 10));
-        VBox.setMargin(dateAndLevel,    new Insets( 0, 10, 10, 10));
+        VBox.setMargin(credentialEntry, new Insets(10, 10,  0, 10));
+        VBox.setMargin(dateAndLevel,    new Insets( 0, 10,  0, 10));
         VBox.setMargin(logEntryFields,  new Insets( 0, 10,  0, 10));
-        VBox.setMargin(logEntryFields,  new Insets(10, 10,  0, 10));
-        VBox.setMargin(buttonBox,       new Insets(10, 10, 10, 10));
+        VBox.setMargin(logEntryFields,  new Insets( 0, 10,  0, 10));
+        VBox.setMargin(buttonBox,       new Insets( 0, 10, 10, 10));
         
+        setSpacing(10);
         getChildren().addAll(credentialEntry, dateAndLevel, logEntryFields, attachmentsView, buttonBox);
         
-        Scene scene = new Scene(this, 1000, 1000);
+        Scene scene = new Scene(this, 700, 1000);
         stage.setTitle("Logbook Entry");
         stage.setScene(scene);
         

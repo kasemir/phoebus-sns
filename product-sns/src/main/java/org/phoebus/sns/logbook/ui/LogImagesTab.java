@@ -36,7 +36,7 @@ public class LogImagesTab extends Tab
         {
             super();
             setAlignment(Pos.CENTER);
-            cellImageView.setFitHeight(150);
+            cellImageView.setFitHeight(100);
             cellImageView.setPreserveRatio(true);
 
             setOnMouseClicked(click ->
@@ -75,19 +75,19 @@ public class LogImagesTab extends Tab
     {
         this.model = model;
         
-        content        = new VBox();
-        imageBox       = new HBox();
-        imageViewBox   = new HBox();
-        imageView      = new ImageView();
-        removeBox      = new VBox();
-        removeImage    = new Button("Remove", removeIcon);
-        listBox        = new VBox();
-        imageList      = new ListView<Image>(model.getImages());        
-        buttonBox      = new HBox();
-        addImage       = new Button("Add Image");
-        addScreenshot  = new Button("Add Screenshot");
-        cssWindow      = new Button("CSS Window");
-        clipboard      = new Button("Clipboard");
+        content       = new VBox();
+        imageBox      = new HBox();
+        imageViewBox  = new HBox();
+        imageView     = new ImageView();
+        removeBox     = new VBox();
+        removeImage   = new Button("Remove", removeIcon);
+        listBox       = new VBox();
+        imageList     = new ListView<Image>(model.getImages());        
+        buttonBox     = new HBox();
+        addImage      = new Button("Add Image");
+        addScreenshot = new Button("Add Screenshot");
+        cssWindow     = new Button("CSS Window");
+        clipboard     = new Button("Clipboard");
         
         addImageDialog = new FileChooser();
         
@@ -121,7 +121,7 @@ public class LogImagesTab extends Tab
 
     private void formatImageBox()
     {
-        imageBox.setPrefSize(1000, 300);
+        imageBox.setPrefSize(1000, 200);
         
         imageBox.setSpacing(10);
         imageBox.setAlignment(Pos.CENTER_RIGHT);
@@ -154,8 +154,14 @@ public class LogImagesTab extends Tab
     
     private void formatListBox()
     {
+        imageList.setStyle("-fx-control-inner-background-alt: #f4f4f4");
+        imageList.setStyle("-fx-control-inner-background: #f4f4f4");
+
         imageList.setCellFactory(param -> new ImageCell(imageView));
-        imageList.setMinWidth(250);
+        imageList.setMinWidth(150);
+        listBox.setSpacing(5);
+        listBox.setMaxWidth(150);
+        HBox.setMargin(listBox, new Insets(0, 10, 0, 0));
         listBox.setAlignment(Pos.CENTER_LEFT);
         listBox.getChildren().addAll(new Label("Images: "), imageList);
     }
