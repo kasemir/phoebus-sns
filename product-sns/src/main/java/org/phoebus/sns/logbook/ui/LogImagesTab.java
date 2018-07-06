@@ -73,6 +73,7 @@ public class LogImagesTab extends Tab
 
     public LogImagesTab(final LogEntryModel model)
     {
+        super();
         this.model = model;
         
         content       = new VBox();

@@ -12,9 +12,10 @@ public class LogEntryAttachmentsView extends TabPane
     
     public LogEntryAttachmentsView(final LogEntryModel model)
     {
+        super();
         this.model = model;
         images     = new LogImagesTab(model);
-        files      = new Tab("Files");
+        files      = new LogFilesTab(model);
         properties = new Tab("Properties");
         
         formatView();
@@ -22,6 +23,7 @@ public class LogEntryAttachmentsView extends TabPane
 
     private void formatView()
     {
+        // Anything else to do?
         getTabs().addAll(images, files, properties);
     }
 }
