@@ -7,6 +7,7 @@
  *******************************************************************************/
 package org.phoebus.sns.logbook.ui;
 
+import java.io.File;
 import java.util.Comparator;
 import java.util.List;
 
@@ -31,6 +32,7 @@ public class LogEntryModel
     // private final SNSLogClient client; // Source of log and tag data.
     private final ObservableList<String>    logbooks, tags, selectedLogbooks, selectedTags;
     private final ObservableList<Image> images;
+    private final ObservableList<File>  files;
     
     public LogEntryModel(final Node callingNode)
     { 
@@ -42,6 +44,7 @@ public class LogEntryModel
         selectedTags     = FXCollections.observableArrayList();
         
         images = FXCollections.observableArrayList();
+        files  = FXCollections.observableArrayList();
         
         node = callingNode;
     }
@@ -165,6 +168,21 @@ public class LogEntryModel
     public boolean removeImage(final Image image)
     {
         return images.remove(image);
+    }
+    
+    public ObservableList<File> getFiles()
+    {
+        return FXCollections.unmodifiableObservableList(files);
+    }
+    
+    public boolean addFile(final File file)
+    {
+        return files.add(file);
+    }
+    
+    public boolean removeFile(final File file)
+    {
+        return files.remove(file);
     }
     
     public void submitEntry()
