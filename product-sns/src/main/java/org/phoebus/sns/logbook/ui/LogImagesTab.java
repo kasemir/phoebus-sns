@@ -28,18 +28,18 @@ public class LogImagesTab extends Tab
 {
     private class ImageCell extends ListCell<Image>
     {
-        private ImageView imageView = new ImageView();
+        private ImageView cellImageView = new ImageView();
          
-        public ImageCell()
+        public ImageCell(final ImageView imageView)
         {
             super();
-            this.setAlignment(Pos.CENTER);
-            imageView.setFitHeight(150);
-            imageView.setPreserveRatio(true);
+            setAlignment(Pos.CENTER);
+            cellImageView.setFitHeight(150);
+            cellImageView.setPreserveRatio(true);
             
-            this.setOnMouseClicked(click ->
+            setOnMouseClicked(click ->
             {
-                imageView.setImage(imageView.getImage());
+                imageView.setImage(cellImageView.getImage());
             });
         }
         
@@ -51,8 +51,8 @@ public class LogImagesTab extends Tab
                 setGraphic(null);
             else
             {
-                imageView.setImage(image);
-                setGraphic(imageView);
+                cellImageView.setImage(image);
+                setGraphic(cellImageView);
             }
         }
     }
@@ -99,7 +99,7 @@ public class LogImagesTab extends Tab
         imageBox.setPrefSize(1000, 300);
         imageView.fitHeightProperty().bind(imageBox.heightProperty());
         imageView.setPreserveRatio(true);
-        imageList.setCellFactory(param -> new ImageCell());
+        imageList.setCellFactory(param -> new ImageCell(imageView));
         imageList.setMinWidth(250);
         listBox.setAlignment(Pos.CENTER_RIGHT);
         HBox.setHgrow(imageBox, Priority.ALWAYS);
@@ -133,8 +133,8 @@ public class LogImagesTab extends Tab
             {
                 for (File imageFile : imageFiles)
                 {
-                    Image img = new Image(imageFile.toURI().toString());
-                    model.addImage(img);
+                    Image image = new Image(imageFile.toURI().toString());
+                    model.addImage(image);
                 }
             }
         });
@@ -146,12 +146,12 @@ public class LogImagesTab extends Tab
         
         removeImage.setOnAction(event ->
         {
-            Image img = imageView.getImage();
-            if (img != null)
+            Image image = imageView.getImage();
+            if (image != null)
             {
                 model.removeImage(imageView.getImage());
-                img = imageList.getSelectionModel().getSelectedItem();
-                imageView.setImage(img);
+                image = imageList.getSelectionModel().getSelectedItem();
+                imageView.setImage(image);
             }
         });
         
@@ -168,19 +168,18 @@ public class LogImagesTab extends Tab
     private WritableImage captureNode()
     {
         Node node = model.getNode();
-        WritableImage img = node.snapshot(new SnapshotParameters(), null);
-        return img;
+        WritableImage image = node.snapshot(new SnapshotParameters(), null);
+        return image;
     }
     
     /**
-     * Capture an image of the scene the calling JavaFX node belongs to.
+     * Capture an image of the scene that the calling JavaFX node belongs to.
      * @return Image
      */
     private WritableImage captureScene()
     {
         Scene scene = model.getScene();
-        WritableImage img = scene.snapshot(null);
-        return img;
+        WritableImage image = scene.snapshot(null);
+        return image;
     }
-    
 }
