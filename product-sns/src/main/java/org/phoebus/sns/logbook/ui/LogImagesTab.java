@@ -5,7 +5,9 @@ import java.util.List;
 
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.Node;
 import javafx.scene.Scene;
+import javafx.scene.SnapshotParameters;
 import javafx.scene.control.Button;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
@@ -37,7 +39,7 @@ public class LogImagesTab extends Tab
             
             this.setOnMouseClicked(click ->
             {
-                image.setImage(imageView.getImage());
+                imageView.setImage(imageView.getImage());
             });
         }
         
@@ -59,7 +61,7 @@ public class LogImagesTab extends Tab
     
     private final VBox        content, removeBox;
     private final HBox        imageBox, listBox;
-    private final ImageView   image;
+    private final ImageView   imageView;
     private final HBox        buttonBox;
     private final Button      addImage, addScreenshot, cssWindow, clipboard, removeImage;
     private final FileChooser addImageDialog;
@@ -72,7 +74,7 @@ public class LogImagesTab extends Tab
         content        = new VBox();
         imageBox       = new HBox();
         listBox        = new HBox();
-        image          = new ImageView();
+        imageView      = new ImageView();
         imageList      = new ListView<Image>(model.getImages());
         buttonBox      = new HBox();
         addImage       = new Button("Add Image");
@@ -95,14 +97,14 @@ public class LogImagesTab extends Tab
                 new ExtensionFilter("Image Files", "*.png", "*.jpg", "*.ppm" , "*.pgm"));
         VBox.setVgrow(imageBox, Priority.ALWAYS);
         imageBox.setPrefSize(1000, 300);
-        image.fitHeightProperty().bind(imageBox.heightProperty());
-        image.setPreserveRatio(true);
+        imageView.fitHeightProperty().bind(imageBox.heightProperty());
+        imageView.setPreserveRatio(true);
         imageList.setCellFactory(param -> new ImageCell());
         imageList.setMinWidth(250);
         listBox.setAlignment(Pos.CENTER_RIGHT);
         HBox.setHgrow(imageBox, Priority.ALWAYS);
         imageBox.setAlignment(Pos.CENTER);
-        imageBox.getChildren().addAll(image);
+        imageBox.getChildren().addAll(imageView);
         removeBox.setMinWidth(100);
         removeBox.getChildren().add(removeImage);
         listBox.getChildren().addAll(imageBox, removeBox, imageList);
@@ -126,35 +128,59 @@ public class LogImagesTab extends Tab
         
         addImage.setOnAction(event ->
         {
-           List<File> imageFiles = addImageDialog.showOpenMultipleDialog(this.getTabPane().getScene().getWindow());
-           for (File imageFile : imageFiles)
-           {
-               Image img = new Image(imageFile.toURI().toString());
-               model.addImage(img);
-           }
+            List<File> imageFiles = addImageDialog.showOpenMultipleDialog(this.getTabPane().getScene().getWindow());
+            if (null != imageFiles)
+            {
+                for (File imageFile : imageFiles)
+                {
+                    Image img = new Image(imageFile.toURI().toString());
+                    model.addImage(img);
+                }
+            }
         });
         
         addScreenshot.setOnAction(event -> 
         {
-            model.addImage(takeScreenshot());
+            model.addImage(captureScene());
         });
         
         removeImage.setOnAction(event ->
         {
-            Image img = image.getImage();
+            Image img = imageView.getImage();
             if (img != null)
             {
-                model.removeImage(image.getImage());
+                model.removeImage(imageView.getImage());
                 img = imageList.getSelectionModel().getSelectedItem();
-                image.setImage(img);
+                imageView.setImage(img);
             }
+        });
+        
+        cssWindow.setOnAction(event ->
+        {
+            model.addImage(captureNode());
         });
     }
     
-    private WritableImage takeScreenshot()
+    /**
+     * Capture an image of the calling JavaFX node.
+     * @return Image
+     */
+    private WritableImage captureNode()
+    {
+        Node node = model.getNode();
+        WritableImage img = node.snapshot(new SnapshotParameters(), null);
+        return img;
+    }
+    
+    /**
+     * Capture an image of the scene the calling JavaFX node belongs to.
+     * @return Image
+     */
+    private WritableImage captureScene()
     {
         Scene scene = model.getScene();
-        WritableImage i = scene.snapshot(null);
-        return i;
+        WritableImage img = scene.snapshot(null);
+        return img;
     }
+    
 }
