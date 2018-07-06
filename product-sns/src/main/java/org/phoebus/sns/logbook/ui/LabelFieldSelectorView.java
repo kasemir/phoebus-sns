@@ -24,6 +24,8 @@ import javafx.scene.control.Label;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleButton;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 
@@ -32,8 +34,7 @@ import javafx.scene.layout.Priority;
  * @author Evan Smith
  */
 public class LabelFieldSelectorView extends HBox
-{
-
+{    
     private final String        labelText;
     private final Label         label;
     private final TextField     field;
@@ -48,7 +49,8 @@ public class LabelFieldSelectorView extends HBox
     private final Predicate<String>         hasSelected;                 // Predicate to test if a specific item is selected.
     private final Function<String, Boolean> addSelected, removeSelected; // Functions to add or remove known items to/from the selected items list.
         
-    public LabelFieldSelectorView(final String labelText, 
+    public LabelFieldSelectorView(String labelText,
+                                   Image icon,
                                    Supplier<ObservableList<String>> known, 
                                    Supplier<ObservableList<String>> selected, 
                                    Predicate<String> hasSelected, 
@@ -65,7 +67,7 @@ public class LabelFieldSelectorView extends HBox
         label     = new Label(labelText + ":");
         field     = new TextField();
         selector  = new ToggleButton("v"); // TODO: Get a down arrow icon for this.
-        addItem   = new Button();          // TODO: Implement add Log books/Tags view. Get a add icon for each.
+        addItem   = new Button("", new ImageView(icon));          // TODO: Implement add Log books/Tags view. Get a add icon for each.
         dropDown  = new ContextMenu();
         
         formatView();
