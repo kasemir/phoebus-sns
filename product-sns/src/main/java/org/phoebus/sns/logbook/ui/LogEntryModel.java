@@ -12,6 +12,7 @@ import java.util.List;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
 
@@ -22,7 +23,7 @@ import javafx.scene.image.Image;
  */
 public class LogEntryModel
 {
-    private Scene scene;
+    private Node   node;
     private String username, password;
     private String date, level;
     private String title, text;
@@ -31,7 +32,7 @@ public class LogEntryModel
     private final ObservableList<String>    logbooks, tags, selectedLogbooks, selectedTags;
     private final ObservableList<Image> images;
     
-    public LogEntryModel()
+    public LogEntryModel(final Node callingNode)
     { 
         // TODO : Implement SNSLogClient and use it to retrieve data. Remove dummy data.
         tags     = FXCollections.observableArrayList(List.of("Tag 1", "Tag 2", "Tag 3"));
@@ -41,18 +42,20 @@ public class LogEntryModel
         selectedTags     = FXCollections.observableArrayList();
         
         images = FXCollections.observableArrayList();
-    }
-    
-    public void setScene(final Scene scene)
-    {
-        this.scene = scene;
+        
+        node = callingNode;
     }
 
-    public Scene getScene()
+    public Node getNode()
     {
-        return scene;
+        return node;
     }
     
+    public Scene getScene()
+    {
+        return node.getScene();
+    }
+
     public void setUser(final String username)
     {
         this.username = username;
