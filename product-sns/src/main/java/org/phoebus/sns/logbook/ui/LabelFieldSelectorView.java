@@ -13,6 +13,8 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
+import org.phoebus.ui.javafx.ImageCache;
+
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -34,7 +36,9 @@ import javafx.scene.layout.Priority;
  * @author Evan Smith
  */
 public class LabelFieldSelectorView extends HBox
-{    
+{   
+    private static final Image down_icon = ImageCache.getImage(LabelFieldSelectorView.class, "/icons/down.png");
+
     private final String        labelText;
     private final Label         label;
     private final TextField     field;
@@ -50,7 +54,7 @@ public class LabelFieldSelectorView extends HBox
     private final Function<String, Boolean> addSelected, removeSelected; // Functions to add or remove known items to/from the selected items list.
         
     public LabelFieldSelectorView(String labelText,
-                                   Image icon,
+                                   Image add_icon,
                                    Supplier<ObservableList<String>> known, 
                                    Supplier<ObservableList<String>> selected, 
                                    Predicate<String> hasSelected, 
@@ -66,8 +70,8 @@ public class LabelFieldSelectorView extends HBox
         
         label     = new Label(labelText + ":");
         field     = new TextField();
-        selector  = new ToggleButton("v"); // TODO: Get a down arrow icon for this.
-        addItem   = new Button("", new ImageView(icon));          // TODO: Implement add Log books/Tags view. Get a add icon for each.
+        selector  = new ToggleButton("", new ImageView(down_icon)); // TODO: Get a down arrow icon for this.
+        addItem   = new Button("", new ImageView(add_icon));          // TODO: Implement add Log books/Tags view. Get a add icon for each.
         dropDown  = new ContextMenu();
         
         formatView();
