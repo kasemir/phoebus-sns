@@ -9,12 +9,14 @@ package org.phoebus.sns.logbook.ui;
 
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import javafx.stage.Window;
 
 /**
  * View for making an entry into a log book.
@@ -44,10 +46,16 @@ public class LogbookEntryView extends VBox
     private final HBox buttonBox;
     private final Button cancel, submit;
     
-    public LogbookEntryView()
+    public LogbookEntryView(final Node callingNode)
     {
-        model = new LogEntryModel();
+        Scene callingScene = callingNode.getParent().getScene();
+        Window owner = callingScene.getWindow();
         
+        Stage stage = new Stage();     
+        stage.initOwner(owner); // The stage should die if the main window dies.
+        
+        model = new LogEntryModel(callingNode);
+       
         // user name and password label and fields.
         credentialEntry = new LogCredentialEntryView(model);
         
@@ -82,6 +90,12 @@ public class LogbookEntryView extends VBox
         VBox.setMargin(buttonBox,       new Insets(10, 10, 10, 10));
         
         getChildren().addAll(credentialEntry, dateAndLevel, logEntryFields, attachmentsView, buttonBox);
+        
+        Scene scene = new Scene(this, 1000, 1000);
+        stage.setTitle("Logbook Entry");
+        stage.setScene(scene);
+        
+        stage.show();
     }
 
     private void setButtonActions()
@@ -103,10 +117,5 @@ public class LogbookEntryView extends VBox
         Scene scene = this.getScene();
         Stage stage = (Stage) scene.getWindow();
         stage.close();
-    }
-    
-    public void setScene(final Scene scene)
-    {
-        model.setScene(scene);
     }
 }
