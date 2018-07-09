@@ -8,6 +8,8 @@ import java.io.IOException;
 import java.util.List;
 import java.util.logging.Level;
 
+import org.phoebus.framework.jobs.JobManager;
+
 import javafx.geometry.Insets;
 import javafx.scene.control.Button;
 import javafx.scene.control.Hyperlink;
@@ -35,19 +37,22 @@ public class LogFilesTab extends Tab
             hyperlink = new Hyperlink();
             hyperlink.setOnAction(event -> 
             {
-                // Open the file in the default editor.
-                if (Desktop.isDesktopSupported())
+                JobManager.schedule("Open Attached File", monitor ->
                 {
-                    Desktop desktop = Desktop.getDesktop();
-                    try
+                    // Open the file in the default editor.
+                    if (Desktop.isDesktopSupported())
                     {
-                        desktop.edit(file);
-                    } 
-                    catch (IOException ex)
-                    {
-                        logger.log(Level.WARNING, "Could not open file in default editor.", ex);
+                        Desktop desktop = Desktop.getDesktop();
+                        try
+                        {
+                            desktop.open(file);
+                        } 
+                        catch (IOException ex)
+                        {
+                            logger.log(Level.WARNING, "Could not open file in default editor.", ex);
+                        }
                     }
-                }
+                });
             });
         }
         
@@ -61,6 +66,7 @@ public class LogFilesTab extends Tab
             }
             else
             {
+                this.file = file;
                 hyperlink.setText(file.getName());
                 setGraphic(hyperlink);
             }   
