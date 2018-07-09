@@ -1,10 +1,18 @@
 package org.phoebus.sns.logbook.ui;
 
+import static org.phoebus.ui.application.PhoebusApplication.logger;
+
+import java.awt.Toolkit;
+import java.awt.datatransfer.DataFlavor;
+import java.awt.datatransfer.Transferable;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.util.List;
+import java.util.logging.Level;
 
 import org.phoebus.ui.javafx.ImageCache;
 
+import javafx.embed.swing.SwingFXUtils;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
@@ -22,7 +30,6 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
-
 /**
  * @author Evan Smith
  */
@@ -67,7 +74,7 @@ public class LogImagesTab extends Tab
     private final HBox        imageBox, imageViewBox;
     private final ImageView   imageView;
     private final HBox        buttonBox;
-    private final Button      addImage, addScreenshot, cssWindow, clipboard, removeImage;
+    private final Button      addImage, addScreenshot, cssWindow, clipBoard, removeImage;
     private final FileChooser addImageDialog;
     private final ListView<Image>  imageList;
 
@@ -88,7 +95,7 @@ public class LogImagesTab extends Tab
         addImage      = new Button("Add Image");
         addScreenshot = new Button("Add Screenshot");
         cssWindow     = new Button("CSS Window");
-        clipboard     = new Button("Clipboard");
+        clipBoard     = new Button("Clipboard Image");
         
         addImageDialog = new FileChooser();
         
@@ -100,6 +107,7 @@ public class LogImagesTab extends Tab
         setText("Images");
         setClosable(false);
         
+        addImageDialog.setInitialDirectory(new File(System.getProperty("user.home")));
         addImageDialog.getExtensionFilters().addAll(
                 new ExtensionFilter("Image Files", "*.png", "*.jpg", "*.ppm" , "*.pgm"));
 
@@ -172,7 +180,7 @@ public class LogImagesTab extends Tab
         buttonBox.setSpacing(10);
 
         HBox.setMargin(addImage,  new Insets(0,  0, 0, 10));
-        HBox.setMargin(clipboard, new Insets(0, 10, 0,  0));
+        HBox.setMargin(clipBoard, new Insets(0, 10, 0,  0));
         
         buttonBox.setAlignment(Pos.CENTER);
         
@@ -180,9 +188,9 @@ public class LogImagesTab extends Tab
         addImage.prefWidthProperty().bind(buttonBox.widthProperty().divide(4));
         addScreenshot.prefWidthProperty().bind(buttonBox.widthProperty().divide(4));
         cssWindow.prefWidthProperty().bind(buttonBox.widthProperty().divide(4));
-        clipboard.prefWidthProperty().bind(buttonBox.widthProperty().divide(4));
+        clipBoard.prefWidthProperty().bind(buttonBox.widthProperty().divide(4));
         
-        buttonBox.getChildren().addAll(addImage, addScreenshot, cssWindow, clipboard);
+        buttonBox.getChildren().addAll(addImage, addScreenshot, cssWindow, clipBoard);
     }
     
     private void setOnActions()
@@ -221,7 +229,10 @@ public class LogImagesTab extends Tab
             model.addImage(captureNode());
         });
         
-        // TODO Implement clip board button
+        clipBoard.setOnAction(event -> 
+        {
+            model.addImage(getImageFromClipBoard());
+        });
     }
     
     /**
@@ -244,5 +255,27 @@ public class LogImagesTab extends Tab
         Scene scene = model.getScene();
         WritableImage image = scene.getRoot().snapshot(null, null);
         return image;
+    }
+    
+    /**
+     * Get an image from the clip board.
+     */
+    private Image getImageFromClipBoard()
+    {
+        Transferable transferable = Toolkit.getDefaultToolkit().getSystemClipboard().getContents(null);
+        if (transferable != null && transferable.isDataFlavorSupported(DataFlavor.imageFlavor))
+        {
+            try
+            {
+                BufferedImage bufImg = (BufferedImage) transferable.getTransferData(DataFlavor.imageFlavor);
+                return (SwingFXUtils.toFXImage(bufImg, null));
+            }
+            catch (Exception ex)
+            {
+                logger.log(Level.WARNING, "Clipboard IO failed.", ex);
+            }
+        }
+        // Wasn't an image on the clip board.
+        return null;
     }
 }

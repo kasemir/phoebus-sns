@@ -11,6 +11,9 @@ import java.io.File;
 import java.util.Comparator;
 import java.util.List;
 
+import org.phoebus.logging.LogFactory;
+import org.phoebus.logging.LogService;
+
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.Node;
@@ -29,6 +32,8 @@ public class LogEntryModel
     private String date, level;
     private String title, text;
     
+    private static final LogService logService = LogService.getInstance();
+    
     // private final SNSLogClient client; // Source of log and tag data.
     private final ObservableList<String>    logbooks, tags, selectedLogbooks, selectedTags;
     private final ObservableList<Image> images;
@@ -39,10 +44,9 @@ public class LogEntryModel
         // TODO : Implement SNSLogClient and use it to retrieve data. Remove dummy data.
         tags     = FXCollections.observableArrayList(List.of("Tag 1", "Tag 2", "Tag 3"));
         logbooks = FXCollections.observableArrayList(List.of("Logbook 1", "Logbook 2", "Logbook 3"));
-        
         selectedLogbooks = FXCollections.observableArrayList();
         selectedTags     = FXCollections.observableArrayList();
-        
+
         images = FXCollections.observableArrayList();
         files  = FXCollections.observableArrayList();
         
@@ -160,14 +164,18 @@ public class LogEntryModel
         return FXCollections.unmodifiableObservableList(images);
     }
     
-    public boolean addImage(final Image img)
+    public boolean addImage(final Image image)
     {
-        return images.add(img);
+        if (null != image)
+            return images.add(image);
+        return false;    
     }
     
     public boolean removeImage(final Image image)
     {
-        return images.remove(image);
+        if (null != image)
+            return images.remove(image);
+        return false;
     }
     
     public ObservableList<File> getFiles()
@@ -187,6 +195,13 @@ public class LogEntryModel
     
     public void submitEntry()
     {
+        
+        LogFactory logFactory = logService.getLogFactories().get("org.phoebus.sns.logbook");
+        if (logFactory != null)
+        {
+            System.out.println("Factory successfully retrieved: " + logFactory.getId());
+        }
+        
         // TODO : Submit entry though SNSClient
         System.out.println("You pressed submit.");
         System.out.println("user: " + username);

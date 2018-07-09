@@ -1,12 +1,16 @@
 package org.phoebus.sns.logbook.ui;
 
+import static org.phoebus.ui.application.PhoebusApplication.logger;
+
 import java.awt.Desktop;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
+import java.util.logging.Level;
 
 import javafx.geometry.Insets;
 import javafx.scene.control.Button;
+import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
@@ -22,21 +26,26 @@ public class LogFilesTab extends Tab
 {
     private class FileCell extends ListCell<File>
     {
+        private Hyperlink hyperlink;
+        private File file;
+        
         public FileCell()
         {
             super();
-            this.setStyle("-fx-text-fill: blue;"
-                         + "-fx-underline: true;");
-            this.setOnMouseClicked(click -> 
+            hyperlink = new Hyperlink();
+            hyperlink.setOnAction(event -> 
             {
-                if (click.getClickCount() == 2)
+                // Open the file in the default editor.
+                if (Desktop.isDesktopSupported())
                 {
+                    Desktop desktop = Desktop.getDesktop();
                     try
                     {
-                        Desktop.getDesktop().open(this.getItem());
-                    } catch (IOException e)
+                        desktop.edit(file);
+                    } 
+                    catch (IOException ex)
                     {
-                        e.printStackTrace();
+                        logger.log(Level.WARNING, "Could not open file in default editor.", ex);
                     }
                 }
             });
@@ -49,11 +58,11 @@ public class LogFilesTab extends Tab
             if (empty)
             {
                 setGraphic(null);
-                setText(null);
             }
             else
             {
-                setText(file.getName());
+                hyperlink.setText(file.getName());
+                setGraphic(hyperlink);
             }   
         }
     }
@@ -92,6 +101,8 @@ public class LogFilesTab extends Tab
         setText("Files");
         setClosable(false);
         
+        fileChooser.setInitialDirectory(new File(System.getProperty("user.home")));
+        
         formatContent();
         setOnActions();
 
@@ -115,6 +126,7 @@ public class LogFilesTab extends Tab
         listView.setCellFactory(cell -> new FileCell());
         listView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
         listView.setPrefHeight(50);
+        // Background of cells is same as default view background.
         listView.setStyle("-fx-control-inner-background-alt: #f4f4f4");
         listView.setStyle("-fx-control-inner-background: #f4f4f4");
         VBox.setMargin(listBox, new Insets(0, 10, 0, 10));
