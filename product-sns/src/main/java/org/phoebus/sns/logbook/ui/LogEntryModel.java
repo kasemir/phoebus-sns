@@ -15,6 +15,7 @@ import org.phoebus.logging.LogFactory;
 import org.phoebus.logging.LogService;
 
 import javafx.collections.FXCollections;
+import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.scene.Node;
 import javafx.scene.Scene;
@@ -53,66 +54,112 @@ public class LogEntryModel
         node = callingNode;
     }
 
-    public Node getNode()
-    {
-        return node;
-    }
-    
+    /**
+     * Gets the JavaFX Scene graph.
+     * @return Scene
+     */
     public Scene getScene()
     {
         return node.getScene();
     }
 
+    /**
+     * Set the user name.
+     * @param username
+     */
     public void setUser(final String username)
     {
         this.username = username;
     }
     
+    /**
+     * Set the password.
+     * @param password
+     */
     public void setPassword(final String password)
     {
         this.password = password;
     }
     
+    /**
+     * Set the date.
+     * @param date
+     */
     public void setDate(final String date)
     {
         this.date = date;
     }
     
+    /**
+     * Set the level.
+     * @param level
+     */
     public void setLevel(final String level)
     {
         this.level = level;
     }
     
+    /**
+     * Set the title.
+     * @param title
+     */
     public void setTitle(final String title)
     {
         this.title = title;
     }
     
+    /**
+     * Set the text.
+     * @param text
+     */
     public void setText(final String text)
     {
         this.text = text;
     }
     
+    /**
+     * Get an unmodifiable list of the log books.
+     * @return
+     */
     public ObservableList<String> getLogbooks()
     {
         return FXCollections.unmodifiableObservableList(logbooks);
     }
     
+    /**
+     * Get an unmodifiable list of the selected log books.
+     * @return
+     */
     public ObservableList<String> getSelectedLogbooks()
     {
         return FXCollections.unmodifiableObservableList(selectedLogbooks);
     }
     
+    /**
+     * Tests whether the model's log book list contains the passed log book name.
+     * @param logbook
+     * @return
+     */
     public boolean hasLogbook (final String logbook)
     {
         return logbooks.contains(logbook);
     }
     
+    /**
+     * Tests whether the model's selected log book list contains the passed log book name.
+     * @param logbook
+     * @return
+     */
     public boolean hasSelectedLogbook (final String logbook)
     {
         return selectedLogbooks.contains(logbook);
     }
     
+    /**
+     * Add a log book to the model's selected log books list.
+     * @param logbook
+     * @return
+     */
     public boolean addSelectedLogbook(final String logbook)
     {
         boolean result = selectedLogbooks.add(logbook);
@@ -120,32 +167,60 @@ public class LogEntryModel
         return result;
     }
     
+    /**
+     * Remove a log book from the model's selected log book list.
+     * @param logbook
+     * @return
+     */
     public boolean removeSelectedLogbook(final String logbook)
     {
         boolean result = selectedLogbooks.remove(logbook);
         return result;    
     }
     
+    /**
+     * Get an unmodifiable list of the tags.
+     * @return
+     */
     public ObservableList<String> getTags()
     {
         return FXCollections.unmodifiableObservableList(tags);
     }
     
+    /**
+     * Get an unmodifiable list of the selected tags.
+     * @return
+     */
     public ObservableList<String> getSelectedTags()
     {
         return FXCollections.unmodifiableObservableList(selectedTags);
     }
     
+    /**
+     * Tests whether the model's tag list contains the passed tag name.
+     * @param tag
+     * @return
+     */
     public boolean hasTag (final String tag) 
     {
         return tags.contains(tag);
     }
     
+    /**
+     * Tests whether the model's selected tag list contains the passed tag name.
+     * @param tag
+     * @return
+     */
     public boolean hasSelectedTag (final String tag) 
     {
         return selectedTags.contains(tag);
     }
     
+    /**
+     * Adds the passed tag name to the model's selected tag list.
+     * @param tag
+     * @return
+     */
     public boolean addSelectedTag(final String tag)
     {
         boolean result = selectedTags.add(tag);
@@ -153,17 +228,31 @@ public class LogEntryModel
         return result;    
     }
     
+    /**
+     * Removes the passed tag name from the model's selected tag list.
+     * @param tag
+     * @return
+     */
     public boolean removeSelectedTag(final String tag)
     {
         boolean result = selectedTags.remove(tag);
         return result;        
     }
     
+    /**
+     * Return an unmodifiable list of the model's images.
+     * @return
+     */
     public ObservableList<Image> getImages()
     {
         return FXCollections.unmodifiableObservableList(images);
     }
     
+    /**
+     * Add an image to the model's list of images.
+     * @param image
+     * @return
+     */
     public boolean addImage(final Image image)
     {
         if (null != image)
@@ -171,6 +260,11 @@ public class LogEntryModel
         return false;    
     }
     
+    /**
+     * Remove an image from the model's list of images.
+     * @param image
+     * @return
+     */
     public boolean removeImage(final Image image)
     {
         if (null != image)
@@ -178,30 +272,59 @@ public class LogEntryModel
         return false;
     }
     
+    /**
+     * Add a listener to the images list.
+     * @param listChangeListener
+     */
+    public void addImagesListener(ListChangeListener<Image> listChangeListener)
+    {
+        images.addListener(listChangeListener);
+    }
+    
+    /**
+     * Return an unmodifiable list of the model's files.
+     * @return
+     */
     public ObservableList<File> getFiles()
     {
         return FXCollections.unmodifiableObservableList(files);
     }
     
+    /**
+     * Add a file to the model's list of files.
+     * @param file
+     * @return
+     */
     public boolean addFile(final File file)
     {
         return files.add(file);
     }
     
+    /** 
+     * Remove a file form the model's list of files.
+     * @param file
+     * @return
+     */
     public boolean removeFile(final File file)
     {
         return files.remove(file);
     }
     
+    /**
+     * Create and submit a log entry with the current data in the log entry form.
+     */
     public void submitEntry()
     {
-        
+        // TODO How to set site specific log factory ID? Get from preferences loader???
         LogFactory logFactory = logService.getLogFactories().get("org.phoebus.sns.logbook");
         if (logFactory != null)
         {
             System.out.println("Factory successfully retrieved: " + logFactory.getId());
         }
         
+        //LogEntry logEntry = 
+        
+        //logFactory.getLogClient().set((LogEntry) null);
         // TODO : Submit entry though SNSClient
         System.out.println("You pressed submit.");
         System.out.println("user: " + username);
