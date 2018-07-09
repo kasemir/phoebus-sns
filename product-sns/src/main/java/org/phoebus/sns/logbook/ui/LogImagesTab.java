@@ -2,6 +2,9 @@ package org.phoebus.sns.logbook.ui;
 
 import static org.phoebus.ui.application.PhoebusApplication.logger;
 
+import java.awt.AWTException;
+import java.awt.Rectangle;
+import java.awt.Robot;
 import java.awt.Toolkit;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
@@ -10,13 +13,14 @@ import java.io.File;
 import java.util.List;
 import java.util.logging.Level;
 
+import org.phoebus.framework.jobs.JobManager;
 import org.phoebus.ui.javafx.ImageCache;
+import org.phoebus.ui.javafx.Screenshot;
 
+import javafx.application.Platform;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.Node;
-import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
@@ -24,7 +28,6 @@ import javafx.scene.control.ListView;
 import javafx.scene.control.Tab;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.image.WritableImage;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
@@ -210,7 +213,7 @@ public class LogImagesTab extends Tab
         
         addScreenshot.setOnAction(event -> 
         {
-            model.addImage(captureScene());
+            model.addImage(captureScreen());
         });
         
         removeImage.setOnAction(event ->
@@ -223,15 +226,21 @@ public class LogImagesTab extends Tab
                 imageView.setImage(image);
             }
         });
-        
+
         cssWindow.setOnAction(event ->
         {
-            model.addImage(captureNode());
+            model.addImage(captureScene());
         });
         
         clipBoard.setOnAction(event -> 
         {
-            model.addImage(getImageFromClipBoard());
+            // Retrieve the image on a background thread.
+            JobManager.schedule("Fetch Image From Clipboard", monitor ->
+            {
+                Image image = getImageFromClipBoard();
+                // Update the model, which the UI listens to, on the UI thread.
+                Platform.runLater( () -> model.addImage(image));
+            });
         });
     }
     
@@ -239,26 +248,36 @@ public class LogImagesTab extends Tab
      * Capture an image of the calling JavaFX node.
      * @return Image
      */
-    private WritableImage captureNode()
+    private Image captureScreen()
     {
-        Node node = model.getNode();
-        WritableImage image = node.snapshot(null, null);
-        return image;
+        try {
+            Robot robot = new Robot();
+            
+            // Create an image of the main screen with the retrieved screen dimensions.
+            Rectangle screenDimensions = new Rectangle(Toolkit.getDefaultToolkit().getScreenSize());
+            BufferedImage screenCapture = robot.createScreenCapture(screenDimensions);
+             
+            return SwingFXUtils.toFXImage(screenCapture, null);
+        } catch (AWTException ex) {
+            logger.log(Level.WARNING, "Screen capture failed.", ex);
+        }
+        
+        return null;
     }
     
     /**
      * Capture an image of the scene that the calling JavaFX node belongs to.
      * @return Image
      */
-    private WritableImage captureScene()
+    private Image captureScene()
     {
-        Scene scene = model.getScene();
-        WritableImage image = scene.getRoot().snapshot(null, null);
-        return image;
+        BufferedImage bufImg = Screenshot.fromNode(model.getScene().getRoot());
+        return SwingFXUtils.toFXImage(bufImg, null);
     }
     
     /**
      * Get an image from the clip board.
+     * @return Image
      */
     private Image getImageFromClipBoard()
     {
@@ -275,6 +294,7 @@ public class LogImagesTab extends Tab
                 logger.log(Level.WARNING, "Clipboard IO failed.", ex);
             }
         }
+        
         // Wasn't an image on the clip board.
         return null;
     }
