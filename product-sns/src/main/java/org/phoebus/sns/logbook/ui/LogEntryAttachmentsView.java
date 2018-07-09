@@ -1,3 +1,10 @@
+/*******************************************************************************
+ * Copyright (c) 2018 Oak Ridge National Laboratory.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *******************************************************************************/
 package org.phoebus.sns.logbook.ui;
 
 import javafx.scene.control.Accordion;
@@ -5,6 +12,11 @@ import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.control.TitledPane;
 
+/**
+ * Collapsible tab pane view that facilitates adding images and files as attachments to log book entries.
+ * @author Evan Smith
+ *
+ */
 public class LogEntryAttachmentsView extends Accordion
 {
     private final TabPane       tabPane;
@@ -22,13 +34,10 @@ public class LogEntryAttachmentsView extends Accordion
         files      = new LogFilesTab(model);
         properties = new LogPropertiesTab();
         
-        formatView();
-    }
-
-    private void formatView()
-    {
         tabPane.getTabs().addAll(images, files, properties);
+        
         TitledPane tPane = new TitledPane("Attachments", tabPane);
-        this.getPanes().add(tPane);
+        
+        getPanes().add(tPane);
     }
 }
