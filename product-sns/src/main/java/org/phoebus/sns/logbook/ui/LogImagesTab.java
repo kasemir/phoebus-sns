@@ -18,6 +18,7 @@ import org.phoebus.ui.javafx.ImageCache;
 import org.phoebus.ui.javafx.Screenshot;
 
 import javafx.application.Platform;
+import javafx.collections.ListChangeListener;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -48,11 +49,6 @@ public class LogImagesTab extends Tab
             setAlignment(Pos.CENTER);
             cellImageView.setFitHeight(100);
             cellImageView.setPreserveRatio(true);
-
-            setOnMouseClicked(click ->
-            {
-                imageView.setImage(cellImageView.getImage());
-            });
         }
         
         @Override
@@ -150,6 +146,7 @@ public class LogImagesTab extends Tab
     {
         imageView.fitHeightProperty().bind(imageBox.heightProperty());
         imageView.setPreserveRatio(true);
+        imageView.imageProperty().bind(imageList.getSelectionModel().selectedItemProperty());
         imageViewBox.prefWidthProperty().bind(imageBox.widthProperty().divide(2));
         imageViewBox.setAlignment(Pos.CENTER);
         imageViewBox.getChildren().add(imageView);
@@ -199,9 +196,21 @@ public class LogImagesTab extends Tab
     
     private void setOnActions()
     {
+        
+        model.addImagesListener(new ListChangeListener<Image>()
+        {
+            @Override
+            public void onChanged(Change<? extends Image> c)
+            {
+                if (c.next())
+                    if (c.wasAdded())
+                        imageList.getSelectionModel().selectLast();
+            }
+        });
+        
         addImage.setOnAction(event ->
         {
-            List<File> imageFiles = addImageDialog.showOpenMultipleDialog(this.getTabPane().getScene().getWindow());
+            List<File> imageFiles = addImageDialog.showOpenMultipleDialog(getTabPane().getScene().getWindow());
             if (null != imageFiles)
             {
                 for (File imageFile : imageFiles)
@@ -228,8 +237,6 @@ public class LogImagesTab extends Tab
             if (image != null)
             {
                 model.removeImage(imageView.getImage());
-                image = imageList.getSelectionModel().getSelectedItem();
-                imageView.setImage(image);
             }
         });
 
