@@ -39,7 +39,7 @@ public class LogbookEntryView extends VBox
     
     /** View handles the input for creation of the entry. */
     private final LogEntryFieldsView      logEntryFields;
-    
+        
     /** View handles addition of log entry attachments. */
     private final LogEntryAttachmentsView attachmentsView;
     
@@ -64,10 +64,10 @@ public class LogbookEntryView extends VBox
         
         // title and text labels and fields.
         logEntryFields = new LogEntryFieldsView(model);
-        
+                
         // Images, Files, Properties
         attachmentsView = new LogEntryAttachmentsView(model);
-        
+                
         // Cancel and Submit buttons.
         buttonBox = new HBox();
         cancel = new Button("Cancel");
@@ -83,16 +83,15 @@ public class LogbookEntryView extends VBox
         // Let the Text Area grow to the bottom.
         VBox.setVgrow(logEntryFields, Priority.ALWAYS);
 
-        VBox.setMargin(credentialEntry, new Insets(10, 10,  0, 10));
-        VBox.setMargin(dateAndLevel,    new Insets( 0, 10,  0, 10));
-        VBox.setMargin(logEntryFields,  new Insets( 0, 10,  0, 10));
-        VBox.setMargin(logEntryFields,  new Insets( 0, 10,  0, 10));
-        VBox.setMargin(buttonBox,       new Insets( 0, 10, 10, 10));
+        VBox.setMargin(credentialEntry,       new Insets(10, 10,  0, 10));
+        VBox.setMargin(dateAndLevel,          new Insets( 0, 10,  0, 10));
+        VBox.setMargin(logEntryFields,        new Insets( 0, 10,  0, 10));
+        VBox.setMargin(buttonBox,             new Insets( 0, 10, 10, 10));
         
         setSpacing(10);
         getChildren().addAll(credentialEntry, dateAndLevel, logEntryFields, attachmentsView, buttonBox);
         
-        Scene scene = new Scene(this, 700, 1000);
+        Scene scene = new Scene(this, 800, 1000);
         stage.setTitle("Logbook Entry");
         stage.setScene(scene);
         

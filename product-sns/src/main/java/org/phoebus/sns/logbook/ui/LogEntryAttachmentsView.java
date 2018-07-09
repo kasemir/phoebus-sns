@@ -1,10 +1,13 @@
 package org.phoebus.sns.logbook.ui;
 
+import javafx.scene.control.Accordion;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
+import javafx.scene.control.TitledPane;
 
-public class LogEntryAttachmentsView extends TabPane
+public class LogEntryAttachmentsView extends Accordion
 {
+    private final TabPane       tabPane;
     @SuppressWarnings("unused")
     private final LogEntryModel model;
     private final LogImagesTab  images;
@@ -14,16 +17,18 @@ public class LogEntryAttachmentsView extends TabPane
     {
         super();
         this.model = model;
+        tabPane    = new TabPane();
         images     = new LogImagesTab(model);
         files      = new LogFilesTab(model);
-        properties = new Tab("Properties");
+        properties = new LogPropertiesTab();
         
         formatView();
     }
 
     private void formatView()
     {
-        // Anything else to do?
-        getTabs().addAll(images, files, properties);
+        tabPane.getTabs().addAll(images, files, properties);
+        TitledPane tPane = new TitledPane("Attachments", tabPane);
+        this.getPanes().add(tPane);
     }
 }

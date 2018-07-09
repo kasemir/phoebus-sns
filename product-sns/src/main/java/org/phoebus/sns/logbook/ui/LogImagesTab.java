@@ -133,7 +133,7 @@ public class LogImagesTab extends Tab
 
     private void formatImageBox()
     {
-        imageBox.setPrefSize(1000, 200);
+        imageBox.setPrefHeight(200);
         
         imageBox.setSpacing(10);
         imageBox.setAlignment(Pos.CENTER_RIGHT);
@@ -150,6 +150,7 @@ public class LogImagesTab extends Tab
     {
         imageView.fitHeightProperty().bind(imageBox.heightProperty());
         imageView.setPreserveRatio(true);
+        imageViewBox.prefWidthProperty().bind(imageBox.widthProperty().divide(2));
         imageViewBox.setAlignment(Pos.CENTER);
         imageViewBox.getChildren().add(imageView);
         
@@ -170,9 +171,9 @@ public class LogImagesTab extends Tab
         imageList.setStyle("-fx-control-inner-background: #f4f4f4");
 
         imageList.setCellFactory(param -> new ImageCell(imageView));
-        imageList.setMinWidth(150);
+        imageList.prefWidthProperty().bind(imageBox.widthProperty().divide(3));
         listBox.setSpacing(5);
-        listBox.setMaxWidth(150);
+        HBox.setHgrow(listBox, Priority.ALWAYS);
         HBox.setMargin(listBox, new Insets(0, 10, 0, 0));
         listBox.setAlignment(Pos.CENTER_LEFT);
         listBox.getChildren().addAll(new Label("Images: "), imageList);
@@ -213,7 +214,12 @@ public class LogImagesTab extends Tab
         
         addScreenshot.setOnAction(event -> 
         {
-            model.addImage(captureScreen());
+            JobManager.schedule("Take Screenshot", monitor ->
+            {
+                // This has been observed to cause platform thread freezes, so should be run in background thread.
+                Image image = captureScreen();
+                Platform.runLater(() -> model.addImage(image));
+            });
         });
         
         removeImage.setOnAction(event ->
