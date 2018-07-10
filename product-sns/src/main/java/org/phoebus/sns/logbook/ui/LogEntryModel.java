@@ -7,9 +7,15 @@
  *******************************************************************************/
 package org.phoebus.sns.logbook.ui;
 
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.IOException;
 import java.util.Comparator;
 import java.util.List;
+
+import javax.imageio.ImageIO;
 
 import org.phoebus.logging.LogFactory;
 import org.phoebus.logging.LogService;
@@ -17,6 +23,7 @@ import org.phoebus.logging.LogService;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
+import javafx.embed.swing.SwingFXUtils;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
@@ -315,17 +322,23 @@ public class LogEntryModel
      */
     public void submitEntry()
     {
-        // TODO How to set site specific log factory ID? Get from preferences loader???
+        // TODO How to set site specific log factory ID? Get from preferences loader?
         LogFactory logFactory = logService.getLogFactories().get("org.phoebus.sns.logbook");
         if (logFactory != null)
         {
             System.out.println("Factory successfully retrieved: " + logFactory.getId());
         }
+        /*
+        LogEntryBuilder logEntryBuilder = new LogEntryBuilder();
         
-        //LogEntry logEntry = 
-        
-        //logFactory.getLogClient().set((LogEntry) null);
-        // TODO : Submit entry though SNSClient
+        for (File file : files)
+            logEntryBuilder.attach(AttachmentImpl.of(file));
+        // for (Image image : images) 
+        // {
+        //     
+        //     logEntryBuilder.attach(AttachmentImpl.of(in));
+        // }
+        */
         System.out.println("You pressed submit.");
         System.out.println("user: " + username);
         System.out.println("password: " + password);
@@ -339,5 +352,23 @@ public class LogEntryModel
         for (String tag : selectedTags)
             System.out.println("\t" + tag);
         System.out.println("text: " + text);
+    }
+    
+    @SuppressWarnings("unused")
+    private ByteArrayInputStream imageToStream(final Image image) throws IOException
+    {
+        BufferedImage bufImg = SwingFXUtils.fromFXImage(image, null);
+        try
+        (
+            ByteArrayOutputStream out = new ByteArrayOutputStream();
+        )
+        {   
+            ImageIO.write(bufImg, "png", out);
+        
+            byte[] data = out.toByteArray();
+            out.close();
+            ByteArrayInputStream in = new ByteArrayInputStream(data);
+            return in;
+        }
     }
 }
