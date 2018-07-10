@@ -93,7 +93,7 @@ public class LogFilesTab extends Tab
     private final HBox           listBox, buttonBox;
     private final Button         attachContext, attachFile, removeSelected;
     
-    private final FileChooser    fileChooser;  
+    private final FileChooser    addFileDialog;  
     
     public LogFilesTab(final LogEntryModel model) 
     {
@@ -109,7 +109,7 @@ public class LogFilesTab extends Tab
         attachFile     = new Button("Attach File");
         removeSelected = new Button("Remove Selected");
         
-        fileChooser = new FileChooser();
+        addFileDialog = new FileChooser();
         
         formatTab();
     }
@@ -119,7 +119,7 @@ public class LogFilesTab extends Tab
         setText("Files");
         setClosable(false);
         
-        fileChooser.setInitialDirectory(new File(System.getProperty("user.home")));
+        addFileDialog.setInitialDirectory(new File(System.getProperty("user.home")));
         
         formatContent();
         setOnActions();
@@ -171,7 +171,7 @@ public class LogFilesTab extends Tab
         attachFile.setOnAction(event -> 
         {
             Window ownerWindow = this.getTabPane().getParent().getScene().getWindow();
-            List<File> files = fileChooser.showOpenMultipleDialog(ownerWindow);
+            List<File> files = addFileDialog.showOpenMultipleDialog(ownerWindow);
             if (null != files)
             {
                 for (File file : files)
