@@ -11,6 +11,8 @@ import java.util.Collection;
 
 import org.phoebus.framework.preferences.PhoebusPreferenceService;
 import org.phoebus.logging.LogEntry;
+import org.phoebus.logging.LogFactory;
+import org.phoebus.logging.LogService;
 import org.phoebus.logging.Logbook;
 import org.phoebus.logging.Tag;
 import org.phoebus.ui.dialog.DialogHelper;
@@ -31,6 +33,8 @@ public class LogbookEntryDialog extends Dialog<LogEntry>
 {
     /** Width of labels on views leftmost column. */
     public static final int labelWidth = 80;
+    
+    private static final LogService logService = LogService.getInstance();
     
     /** Purveyor of log entry application state. */
     private final LogEntryModel           model;
@@ -116,5 +120,20 @@ public class LogbookEntryDialog extends Dialog<LogEntry>
         {
             model.addSelectedTag(tag.getName());
         });
+    }
+    
+    public void submitEntry()
+    {
+        LogFactory logFactory = logService.getLogFactories().get("org.phoebus.sns.logbook");
+        if (logFactory != null)
+        {
+            System.out.println("Factory successfully retrieved: " + logFactory.getId());
+        }
+        
+        LogEntry logEntry = model.getEntry();
+        
+        //LogClient client = logFactory.getLogClient(model.getUsername(), model.getPassword());
+        
+        //sclient.set(logEntry);
     }
 }

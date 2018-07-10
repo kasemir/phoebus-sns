@@ -8,11 +8,14 @@
 package org.phoebus.sns.logbook.ui;
 
 import java.io.File;
+import java.time.Instant;
 import java.util.Comparator;
 import java.util.List;
 
-import org.phoebus.logging.LogFactory;
-import org.phoebus.logging.LogService;
+import org.phoebus.logging.LogEntry;
+import org.phoebus.logging.LogEntryImpl.LogEntryBuilder;
+import org.phoebus.logging.LogbookImpl;
+import org.phoebus.logging.TagImpl;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
@@ -32,8 +35,6 @@ public class LogEntryModel
     private String username, password;
     private String date, level;
     private String title, text;
-    
-    private static final LogService logService = LogService.getInstance();
     
     private final ObservableList<String> logbooks, tags, selectedLogbooks, selectedTags;
     private final ObservableList<Image>  images;
@@ -330,27 +331,37 @@ public class LogEntryModel
     /**
      * Create and return a log entry with the current data in the log entry form.
      */
-    public void getEntry()
+    public LogEntry getEntry()
     {
-        // TODO How to set site specific log factory ID? Get from preferences loader?
-        LogFactory logFactory = logService.getLogFactories().get("org.phoebus.sns.logbook");
-        if (logFactory != null)
-        {
-            System.out.println("Factory successfully retrieved: " + logFactory.getId());
-        }
+        // Create a log entry with the form data.
+        LogEntryBuilder logEntryBuilder = new LogEntryBuilder();
+        //logEntryBuilder.title(title);
+        logEntryBuilder.description(text)
+            .createdDate(Instant.parse(date))
+            .modifiedDate(Instant.parse(date))
+            .level(level);
         
-        System.out.println("You pressed submit.");
-        System.out.println("user: " + username);
-        System.out.println("password: " + password);
-        System.out.println("date: " + date);
-        System.out.println("level: " + level);
-        System.out.println("title: " + title);
-        System.out.println("logbooks: ");
-        for (String logbook : selectedLogbooks)
-            System.out.println("\t" + logbook);
-        System.out.println("tags: ");
-        for (String tag : selectedTags)
-            System.out.println("\t" + tag);
-        System.out.println("text: " + text);
+        for (String selectedLogbook : selectedLogbooks)
+            logEntryBuilder.appendToLogbook(LogbookImpl.of(selectedLogbook));
+        for (String selectedTag : selectedTags)
+            logEntryBuilder.appendTag(TagImpl.of(selectedTag));
+                
+        // Add Images
+        // Add Files
+        
+        // Anything else???
+        
+        return logEntryBuilder.build();
+    }
+    
+    // Make it so the model handles passing credentials to the log book client? Prevent data leaks that way.
+    public String getUsername()
+    {
+        return username;
+    }
+    
+    public String getPassword()
+    {
+        return password;
     }
 }
