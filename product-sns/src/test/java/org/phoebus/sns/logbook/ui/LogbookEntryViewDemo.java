@@ -1,4 +1,16 @@
+/*******************************************************************************
+ * Copyright (c) 2018 Oak Ridge National Laboratory.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *******************************************************************************/
 package org.phoebus.sns.logbook.ui;
+
+import java.time.Instant;
+
+import org.phoebus.logging.LogEntry;
+import org.phoebus.logging.LogEntryImpl.LogEntryBuilder;
 
 import javafx.application.Application;
 import javafx.scene.Node;
@@ -28,8 +40,14 @@ public class LogbookEntryViewDemo extends Application
             MenuItem mi = new MenuItem("Create Log Entry");
             mi.setOnAction(value -> 
             {
+                
+                LogEntryBuilder logEntryBuilder = new LogEntryBuilder();
+                LogEntry template = logEntryBuilder.appendDescription("Log entry from " + getText())
+                               .createdDate(Instant.now())
+                               .build();
+                
                 Node node = (Node) this;
-                LogbookEntryDialog logDialog = new LogbookEntryDialog(node);
+                LogbookEntryDialog logDialog = new LogbookEntryDialog(node, template);
                 logDialog.showAndWait();
             });
             cm.getItems().add(mi);

@@ -27,13 +27,13 @@ public class LogEntryFieldsView extends VBox
     {
         this.model = model;
         titleLabel = new Label("Title:");
-        titleField = new TextField();
+        titleField = new TextField(model.getTitle());
         
         // log books and tags text field, selector, and addition view button
         logbooksAndTags =  new LogbooksTagsView(model);
         
         textLabel  = new Label("Text:");
-        textArea   = new TextArea();
+        textArea   = new TextArea(model.getText());
         
         formatView();
     }

@@ -10,16 +10,20 @@ package org.phoebus.sns.logbook.ui;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.Callable;
 import java.util.function.Function;
 import java.util.function.Supplier;
+
+import org.phoebus.framework.preferences.PhoebusPreferenceService;
+import org.phoebus.ui.dialog.DialogHelper;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.Scene;
+import javafx.scene.Node;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.Dialog;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.SelectionMode;
@@ -27,16 +31,12 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
-import javafx.stage.Stage;
-import javafx.stage.Window;
 /**
- * 
  * @author Evan Smith
- *
  */
-public class ListSelectionView extends HBox
+public class ListSelectionDialog extends Dialog<Boolean>
 {
-    private final Stage  stage;
+    private final HBox content;
     
     @SuppressWarnings("unused") // Used to initialize list views.
     private final Supplier<ObservableList<String>> available;
@@ -50,41 +50,30 @@ public class ListSelectionView extends HBox
     private final Label selectedLabel, itemsLabel;
     private final ListView<String> availableItems;
     private final ListView<String> selectedItems;
-    
-    private final HBox entryBox;
-    
-    private final int buttonWidth = 75, spacing = 10;
-    private final Button add, remove, clear, apply, cancel;
-    
-    private final Callable<Void> toCall;
 
-    public ListSelectionView(Window parent,
+    private final int buttonWidth = 75, spacing = 10;
+    private final Button add, remove, clear;
+
+    public ListSelectionDialog(Node root,
                               String title,
                               Supplier<ObservableList<String>>    available, 
                               Supplier<ObservableList<String>>    selected,
                               Function<String, Boolean> addSelected,
-                              Function<String, Boolean> removeSelected,
-                              Callable<Void>            toCall)
-    {
-        stage = new Stage();     
-        stage.initOwner(parent); // The stage should die if the main window dies.
-        
+                              Function<String, Boolean> removeSelected)
+    {   
         this.available      = available;
         this.selected       = selected;
         this.addSelected    = addSelected;
         this.removeSelected = removeSelected;
-        this.toCall         = toCall;
         
+        content      = new HBox();
         selectedBox  = new VBox();
         buttonsBox   = new VBox();
         availableBox = new VBox();
-        entryBox     = new HBox();
         
         add    = new Button("Add");
         remove = new Button("Remove");
         clear  = new Button("Clear");
-        apply  = new Button("Apply");
-        cancel = new Button("Cancel");
         
         labelFont     = new Font(16);
         selectedLabel = new Label("Selected");
@@ -99,16 +88,24 @@ public class ListSelectionView extends HBox
         for (String item : selectedItems.getItems())
             availableItems.getItems().remove(item);
         
-        formatView();
+        formatContent();
         
-        Scene scene = new Scene(this, 600, 600);
-        stage.setTitle(title);
-        stage.setScene(scene);
+        getDialogPane().getButtonTypes().addAll(ButtonType.CANCEL, ButtonType.APPLY);
+        getDialogPane().setContent(content);
         
-        stage.show();
+        setResizable(true);
+        
+        DialogHelper.positionAndSize(this, root,
+                PhoebusPreferenceService.userNodeForClass(ListSelectionDialog.class),
+                400, 600);
+        
+        setResultConverter(button ->
+        {
+            return button == ButtonType.APPLY;
+        });
     }
 
-    private void formatView()
+    private void formatContent()
     {
         selectedItems.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
         availableItems.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
@@ -152,24 +149,9 @@ public class ListSelectionView extends HBox
             Collections.sort(availableItems.getItems());
             clearSelections();
         });
-        
-        apply.setOnAction(event ->
-        {
-            try
-            {  toCall.call();  }
-            catch (Exception ex)
-            {  /* Ignore? */   }
-            finally
-            {  stage.close();  }
-        });
-        
-        cancel.setOnAction(event -> 
-        {
-            stage.close();
-        });
-        
-        setAlignment(Pos.CENTER);
-        setSpacing(spacing);
+
+        content.setAlignment(Pos.CENTER);
+        content.setSpacing(spacing);
         
         add.setPrefWidth(buttonWidth);
         remove.setPrefWidth(buttonWidth);
@@ -178,36 +160,23 @@ public class ListSelectionView extends HBox
         buttonsBox.setSpacing(10);
         buttonsBox.setAlignment(Pos.CENTER);
         buttonsBox.getChildren().addAll(add, remove, clear);
-        
-        // For spacing purposes.
-        HBox emptyBox = new HBox();
-        
-        Button hiddenButton = new Button();
-        hiddenButton.setVisible(false);
-        emptyBox.getChildren().add(hiddenButton);
-        
+
         itemsLabel.setFont(labelFont);
         VBox.setVgrow(availableItems, Priority.ALWAYS);
         availableBox.setSpacing(spacing);
-        availableBox.getChildren().addAll(itemsLabel, availableItems, emptyBox);
+        availableBox.getChildren().addAll(itemsLabel, availableItems);
         
         selectedLabel.setFont(labelFont);
         VBox.setVgrow(selectedItems, Priority.ALWAYS);
         selectedBox.setSpacing(spacing);
         
-        cancel.setPrefWidth(buttonWidth);
-        apply.setPrefWidth(buttonWidth);
-        entryBox.setAlignment(Pos.CENTER_RIGHT);
-        entryBox.setSpacing(spacing);
-        entryBox.getChildren().addAll(cancel, apply);
-        
-        selectedBox.getChildren().addAll(selectedLabel, selectedItems, entryBox);
+        selectedBox.getChildren().addAll(selectedLabel, selectedItems);
 
         HBox.setMargin(availableBox, new Insets(5,  0, 10, 10));
         HBox.setMargin(buttonsBox,   new Insets(5,  0, 10,  0));
         HBox.setMargin(selectedBox,  new Insets(5, 10, 10,  0));
         
-        getChildren().addAll(availableBox, buttonsBox, selectedBox);
+        content.getChildren().addAll(availableBox, buttonsBox, selectedBox);
     }
 
     private void clearSelections()

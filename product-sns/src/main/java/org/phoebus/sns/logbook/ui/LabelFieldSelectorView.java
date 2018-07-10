@@ -8,7 +8,7 @@
 package org.phoebus.sns.logbook.ui;
 
 import java.util.List;
-import java.util.concurrent.Callable;
+import java.util.Optional;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
@@ -70,8 +70,8 @@ public class LabelFieldSelectorView extends HBox
         
         label     = new Label(labelText + ":");
         field     = new TextField();
-        selector  = new ToggleButton("", new ImageView(down_icon)); // TODO: Get a down arrow icon for this.
-        addItem   = new Button("", new ImageView(add_icon));          // TODO: Implement add Log books/Tags view. Get a add icon for each.
+        selector  = new ToggleButton("", new ImageView(down_icon)); 
+        addItem   = new Button("", new ImageView(add_icon));        
         dropDown  = new ContextMenu();
         
         formatView();
@@ -102,15 +102,10 @@ public class LabelFieldSelectorView extends HBox
         final String title = "Select " + labelText;
         addItem.setOnAction(event ->
         {
-            new ListSelectionView(getScene().getWindow(), title, known, selected, addSelected, removeSelected, new Callable<Void> ()
-            {
-                @Override
-                public Void call() throws Exception
-                {
-                    setFieldText();
-                    return null;
-                }
-            }); 
+            ListSelectionDialog select = new ListSelectionDialog(getScene().getRoot(), title, known, selected, addSelected, removeSelected);
+            Optional<Boolean> result = select.showAndWait();
+            if (result.isPresent() && result.get())
+                setFieldText();
         });
         
         getChildren().addAll(label, field, selector, addItem);

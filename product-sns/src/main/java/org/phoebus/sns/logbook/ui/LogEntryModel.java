@@ -7,15 +7,9 @@
  *******************************************************************************/
 package org.phoebus.sns.logbook.ui;
 
-import java.awt.image.BufferedImage;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.IOException;
 import java.util.Comparator;
 import java.util.List;
-
-import javax.imageio.ImageIO;
 
 import org.phoebus.logging.LogFactory;
 import org.phoebus.logging.LogService;
@@ -23,7 +17,6 @@ import org.phoebus.logging.LogService;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
-import javafx.embed.swing.SwingFXUtils;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
@@ -42,16 +35,15 @@ public class LogEntryModel
     
     private static final LogService logService = LogService.getInstance();
     
-    // private final SNSLogClient client; // Source of log and tag data.
-    private final ObservableList<String>    logbooks, tags, selectedLogbooks, selectedTags;
-    private final ObservableList<Image> images;
-    private final ObservableList<File>  files;
+    private final ObservableList<String> logbooks, tags, selectedLogbooks, selectedTags;
+    private final ObservableList<Image>  images;
+    private final ObservableList<File>   files;
     
     public LogEntryModel(final Node callingNode)
-    { 
-        // TODO : Implement SNSLogClient and use it to retrieve data. Remove dummy data.
+    {  
         tags     = FXCollections.observableArrayList(List.of("Tag 1", "Tag 2", "Tag 3"));
         logbooks = FXCollections.observableArrayList(List.of("Logbook 1", "Logbook 2", "Logbook 3"));
+        
         selectedLogbooks = FXCollections.observableArrayList();
         selectedTags     = FXCollections.observableArrayList();
 
@@ -105,6 +97,15 @@ public class LogEntryModel
     {
         this.level = level;
     }
+   
+    /**
+     * Get the text.
+     * @param text
+     */
+    public String getTitle()
+    {
+        return title;
+    }
     
     /**
      * Set the title.
@@ -113,6 +114,15 @@ public class LogEntryModel
     public void setTitle(final String title)
     {
         this.title = title;
+    }
+    
+    /**
+     * Get the text.
+     * @param text
+     */
+    public String getText()
+    {
+        return text;
     }
     
     /**
@@ -318,9 +328,9 @@ public class LogEntryModel
     }
     
     /**
-     * Create and submit a log entry with the current data in the log entry form.
+     * Create and return a log entry with the current data in the log entry form.
      */
-    public void submitEntry()
+    public void getEntry()
     {
         // TODO How to set site specific log factory ID? Get from preferences loader?
         LogFactory logFactory = logService.getLogFactories().get("org.phoebus.sns.logbook");
@@ -328,16 +338,7 @@ public class LogEntryModel
         {
             System.out.println("Factory successfully retrieved: " + logFactory.getId());
         }
-        /*
-        LogEntryBuilder logEntryBuilder = new LogEntryBuilder();
         
-        for (File file : files)
-            logEntryBuilder.attach(AttachmentImpl.of(file));
-        // for (Image image : images) 
-        // {
-        //     logEntryBuilder.attach(AttachmentImpl.of(imageToStream(image));
-        // }
-        */
         System.out.println("You pressed submit.");
         System.out.println("user: " + username);
         System.out.println("password: " + password);
@@ -351,23 +352,5 @@ public class LogEntryModel
         for (String tag : selectedTags)
             System.out.println("\t" + tag);
         System.out.println("text: " + text);
-    }
-    
-    @SuppressWarnings("unused")
-    private ByteArrayInputStream imageToStream(final Image image) throws IOException
-    {
-        BufferedImage bufImg = SwingFXUtils.fromFXImage(image, null);
-        try
-        (
-            ByteArrayOutputStream out = new ByteArrayOutputStream();
-        )
-        {   
-            ImageIO.write(bufImg, "png", out);
-        
-            byte[] data = out.toByteArray();
-            out.close();
-            ByteArrayInputStream in = new ByteArrayInputStream(data);
-            return in;
-        }
     }
 }

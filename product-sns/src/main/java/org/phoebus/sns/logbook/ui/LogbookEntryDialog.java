@@ -7,10 +7,13 @@
  *******************************************************************************/
 package org.phoebus.sns.logbook.ui;
 
+import java.util.Collection;
+
 import org.phoebus.framework.preferences.PhoebusPreferenceService;
 import org.phoebus.logging.LogEntry;
+import org.phoebus.logging.Logbook;
+import org.phoebus.logging.Tag;
 import org.phoebus.ui.dialog.DialogHelper;
-import org.phoebus.ui.dialog.MultiLineInputDialog;
 
 import javafx.geometry.Insets;
 import javafx.scene.Node;
@@ -21,9 +24,8 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 
 /**
- * View for making an entry into a log book.
+ * Dialog for making an entry into a log book.
  * @author Evan Smith
- *
  */
 public class LogbookEntryDialog extends Dialog<LogEntry>
 {
@@ -51,10 +53,11 @@ public class LogbookEntryDialog extends Dialog<LogEntry>
     /** Button type for submitting log entry. */
     private final ButtonType submit;
 
-    public LogbookEntryDialog(final Node parent/*, LogEntry template */)
+    public LogbookEntryDialog(final Node parent, LogEntry template)
     {   
         model = new LogEntryModel(parent);
-       
+        initModel(template);
+        
         content = new VBox();
         
         // user name and password label and fields.
@@ -86,7 +89,7 @@ public class LogbookEntryDialog extends Dialog<LogEntry>
         setResizable(true);
         
         DialogHelper.positionAndSize(this, parent,
-                PhoebusPreferenceService.userNodeForClass(MultiLineInputDialog.class),
+                PhoebusPreferenceService.userNodeForClass(LogbookEntryDialog.class),
                 800, 1000);
 
         getDialogPane().getButtonTypes().addAll(ButtonType.CANCEL, submit);
@@ -95,6 +98,23 @@ public class LogbookEntryDialog extends Dialog<LogEntry>
         {
             return button == submit ? null /* model.getEntry() */ : null;
         });
+    }
 
+    private void initModel(LogEntry template)
+    {
+        // model.setTitle(template.getTitle());
+        model.setText(template.getDescription());
+        
+        Collection<Logbook> logbooks = template.getLogbooks();
+        logbooks.forEach(logbook-> 
+        {
+            model.addSelectedLogbook(logbook.getName());
+        });  
+        
+        Collection<Tag> tags = template.getTags();
+        tags.forEach(tag-> 
+        {
+            model.addSelectedTag(tag.getName());
+        });
     }
 }
