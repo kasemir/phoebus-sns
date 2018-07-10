@@ -85,6 +85,8 @@ public class LogbookEntryDialog extends Dialog<LogEntry>
         content.setSpacing(10);
         content.getChildren().addAll(credentialEntry, dateAndLevel, logEntryFields, attachmentsView);
         
+        setTitle("Create Log Book Entry");
+        
         getDialogPane().setContent(content);
         
         submit = new ButtonType("Submit", ButtonBar.ButtonData.OK_DONE);

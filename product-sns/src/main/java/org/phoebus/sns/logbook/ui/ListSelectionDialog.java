@@ -88,6 +88,8 @@ public class ListSelectionDialog extends Dialog<Boolean>
         for (String item : selectedItems.getItems())
             availableItems.getItems().remove(item);
         
+        setTitle(title);
+        
         formatContent();
         
         getDialogPane().getButtonTypes().addAll(ButtonType.CANCEL, ButtonType.APPLY);
