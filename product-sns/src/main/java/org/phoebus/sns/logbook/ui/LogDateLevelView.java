@@ -55,7 +55,7 @@ public class LogDateLevelView extends HBox
     private void formatView()
     {
         dateField.setEditable(false);
-        dateLabel.setPrefWidth(LogbookEntryView.labelWidth);
+        dateLabel.setPrefWidth(LogbookEntryDialog.labelWidth);
         levelLabel.setAlignment(Pos.CENTER_RIGHT);
         
         // Put log level label and selector in HBox so that they can be right justified.

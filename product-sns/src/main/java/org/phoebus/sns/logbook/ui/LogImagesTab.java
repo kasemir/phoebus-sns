@@ -128,7 +128,8 @@ public class LogImagesTab extends Tab
         formatButtonBox();
         
         content.setSpacing(10);
-        VBox.setMargin(imageBox, new Insets(10, 0, 0, 0));
+        VBox.setMargin(imageBox,  new Insets(10, 0, 0, 0));
+        VBox.setMargin(buttonBox, new Insets(0, 0, 10, 0));
         content.getChildren().addAll(imageBox, buttonBox);
         
         this.setContent(content);
@@ -151,12 +152,13 @@ public class LogImagesTab extends Tab
     
     private void formatImageViewBox()
     {
-        imageView.fitHeightProperty().bind(imageBox.heightProperty());
+        imageView.fitWidthProperty().bind(imageBox.widthProperty().divide(3));
+        //imageView.fitHeightProperty().bind(imageBox.heightProperty());
         imageView.setPreserveRatio(true);
         imageView.imageProperty().bind(imageList.getSelectionModel().selectedItemProperty());
         imageViewBox.prefWidthProperty().bind(imageBox.widthProperty().divide(2));
         imageViewBox.setAlignment(Pos.CENTER);
-        imageViewBox.getChildren().add(imageView);
+        imageViewBox.getChildren().addAll(imageView);
         
         HBox.setHgrow(imageViewBox, Priority.ALWAYS);
     }
@@ -165,7 +167,7 @@ public class LogImagesTab extends Tab
     {
         removeBox.setMinWidth(110);
         removeImage.setPrefSize(100, 30);
-        VBox.setMargin(removeImage, new Insets(30, 0, 0, 0));
+        //VBox.setMargin(removeImage, new Insets(5, 0, 0, 0));
         removeBox.getChildren().add(removeImage);
     }
     

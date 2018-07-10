@@ -7,29 +7,34 @@
  *******************************************************************************/
 package org.phoebus.sns.logbook.ui;
 
+import org.phoebus.framework.preferences.PhoebusPreferenceService;
+import org.phoebus.logging.LogEntry;
+import org.phoebus.ui.dialog.DialogHelper;
+import org.phoebus.ui.dialog.MultiLineInputDialog;
+
 import javafx.geometry.Insets;
-import javafx.geometry.Pos;
 import javafx.scene.Node;
-import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.layout.HBox;
+import javafx.scene.control.ButtonBar;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.Dialog;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
-import javafx.stage.Stage;
-import javafx.stage.Window;
 
 /**
  * View for making an entry into a log book.
  * @author Evan Smith
  *
  */
-public class LogbookEntryView extends VBox
+public class LogbookEntryDialog extends Dialog<LogEntry>
 {
     /** Width of labels on views leftmost column. */
     public static final int labelWidth = 80;
     
     /** Purveyor of log entry application state. */
     private final LogEntryModel           model;
+    
+    /** Dialog Content */
+    private final VBox                    content;
     
     /** View handles user credential entry for access to log. */
     private final LogCredentialEntryView  credentialEntry;
@@ -43,19 +48,15 @@ public class LogbookEntryView extends VBox
     /** View handles addition of log entry attachments. */
     private final LogEntryAttachmentsView attachmentsView;
     
-    private final HBox buttonBox;
-    private final Button cancel, submit;
-    
-    public LogbookEntryView(final Node callingNode)
-    {
-        Scene callingScene = callingNode.getParent().getScene();
-        Window owner = callingScene.getWindow();
-        
-        Stage stage = new Stage();     
-        stage.initOwner(owner); // The stage should die if the main window dies.
-        
-        model = new LogEntryModel(callingNode);
+    /** Button type for submitting log entry. */
+    private final ButtonType submit;
+
+    public LogbookEntryDialog(final Node parent/*, LogEntry template */)
+    {   
+        model = new LogEntryModel(parent);
        
+        content = new VBox();
+        
         // user name and password label and fields.
         credentialEntry = new LogCredentialEntryView(model);
         
@@ -66,56 +67,34 @@ public class LogbookEntryView extends VBox
         logEntryFields = new LogEntryFieldsView(model);
                 
         // Images, Files, Properties
-        attachmentsView = new LogEntryAttachmentsView(model);
-                
-        // Cancel and Submit buttons.
-        buttonBox = new HBox();
-        cancel = new Button("Cancel");
-        submit = new Button("Submit");
-        cancel.setPrefWidth(100);
-        submit.setPrefWidth(100);
-        buttonBox.getChildren().addAll(cancel, submit);
-        buttonBox.setAlignment(Pos.CENTER_RIGHT);
-        buttonBox.setSpacing(10);
-        
-        setButtonActions();
+        attachmentsView = new LogEntryAttachmentsView(model);        
         
         // Let the Text Area grow to the bottom.
-        VBox.setVgrow(logEntryFields, Priority.ALWAYS);
+        VBox.setVgrow(logEntryFields,  Priority.ALWAYS);
 
         VBox.setMargin(credentialEntry,       new Insets(10, 10,  0, 10));
         VBox.setMargin(dateAndLevel,          new Insets( 0, 10,  0, 10));
-        VBox.setMargin(logEntryFields,        new Insets( 0, 10,  0, 10));
-        VBox.setMargin(buttonBox,             new Insets( 0, 10, 10, 10));
+        VBox.setMargin(logEntryFields,        new Insets( 0, 10,  10, 10));
         
-        setSpacing(10);
-        getChildren().addAll(credentialEntry, dateAndLevel, logEntryFields, attachmentsView, buttonBox);
+        content.setSpacing(10);
+        content.getChildren().addAll(credentialEntry, dateAndLevel, logEntryFields, attachmentsView);
         
-        Scene scene = new Scene(this, 800, 1000);
-        stage.setTitle("Logbook Entry");
-        stage.setScene(scene);
+        getDialogPane().setContent(content);
         
-        stage.show();
-    }
+        submit = new ButtonType("Submit", ButtonBar.ButtonData.OK_DONE);
+        
+        setResizable(true);
+        
+        DialogHelper.positionAndSize(this, parent,
+                PhoebusPreferenceService.userNodeForClass(MultiLineInputDialog.class),
+                800, 1000);
 
-    private void setButtonActions()
-    {
-        cancel.setOnAction(event ->
-        {
-            close();
-        });
+        getDialogPane().getButtonTypes().addAll(ButtonType.CANCEL, submit);
         
-        submit.setOnAction(event ->
+        setResultConverter(button ->
         {
-            model.submitEntry();
-            close();
+            return button == submit ? null /* model.getEntry() */ : null;
         });
-    }
-    
-    private void close()
-    {
-        Scene scene = this.getScene();
-        Stage stage = (Stage) scene.getWindow();
-        stage.close();
+
     }
 }

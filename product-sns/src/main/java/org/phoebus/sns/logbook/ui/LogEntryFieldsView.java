@@ -46,8 +46,8 @@ public class LogEntryFieldsView extends VBox
         // title label and title field.
         HBox titleBox = new HBox();
         titleBox.setAlignment(Pos.CENTER);
-        titleLabel.setPrefWidth(LogbookEntryView.labelWidth);
-        textLabel.setPrefWidth(LogbookEntryView.labelWidth);
+        titleLabel.setPrefWidth(LogbookEntryDialog.labelWidth);
+        textLabel.setPrefWidth(LogbookEntryDialog.labelWidth);
         
         titleField.setPrefWidth(0);
         HBox.setHgrow(titleField, Priority.ALWAYS);

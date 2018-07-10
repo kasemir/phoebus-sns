@@ -29,7 +29,8 @@ public class LogbookEntryViewDemo extends Application
             mi.setOnAction(value -> 
             {
                 Node node = (Node) this;
-                new LogbookEntryView(node);
+                LogbookEntryDialog logDialog = new LogbookEntryDialog(node);
+                logDialog.showAndWait();
             });
             cm.getItems().add(mi);
             setContextMenu(cm);

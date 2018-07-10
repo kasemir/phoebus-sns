@@ -42,7 +42,7 @@ public class LogCredentialEntryView extends HBox
     {
         setFieldActions();
         
-        userFieldLabel.setPrefWidth(LogbookEntryView.labelWidth);
+        userFieldLabel.setPrefWidth(LogbookEntryDialog.labelWidth);
 
         // The preferred width is set to zero so that the labels don't minimize themselves to let the fields have their preferred widths.
         userField.setPrefWidth(0);

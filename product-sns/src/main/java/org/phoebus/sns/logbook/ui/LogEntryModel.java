@@ -335,8 +335,7 @@ public class LogEntryModel
             logEntryBuilder.attach(AttachmentImpl.of(file));
         // for (Image image : images) 
         // {
-        //     
-        //     logEntryBuilder.attach(AttachmentImpl.of(in));
+        //     logEntryBuilder.attach(AttachmentImpl.of(imageToStream(image));
         // }
         */
         System.out.println("You pressed submit.");

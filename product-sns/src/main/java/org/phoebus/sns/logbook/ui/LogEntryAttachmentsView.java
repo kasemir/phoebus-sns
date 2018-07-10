@@ -8,7 +8,6 @@
 package org.phoebus.sns.logbook.ui;
 
 import javafx.scene.control.Accordion;
-import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.control.TitledPane;
 
@@ -19,11 +18,12 @@ import javafx.scene.control.TitledPane;
  */
 public class LogEntryAttachmentsView extends Accordion
 {
-    private final TabPane       tabPane;
     @SuppressWarnings("unused")
-    private final LogEntryModel model;
-    private final LogImagesTab  images;
-    private final Tab           files, properties;
+    private final LogEntryModel    model;
+    private final TabPane          tabPane;
+    private final LogImagesTab     images;
+    private final LogFilesTab      files;
+    private final LogPropertiesTab properties;
     
     public LogEntryAttachmentsView(final LogEntryModel model)
     {

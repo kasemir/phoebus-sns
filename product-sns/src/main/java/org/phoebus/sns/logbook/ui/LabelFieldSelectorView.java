@@ -80,7 +80,7 @@ public class LabelFieldSelectorView extends HBox
      /** Format the view  */
     private void formatView()
     {
-        label.setPrefWidth(LogbookEntryView.labelWidth);
+        label.setPrefWidth(LogbookEntryDialog.labelWidth);
         selector.setOnAction(actionEvent -> 
         {
             if (selector.isSelected())
