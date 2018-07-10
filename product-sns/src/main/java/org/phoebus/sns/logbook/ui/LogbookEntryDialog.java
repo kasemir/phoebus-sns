@@ -79,9 +79,8 @@ public class LogbookEntryDialog extends Dialog<LogEntry>
         // Let the Text Area grow to the bottom.
         VBox.setVgrow(logEntryFields,  Priority.ALWAYS);
 
-        VBox.setMargin(credentialEntry,       new Insets(10, 10,  0, 10));
-        VBox.setMargin(dateAndLevel,          new Insets( 0, 10,  0, 10));
-        VBox.setMargin(logEntryFields,        new Insets( 0, 10,  10, 10));
+        VBox.setMargin(credentialEntry,       new Insets(10, 0,  0, 0));
+        VBox.setMargin(logEntryFields,        new Insets( 0, 0, 10, 0));
         
         content.setSpacing(10);
         content.getChildren().addAll(credentialEntry, dateAndLevel, logEntryFields, attachmentsView);
@@ -100,7 +99,7 @@ public class LogbookEntryDialog extends Dialog<LogEntry>
         
         setResultConverter(button ->
         {
-            return button == submit ? null /* model.getEntry() */ : null;
+            return button == submit ? model.getEntry() : null;
         });
     }
 
@@ -134,6 +133,6 @@ public class LogbookEntryDialog extends Dialog<LogEntry>
         
         //LogClient client = logFactory.getLogClient(model.getUsername(), model.getPassword());
         
-        //sclient.set(logEntry);
+        //client.set(logEntry);
     }
 }

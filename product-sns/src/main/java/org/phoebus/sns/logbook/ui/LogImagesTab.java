@@ -54,7 +54,7 @@ public class LogImagesTab extends Tab
         {
             super();
             setAlignment(Pos.CENTER);
-            cellImageView.setFitHeight(100);
+            cellImageView.fitWidthProperty().bind(imageList.widthProperty().subtract(50));
             cellImageView.setPreserveRatio(true);
         }
         
@@ -137,10 +137,10 @@ public class LogImagesTab extends Tab
 
     private void formatImageBox()
     {
-        imageBox.setPrefHeight(200);
+        imageBox.setPrefHeight(250);
         
         imageBox.setSpacing(10);
-        imageBox.setAlignment(Pos.CENTER_RIGHT);
+        imageBox.setAlignment(Pos.CENTER);
         imageBox.getChildren().addAll(imageViewBox, removeBox, listBox);
         
         VBox.setMargin(imageBox, new Insets(0, 0, 0, 10));
@@ -152,22 +152,20 @@ public class LogImagesTab extends Tab
     
     private void formatImageViewBox()
     {
-        imageView.fitWidthProperty().bind(imageBox.widthProperty().divide(3));
-        //imageView.fitHeightProperty().bind(imageBox.heightProperty());
+        imageView.fitHeightProperty().bind(imageBox.heightProperty());
         imageView.setPreserveRatio(true);
         imageView.imageProperty().bind(imageList.getSelectionModel().selectedItemProperty());
-        imageViewBox.prefWidthProperty().bind(imageBox.widthProperty().divide(2));
-        imageViewBox.setAlignment(Pos.CENTER);
-        imageViewBox.getChildren().addAll(imageView);
-        
         HBox.setHgrow(imageViewBox, Priority.ALWAYS);
+        imageViewBox.prefWidthProperty().bind(imageBox.widthProperty().divide(3));
+        imageViewBox.setAlignment(Pos.CENTER);
+        imageViewBox.getChildren().add(imageView);
+        HBox.setMargin(imageViewBox, new Insets(0, 0, 0, 10));
     }
     
     private void formatRemoveBox()
     {
         removeBox.setMinWidth(110);
         removeImage.setPrefSize(100, 30);
-        //VBox.setMargin(removeImage, new Insets(5, 0, 0, 0));
         removeBox.getChildren().add(removeImage);
     }
     
@@ -177,9 +175,8 @@ public class LogImagesTab extends Tab
         imageList.setStyle("-fx-control-inner-background: #f4f4f4");
 
         imageList.setCellFactory(param -> new ImageCell(imageView));
-        imageList.prefWidthProperty().bind(imageBox.widthProperty().divide(3));
+        imageList.prefWidthProperty().bind(imageBox.widthProperty().divide(5));
         listBox.setSpacing(5);
-        HBox.setHgrow(listBox, Priority.ALWAYS);
         HBox.setMargin(listBox, new Insets(0, 10, 0, 0));
         listBox.setAlignment(Pos.CENTER_LEFT);
         listBox.getChildren().addAll(new Label("Images: "), imageList);
