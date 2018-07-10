@@ -26,6 +26,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleButton;
+import javafx.scene.control.Tooltip;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
@@ -80,19 +81,19 @@ public class LabelFieldSelectorView extends HBox
      /** Format the view  */
     private void formatView()
     {
+        Tooltip tooltip = new Tooltip("Add " + labelText + " to the log entry.");
+        addItem.setTooltip(tooltip);
+        selector.setTooltip(tooltip);
         label.setPrefWidth(LogbookEntryDialog.labelWidth);
         selector.setOnAction(actionEvent -> 
         {
-            if (selector.isSelected())
-                dropDown.show(field, Side.BOTTOM, 0, 0);
-            else
-                dropDown.hide();
+            dropDown.show(field, Side.BOTTOM, 0, 0);
         });
         
         dropDown.focusedProperty().addListener((changeListener, oldVal, newVal) -> 
         {
-            if (! newVal && ! selector.focusedProperty().get())
-                selector.setSelected(newVal);
+            if (!newVal)
+                selector.setSelected(false);
         });
         
         field.setEditable(false);
@@ -147,6 +148,7 @@ public class LabelFieldSelectorView extends HBox
                     addSelected.apply(text);
                     setFieldText();
                 }
+                
                 if (selector.isSelected())
                     selector.setSelected(false);
             }

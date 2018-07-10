@@ -17,6 +17,7 @@ import javafx.geometry.Pos;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.scene.control.Tooltip;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 
@@ -55,9 +56,10 @@ public class LogDateLevelView extends HBox
     private void formatView()
     {
         dateField.setEditable(false);
+        dateField.setTooltip(new Tooltip("Current Date"));
         dateLabel.setPrefWidth(LogbookEntryDialog.labelWidth);
         levelLabel.setAlignment(Pos.CENTER_RIGHT);
-        
+        levelSelector.setTooltip(new Tooltip("Select the log entry level."));
         // Put log level label and selector in HBox so that they can be right justified.
         HBox levelBox  = new HBox();
         levelBox.getChildren().addAll(levelLabel, levelSelector);
