@@ -9,12 +9,28 @@ package org.phoebus.sns.logbook.ui;
 
 import static org.phoebus.ui.application.PhoebusApplication.logger;
 
+import java.util.List;
+import java.util.Optional;
 import java.util.logging.Level;
 
 import org.phoebus.ui.javafx.ImageCache;
 
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.geometry.Pos;
+import javafx.geometry.Side;
+import javafx.scene.control.Button;
+import javafx.scene.control.CheckMenuItem;
+import javafx.scene.control.ContextMenu;
+import javafx.scene.control.Label;
+import javafx.scene.control.MenuItem;
+import javafx.scene.control.TextField;
+import javafx.scene.control.ToggleButton;
+import javafx.scene.control.Tooltip;
 import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 
 /**
@@ -23,79 +39,298 @@ import javafx.scene.layout.VBox;
  */
 public class LogbooksTagsView extends VBox
 {
-    private static final Image tag_icon = ImageCache.getImage(LabelFieldSelectorView.class, "/icons/add_tag.png");
-    private static final Image logbook_icon = ImageCache.getImage(LabelFieldSelectorView.class, "/icons/logbook-16.png");
+    private final LogEntryModel model;
+    
+    private static final Image tag_icon = ImageCache.getImage(LogbooksTagsView.class, "/icons/add_tag.png");
+    private static final Image logbook_icon = ImageCache.getImage(LogbooksTagsView.class, "/icons/logbook-16.png");
+    private static final Image down_icon = ImageCache.getImage(LogbooksTagsView.class, "/icons/down.png");
 
+    private final HBox         logbookBox, tagBox;
+    private final Label        logbookLabel, tagLabel;
+    private final TextField    logbookField, tagField;
+    private final ContextMenu  logbookDropDown, tagDropDown;
+    private final ToggleButton logbookSelector, tagSelector; // Opens context menu (dropDown).
+    private final Button       addLogbook, addTag;
+    
     public LogbooksTagsView(LogEntryModel model)
     {
-        LabelFieldSelectorView logbooks = new LabelFieldSelectorView("Logbooks",
-                                                                      logbook_icon,
-                                                                      model::getLogbooks, 
-                                                                      model::getSelectedLogbooks, 
-                                                                      model::hasSelectedLogbook, 
-                                                                      // Function throws Exception on internal error so use lambda to catch.
-                                                                      logbook ->
-                                                                      {
-                                                                          try
-                                                                          {
-                                                                              return model.addSelectedLogbook(logbook);
-                                                                          } 
-                                                                          catch (Exception ex)
-                                                                          {
-                                                                              logger.log(Level.SEVERE, "Internal log selection failed.", ex);
-                                                                          }
-                                                                          return false;
-                                                                      }, 
-                                                                      // Function throws Exception on internal error so use lambda to catch.
-                                                                      logbook ->
-                                                                      {
-                                                                          try
-                                                                          {
-                                                                              return model.removeSelectedLogbook(logbook);
-                                                                          } 
-                                                                          catch (Exception ex)
-                                                                          {
-                                                                              logger.log(Level.SEVERE, "Internal log selection failed.", ex);
-                                                                          }
-                                                                          return false;
-                                                                      });
+        this.model = model;
         
-        LabelFieldSelectorView tags = new LabelFieldSelectorView("Tags",
-                                                                  tag_icon,
-                                                                  model::getTags,
-                                                                  model::getSelectedTags, 
-                                                                  model::hasSelectedTag, 
-                                                                  // Function throws Exception on internal error so use lambda to catch.
-                                                                  tag ->
-                                                                  {
-                                                                      try
-                                                                      {
-                                                                          return model.addSelectedTag(tag);
-                                                                      } 
-                                                                      catch (Exception ex)
-                                                                      {
-                                                                          logger.log(Level.SEVERE, "Internal tag selection failed.", ex);
-                                                                      }
-                                                                      return false;
-                                                                  }, 
-                                                                  // Function throws Exception on internal error so use lambda to catch.
-                                                                  tag ->
-                                                                  {
-                                                                      try
-                                                                      {
-                                                                          return model.removeSelectedTag(tag);
-                                                                      } 
-                                                                      catch (Exception ex)
-                                                                      {
-                                                                          logger.log(Level.SEVERE, "Internal tag selection failed.", ex);
-                                                                      }
-                                                                      return false;
-                                                                  });
+        logbookBox = new HBox();
+        logbookLabel = new Label("Logbooks: ");
+        logbookField = new TextField();
+        logbookDropDown = new ContextMenu();
+        logbookSelector = new ToggleButton("", new ImageView(down_icon));
+        addLogbook = new Button("", new ImageView(logbook_icon));
+        
+        tagBox = new HBox();
+        tagLabel = new Label("Tags: ");
+        tagField = new TextField();
+        tagDropDown = new ContextMenu();
+        tagSelector = new ToggleButton("", new ImageView(down_icon));
+        addTag = new Button("", new ImageView(tag_icon));
         
         setSpacing(10);
         
-        logbooks.setAlignment(Pos.CENTER);
-        tags.setAlignment(Pos.CENTER);
-        getChildren().addAll(logbooks, tags);
+        formatLogbooks();
+        formatTags();
+        initializeSelectors();
+        
+        getChildren().addAll(logbookBox, tagBox);
+    }
+    
+    /** Format log books HBox  */
+    private void formatLogbooks()
+    {
+        Tooltip tooltip = new Tooltip("Add logbook to the log entry.");
+        addLogbook.setTooltip(tooltip);
+        logbookSelector.setTooltip(tooltip);
+        logbookLabel.setPrefWidth(LogbookEntryDialog.labelWidth);
+        logbookSelector.setOnAction(actionEvent -> 
+        {
+            if (logbookSelector.isSelected())
+                logbookDropDown.show(logbookField, Side.BOTTOM, 0, 0);
+            else
+                logbookDropDown.hide();
+        });
+        
+        logbookField.setEditable(false);
+       
+        HBox.setHgrow(logbookField, Priority.ALWAYS);
+        
+        final String title = "Select Logbooks";
+        addLogbook.setOnAction(event ->
+        {
+            ListSelectionDialog select = new ListSelectionDialog(getScene().getRoot(), title, model::getLogbooks, model::getSelectedLogbooks,
+                logbook ->
+                {
+                    try
+                    {
+                        return model.addSelectedLogbook(logbook);
+                    } 
+                    catch (Exception ex)
+                    {
+                        logger.log(Level.SEVERE, "Internal log selection failed.", ex);
+                    }
+                    return false;
+                }, 
+                // Function throws Exception on internal error so use lambda to catch.
+                logbook ->
+                {
+                    try
+                    {
+                        return model.removeSelectedLogbook(logbook);
+                    } 
+                    catch (Exception ex)
+                    {
+                        logger.log(Level.SEVERE, "Internal log selection failed.", ex);
+                    }
+                    return false;
+                });
+            
+            Optional<Boolean> result = select.showAndWait();
+            if (result.isPresent() && result.get())
+                setFieldText(logbookDropDown, model.getSelectedLogbooks(), logbookField);
+        });
+        
+        logbookBox.getChildren().addAll(logbookLabel, logbookField, logbookSelector, addLogbook);
+        
+
+        logbookBox.setSpacing(5);
+        logbookBox.setAlignment(Pos.CENTER);
+    }
+    
+    /** Format tags HBox  */
+    private void formatTags()
+    {
+        Tooltip tooltip = new Tooltip("Add tag to the log entry.");
+        addTag.setTooltip(tooltip);
+        tagSelector.setTooltip(tooltip);
+        tagLabel.setPrefWidth(LogbookEntryDialog.labelWidth);
+        tagSelector.setOnAction(actionEvent -> 
+        {
+            if (tagSelector.isSelected())
+                tagDropDown.show(tagField, Side.BOTTOM, 0, 0);
+            else
+                tagDropDown.hide();
+        });
+        
+        tagField.setEditable(false);
+       
+        HBox.setHgrow(tagField, Priority.ALWAYS);
+        
+        final String title = "Select Tags";
+        addTag.setOnAction(event ->
+        {
+            ListSelectionDialog select = new ListSelectionDialog(getScene().getRoot(), title, model::getTags, model::getSelectedTags,
+                tag ->
+                {
+                    try
+                    {
+                        return model.addSelectedTag(tag);
+                    } 
+                    catch (Exception ex)
+                    {
+                        logger.log(Level.SEVERE, "Internal tag selection failed.", ex);
+                    }
+                    return false;
+                }, 
+                // Function throws Exception on internal error so use lambda to catch.
+                tag ->
+                {
+                    try
+                    {
+                        return model.removeSelectedTag(tag);
+                    } 
+                    catch (Exception ex)
+                    {
+                        logger.log(Level.SEVERE, "Internal tag selection failed.", ex);
+                    }
+                    return false;
+                });
+            
+            Optional<Boolean> result = select.showAndWait();
+            if (result.isPresent() && result.get())
+                setFieldText(tagDropDown, model.getSelectedTags(), tagField);
+        });
+        
+        tagBox.getChildren().addAll(tagLabel, tagField, tagSelector, addTag);
+        
+        tagBox.setSpacing(5);
+        tagBox.setAlignment(Pos.CENTER);
+    }
+    
+    /** Initialize the drop down context menu. */
+    private void initializeSelectors()
+    {
+        for (final String logbook :model.getLogbooks())
+        {
+            addToLogbookDropDown(logbook);
+        }
+        for (final String tag :model.getTags())
+        {
+            addToTagDropDown(tag);
+        }
+    }
+    
+    /**
+     * Add a new CheckMenuItem to the drop down ContextMenu.
+     * @param item - Item to be added.
+     */
+    private void addToLogbookDropDown(String item)
+    {
+        CheckMenuItem newLogbook = new CheckMenuItem(item);
+        newLogbook.setOnAction(new EventHandler<ActionEvent>()
+        {
+            public void handle(ActionEvent e)
+            {
+                CheckMenuItem source = (CheckMenuItem) e.getSource();
+                String text = source.getText();
+                if (model.getSelectedLogbooks().contains(text))
+                {
+                    try
+                    {
+                        model.removeSelectedLogbook(text);
+                    } 
+                    catch (Exception ex)
+                    {
+                        logger.log(Level.SEVERE, "Internal logbook selection failed.", ex);
+                    }
+                    setFieldText(logbookDropDown, model.getSelectedLogbooks(), logbookField);
+                }
+                else
+                {
+                    try
+                    {
+                        model.addSelectedLogbook(text);
+                    } 
+                    catch (Exception ex)
+                    {
+                        logger.log(Level.SEVERE, "Internal logbook selection failed.", ex);
+                    }
+                    setFieldText(logbookDropDown, model.getSelectedLogbooks(), logbookField);
+                }
+                
+                if (logbookSelector.isSelected())
+                    logbookSelector.setSelected(false);
+            }
+        });
+        logbookDropDown.getItems().add(newLogbook);        
+    }
+    
+    /**
+     * Add a new CheckMenuItem to the drop down ContextMenu.
+     * @param item - Item to be added.
+     */
+    private void addToTagDropDown(String item)
+    {
+        CheckMenuItem newTag = new CheckMenuItem(item);
+        newTag.setOnAction(new EventHandler<ActionEvent>()
+        {
+            public void handle(ActionEvent e)
+            {
+                CheckMenuItem source = (CheckMenuItem) e.getSource();
+                String text = source.getText();
+                if (model.getSelectedTags().contains(text))
+                {
+                    try
+                    {
+                        model.removeSelectedTag(text);
+                    } 
+                    catch (Exception ex)
+                    {
+                        logger.log(Level.SEVERE, "Internal tag selection failed.", ex);
+                    }
+                    setFieldText(tagDropDown, model.getSelectedTags(), tagField);
+                }
+                else
+                {
+                    try
+                    {
+                        model.addSelectedTag(text);
+                    } 
+                    catch (Exception ex)
+                    {
+                        logger.log(Level.SEVERE, "Internal tag selection failed.", ex);
+                    }
+                    setFieldText(tagDropDown, model.getSelectedTags(), tagField);
+                }
+
+                if (tagSelector.isSelected())
+                    tagSelector.setSelected(false);
+            }
+        });
+        tagDropDown.getItems().add(newTag);        
+    }
+    
+    /** Sets the field's text based on the selected items list.*/
+    private void setFieldText(ContextMenu dropDown, List<String> selectedItems, TextField field)
+    {
+        // Handle drop down menu item checking.
+        for (MenuItem menuItem : dropDown.getItems())
+        {
+            CheckMenuItem check = (CheckMenuItem) menuItem;
+            // If the item is selected make sure it is checked.
+            if (selectedItems.contains(check.getText()))
+            {
+                if (! check.isSelected()) 
+                    check.setSelected(true);
+            }
+            // If the item is not selected, make sure it is not checked.
+            else
+            {
+                if (check.isSelected())
+                    check.setSelected(false);
+            }
+        }
+        
+        // Build the field text string.
+        String fieldText = "";
+        for (String item : selectedItems)
+        {
+            fieldText += (fieldText.isEmpty() ? "" : ", ") + item;
+        }
+        
+        field.setText(fieldText);
     }
 }
