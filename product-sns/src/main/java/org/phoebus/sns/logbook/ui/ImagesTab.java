@@ -44,7 +44,7 @@ import javafx.stage.FileChooser.ExtensionFilter;
 /**
  * @author Evan Smith
  */
-public class LogImagesTab extends Tab
+public class ImagesTab extends Tab
 {
     private class ImageCell extends ListCell<Image>
     {
@@ -84,7 +84,7 @@ public class LogImagesTab extends Tab
     private final FileChooser addImageDialog;
     private final ListView<Image>  imageList;
 
-    public LogImagesTab(final LogEntryModel model)
+    public ImagesTab(final LogEntryModel model)
     {
         super();
         this.model = model;

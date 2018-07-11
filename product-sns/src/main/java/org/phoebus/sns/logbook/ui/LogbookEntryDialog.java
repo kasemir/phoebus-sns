@@ -43,16 +43,16 @@ public class LogbookEntryDialog extends Dialog<LogEntry>
     private final VBox                    content;
     
     /** View handles user credential entry for access to log. */
-    private final LogCredentialEntryView  credentialEntry;
+    private final CredentialEntryView  credentialEntry;
     
     /** View handles displaying of date and log entry level selection. */
-    private final LogDateLevelView        dateAndLevel;
+    private final DateLevelView        dateAndLevel;
     
     /** View handles the input for creation of the entry. */
-    private final LogEntryFieldsView      logEntryFields;
+    private final FieldsView      logEntryFields;
         
     /** View handles addition of log entry attachments. */
-    private final LogEntryAttachmentsView attachmentsView;
+    private final AttachmentsView attachmentsView;
     
     /** Button type for submitting log entry. */
     private final ButtonType submit;
@@ -65,16 +65,16 @@ public class LogbookEntryDialog extends Dialog<LogEntry>
         content = new VBox();
         
         // user name and password label and fields.
-        credentialEntry = new LogCredentialEntryView(model);
+        credentialEntry = new CredentialEntryView(model);
         
         // date and level labels, fields, and selectors.
-        dateAndLevel = new LogDateLevelView(model);
+        dateAndLevel = new DateLevelView(model);
         
         // title and text labels and fields.
-        logEntryFields = new LogEntryFieldsView(model);
+        logEntryFields = new FieldsView(model);
                 
         // Images, Files, Properties
-        attachmentsView = new LogEntryAttachmentsView(model);        
+        attachmentsView = new AttachmentsView(model);        
         
         // Let the Text Area grow to the bottom.
         VBox.setVgrow(logEntryFields,  Priority.ALWAYS);

@@ -19,14 +19,14 @@ import javafx.scene.layout.Priority;
  * View to facilitate user credential entry.
  * @author Evan Smith
  */
-public class LogCredentialEntryView extends HBox
+public class CredentialEntryView extends HBox
 {
     private final LogEntryModel model;
     private final Label         userFieldLabel, passwordFieldLabel;
     private final TextField     userField;
     private final PasswordField passwordField;
     
-    public LogCredentialEntryView(LogEntryModel model)
+    public CredentialEntryView(LogEntryModel model)
     {
         this.model = model;
         userFieldLabel     = new Label("User Name:");       

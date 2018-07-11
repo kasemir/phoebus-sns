@@ -16,23 +16,23 @@ import javafx.scene.control.TitledPane;
  * @author Evan Smith
  *
  */
-public class LogEntryAttachmentsView extends Accordion
+public class AttachmentsView extends Accordion
 {
     @SuppressWarnings("unused")
     private final LogEntryModel    model;
     private final TabPane          tabPane;
-    private final LogImagesTab     images;
-    private final LogFilesTab      files;
-    private final LogPropertiesTab properties;
+    private final ImagesTab     images;
+    private final FilesTab      files;
+    private final PropertiesTab properties;
     
-    public LogEntryAttachmentsView(final LogEntryModel model)
+    public AttachmentsView(final LogEntryModel model)
     {
         super();
         this.model = model;
         tabPane    = new TabPane();
-        images     = new LogImagesTab(model);
-        files      = new LogFilesTab(model);
-        properties = new LogPropertiesTab();
+        images     = new ImagesTab(model);
+        files      = new FilesTab(model);
+        properties = new PropertiesTab();
         
         tabPane.getTabs().addAll(images, files, properties);
         

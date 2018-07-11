@@ -36,7 +36,7 @@ import javafx.stage.Window;
  * @author Evan Smith
  *
  */
-public class LogFilesTab extends Tab
+public class FilesTab extends Tab
 {
     private class FileCell extends ListCell<File>
     {
@@ -95,7 +95,7 @@ public class LogFilesTab extends Tab
     
     private final FileChooser    addFileDialog;  
     
-    public LogFilesTab(final LogEntryModel model) 
+    public FilesTab(final LogEntryModel model) 
     {
         super();
         this.model = model;

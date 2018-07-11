@@ -25,7 +25,7 @@ import javafx.scene.layout.Priority;
  * View to display the date and select the log entry level.
  * @author Evan Smith
  */
-public class LogDateLevelView extends HBox
+public class DateLevelView extends HBox
 {
     private final LogEntryModel          model;
     private final Label                  dateLabel, levelLabel;
@@ -36,7 +36,7 @@ public class LogDateLevelView extends HBox
                                                         "High",
                                                         "Normal");
 
-    public LogDateLevelView(final LogEntryModel model)
+    public DateLevelView(final LogEntryModel model)
     {
         this.model = model;
         

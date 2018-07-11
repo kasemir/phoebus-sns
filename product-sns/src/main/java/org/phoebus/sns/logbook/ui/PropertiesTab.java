@@ -14,9 +14,9 @@ import javafx.scene.control.Tab;
  * @author Evan Smith
  *
  */
-public class LogPropertiesTab extends Tab
+public class PropertiesTab extends Tab
 {
-    public LogPropertiesTab()
+    public PropertiesTab()
     {
         formatTab();
     }

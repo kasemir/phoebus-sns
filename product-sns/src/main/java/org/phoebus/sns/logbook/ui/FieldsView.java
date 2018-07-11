@@ -15,7 +15,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 
-public class LogEntryFieldsView extends VBox
+public class FieldsView extends VBox
 {
     private final LogEntryModel    model;
     private final Label            titleLabel, textLabel;
@@ -23,7 +23,7 @@ public class LogEntryFieldsView extends VBox
     private final LogbooksTagsView logbooksAndTags;
     private final TextArea         textArea;
     
-    public LogEntryFieldsView(LogEntryModel model)
+    public FieldsView(LogEntryModel model)
     {
         this.model = model;
         titleLabel = new Label("Title:");
