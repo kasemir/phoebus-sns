@@ -33,6 +33,7 @@ public class LogbooksTagsView extends VBox
                                                                       model::getLogbooks, 
                                                                       model::getSelectedLogbooks, 
                                                                       model::hasSelectedLogbook, 
+                                                                      // Function throws Exception on internal error so use lambda to catch.
                                                                       logbook ->
                                                                       {
                                                                           try
@@ -45,6 +46,7 @@ public class LogbooksTagsView extends VBox
                                                                           }
                                                                           return false;
                                                                       }, 
+                                                                      // Function throws Exception on internal error so use lambda to catch.
                                                                       logbook ->
                                                                       {
                                                                           try
@@ -63,6 +65,7 @@ public class LogbooksTagsView extends VBox
                                                                   model::getTags,
                                                                   model::getSelectedTags, 
                                                                   model::hasSelectedTag, 
+                                                                  // Function throws Exception on internal error so use lambda to catch.
                                                                   tag ->
                                                                   {
                                                                       try
@@ -75,6 +78,7 @@ public class LogbooksTagsView extends VBox
                                                                       }
                                                                       return false;
                                                                   }, 
+                                                                  // Function throws Exception on internal error so use lambda to catch.
                                                                   tag ->
                                                                   {
                                                                       try
