@@ -7,7 +7,10 @@
  *******************************************************************************/
 package org.phoebus.sns.logbook.ui;
 
+import static org.phoebus.ui.application.PhoebusApplication.logger;
+
 import java.util.Collection;
+import java.util.logging.Level;
 
 import org.phoebus.framework.preferences.PhoebusPreferenceService;
 import org.phoebus.logging.LogEntry;
@@ -22,7 +25,6 @@ import javafx.scene.control.ButtonType;
 import javafx.scene.control.Dialog;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
-
 /**
  * Dialog for making an entry into a log book.
  * @author Evan Smith
@@ -112,13 +114,25 @@ public class LogbookEntryDialog extends Dialog<LogEntry>
         Collection<Logbook> logbooks = template.getLogbooks();
         logbooks.forEach(logbook-> 
         {
-            model.addSelectedLogbook(logbook.getName());
+            try
+            {
+                model.addSelectedLogbook(logbook.getName());
+            } catch (Exception ex)
+            {
+                logger.log(Level.WARNING, "Selected logbook initialization failed.", ex);
+            }
         });  
         
         Collection<Tag> tags = template.getTags();
         tags.forEach(tag-> 
         {
-            model.addSelectedTag(tag.getName());
+            try
+            {
+                model.addSelectedTag(tag.getName());
+            } catch (Exception ex)
+            {
+                logger.log(Level.WARNING, "Selected tag initialization failed.", ex);
+            }
         });
         
         // Add Images

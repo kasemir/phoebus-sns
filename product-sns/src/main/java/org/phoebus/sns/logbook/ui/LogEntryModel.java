@@ -181,9 +181,12 @@ public class LogEntryModel
      * Add a log book to the model's selected log books list.
      * @param logbook
      * @return
+     * @throws Exception If the selected log book does not exist.
      */
-    public boolean addSelectedLogbook(final String logbook)
+    public boolean addSelectedLogbook(final String logbook) throws Exception
     {
+        if (! logbooks.contains(logbook))
+            throw new Exception("The selected logbook '" + logbook + "' does not exist.");
         boolean result = selectedLogbooks.add(logbook);
         selectedLogbooks.sort(Comparator.naturalOrder());
         return result;
@@ -193,9 +196,12 @@ public class LogEntryModel
      * Remove a log book from the model's selected log book list.
      * @param logbook
      * @return
+     * @throws Exception If the selected log book does not exist.
      */
-    public boolean removeSelectedLogbook(final String logbook)
+    public boolean removeSelectedLogbook(final String logbook) throws Exception
     {
+        if (! logbooks.contains(logbook))
+            throw new Exception("The selected logbook '" + logbook + "' does not exist.");
         boolean result = selectedLogbooks.remove(logbook);
         return result;    
     }
@@ -242,9 +248,12 @@ public class LogEntryModel
      * Adds the passed tag name to the model's selected tag list.
      * @param tag
      * @return
+     * @throws Exception If the selected tag does not exist.
      */
-    public boolean addSelectedTag(final String tag)
+    public boolean addSelectedTag(final String tag) throws Exception
     {
+        if (! tags.contains(tag))
+            throw new Exception("The selected tag '" + tag + "' does not exist.");
         boolean result = selectedTags.add(tag);
         selectedTags.sort(Comparator.naturalOrder());
         return result;    
@@ -254,9 +263,12 @@ public class LogEntryModel
      * Removes the passed tag name from the model's selected tag list.
      * @param tag
      * @return
+     * @throws Exception Exception If the selected tag does not exist.
      */
-    public boolean removeSelectedTag(final String tag)
+    public boolean removeSelectedTag(final String tag) throws Exception
     {
+        if (! tags.contains(tag))
+            throw new Exception("The selected tag '" + tag + "' does not exist.");
         boolean result = selectedTags.remove(tag);
         return result;        
     }

@@ -7,38 +7,86 @@
  *******************************************************************************/
 package org.phoebus.sns.logbook.ui;
 
+import static org.phoebus.ui.application.PhoebusApplication.logger;
+
+import java.util.logging.Level;
+
 import org.phoebus.ui.javafx.ImageCache;
 
 import javafx.geometry.Pos;
 import javafx.scene.image.Image;
 import javafx.scene.layout.VBox;
 
+/**
+ * View for selecting log books and tags for a log entry.
+ * @author Evan Smith
+ */
 public class LogbooksTagsView extends VBox
 {
-    @SuppressWarnings("unused")
-    private final LogEntryModel model;
     private static final Image tag_icon = ImageCache.getImage(LabelFieldSelectorView.class, "/icons/add_tag.png");
     private static final Image logbook_icon = ImageCache.getImage(LabelFieldSelectorView.class, "/icons/logbook-16.png");
 
     public LogbooksTagsView(LogEntryModel model)
     {
-        this.model = model;
-        
         LabelFieldSelectorView logbooks = new LabelFieldSelectorView("Logbooks",
                                                                       logbook_icon,
                                                                       model::getLogbooks, 
                                                                       model::getSelectedLogbooks, 
                                                                       model::hasSelectedLogbook, 
-                                                                      model::addSelectedLogbook, 
-                                                                      model::removeSelectedLogbook);
+                                                                      logbook ->
+                                                                      {
+                                                                          try
+                                                                          {
+                                                                              return model.addSelectedLogbook(logbook);
+                                                                          } 
+                                                                          catch (Exception ex)
+                                                                          {
+                                                                              logger.log(Level.SEVERE, "Internal log selection failed.", ex);
+                                                                          }
+                                                                          return false;
+                                                                      }, 
+                                                                      logbook ->
+                                                                      {
+                                                                          try
+                                                                          {
+                                                                              return model.removeSelectedLogbook(logbook);
+                                                                          } 
+                                                                          catch (Exception ex)
+                                                                          {
+                                                                              logger.log(Level.SEVERE, "Internal log selection failed.", ex);
+                                                                          }
+                                                                          return false;
+                                                                      });
         
         LabelFieldSelectorView tags = new LabelFieldSelectorView("Tags",
                                                                   tag_icon,
                                                                   model::getTags,
                                                                   model::getSelectedTags, 
                                                                   model::hasSelectedTag, 
-                                                                  model::addSelectedTag, 
-                                                                  model::removeSelectedTag);
+                                                                  tag ->
+                                                                  {
+                                                                      try
+                                                                      {
+                                                                          return model.addSelectedTag(tag);
+                                                                      } 
+                                                                      catch (Exception ex)
+                                                                      {
+                                                                          logger.log(Level.SEVERE, "Internal tag selection failed.", ex);
+                                                                      }
+                                                                      return false;
+                                                                  }, 
+                                                                  tag ->
+                                                                  {
+                                                                      try
+                                                                      {
+                                                                          return model.removeSelectedTag(tag);
+                                                                      } 
+                                                                      catch (Exception ex)
+                                                                      {
+                                                                          logger.log(Level.SEVERE, "Internal tag selection failed.", ex);
+                                                                      }
+                                                                      return false;
+                                                                  });
         
         setSpacing(10);
         
