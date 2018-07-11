@@ -15,6 +15,7 @@ import java.util.function.Supplier;
 
 import org.phoebus.framework.preferences.PhoebusPreferenceService;
 import org.phoebus.ui.dialog.DialogHelper;
+import org.phoebus.ui.javafx.ImageCache;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -27,6 +28,8 @@ import javafx.scene.control.Dialog;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.SelectionMode;
+import javafx.scene.control.Tooltip;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
@@ -51,7 +54,11 @@ public class ListSelectionDialog extends Dialog<Boolean>
     private final ListView<String> availableItems;
     private final ListView<String> selectedItems;
 
-    private final int buttonWidth = 75, spacing = 10;
+    private final static ImageView addIcon = ImageCache.getImageView(ImageCache.class, "/icons/add.png");
+    private final static ImageView removeIcon = ImageCache.getImageView(ImageCache.class, "/icons/delete.png");
+    private final static ImageView clearIcon = ImageCache.getImageView(ImageCache.class, "/icons/remove_multiple.png");
+    
+    private final int buttonWidth = 130, spacing = 10;
     private final Button add, remove, clear;
 
     public ListSelectionDialog(Node root,
@@ -71,9 +78,9 @@ public class ListSelectionDialog extends Dialog<Boolean>
         buttonsBox   = new VBox();
         availableBox = new VBox();
         
-        add    = new Button("Add");
-        remove = new Button("Remove");
-        clear  = new Button("Clear");
+        add    = new Button("Add", addIcon);
+        remove = new Button("Remove", removeIcon);
+        clear  = new Button("Clear", clearIcon);
         
         labelFont     = new Font(16);
         selectedLabel = new Label("Selected");
@@ -114,6 +121,7 @@ public class ListSelectionDialog extends Dialog<Boolean>
         selectedItems.setStyle("-fx-control-inner-background-alt: white");
         availableItems.setStyle("-fx-control-inner-background-alt: white");
 
+        add.setTooltip(new Tooltip("Add the selected items."));
         add.setOnAction(event ->
         {
             // Can't modify list we're iterating over, so make a copy to iterate over.
@@ -125,7 +133,8 @@ public class ListSelectionDialog extends Dialog<Boolean>
             }
             clearSelections();
         });
-        
+
+        remove.setTooltip(new Tooltip("Remove the selected items."));
         remove.setOnAction(event ->
         {
             // Can't modify list we're iterating over, so make a copy to iterate over.
@@ -139,6 +148,7 @@ public class ListSelectionDialog extends Dialog<Boolean>
             clearSelections();
         });
         
+        clear.setTooltip(new Tooltip("Clear the selected items list."));
         clear.setOnAction(event ->
         {
             // Can't modify list we're iterating over, so make a copy to iterate over.
