@@ -34,6 +34,9 @@ import javafx.scene.layout.Priority;
 
 /**
  * View that handles user input in regards to selecting items of passed lists.
+ * <p> Consists of a label, a field to display selected items, a button to trigger a drop down selection of items, 
+ * and a button to open a dialog that displays the selected items and available items in side by side lists.
+ * <p> The label's text will be labelText appended with a ":". The add button's tool tip will be "Add " + labelText.
  * @author Evan Smith
  */
 public class LabelFieldSelectorView extends HBox
@@ -53,7 +56,17 @@ public class LabelFieldSelectorView extends HBox
     
     private final Predicate<String>         hasSelected;                 // Predicate to test if a specific item is selected.
     private final Function<String, Boolean> addSelected, removeSelected; // Functions to add or remove known items to/from the selected items list.
-        
+    
+    /**
+     * Constructor
+     * @param labelText What the label and tool tip will display.
+     * @param add_icon Icon that the add button will use.
+     * @param known List of known items.
+     * @param selected List of selected items.
+     * @param hasSelected Predicate to test if selected list contains a specific item.
+     * @param addSelected Function to add an available item to the selected list.
+     * @param removeSelected Function to remove an available item from the selected list.
+     */
     public LabelFieldSelectorView(String labelText,
                                    Image add_icon,
                                    Supplier<ObservableList<String>> known, 
