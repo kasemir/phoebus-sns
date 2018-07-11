@@ -34,6 +34,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.control.Tab;
+import javafx.scene.control.Tooltip;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
@@ -80,7 +81,7 @@ public class ImagesTab extends Tab
     private final HBox        imageBox, imageViewBox;
     private final ImageView   imageView;
     private final HBox        buttonBox;
-    private final Button      addImage, addScreenshot, cssWindow, clipBoard, removeImage;
+    private final Button      addImage, addScreenshot, cssWindow, clipboard, removeImage;
     private final FileChooser addImageDialog;
     private final ListView<Image>  imageList;
 
@@ -101,7 +102,7 @@ public class ImagesTab extends Tab
         addImage      = new Button("Add Image");
         addScreenshot = new Button("Add Screenshot");
         cssWindow     = new Button("CSS Window");
-        clipBoard     = new Button("Clipboard Image");
+        clipboard     = new Button("Clipboard Image");
         
         addImageDialog = new FileChooser();
         
@@ -184,10 +185,15 @@ public class ImagesTab extends Tab
     
     private void formatButtonBox()
     {
+        addImage.setTooltip(new Tooltip("Add an image to the log entry."));
+        addScreenshot.setTooltip(new Tooltip("Add a screenshot to the log entry."));
+        cssWindow.setTooltip(new Tooltip("Add a capture of the application window to the log entry."));
+        clipboard.setTooltip(new Tooltip("Add an image from the clipboard to the log entry."));
+
         buttonBox.setSpacing(10);
 
         HBox.setMargin(addImage,  new Insets(0,  0, 0, 10));
-        HBox.setMargin(clipBoard, new Insets(0, 10, 0,  0));
+        HBox.setMargin(clipboard, new Insets(0, 10, 0,  0));
         
         buttonBox.setAlignment(Pos.CENTER);
         
@@ -195,9 +201,9 @@ public class ImagesTab extends Tab
         addImage.prefWidthProperty().bind(buttonBox.widthProperty().divide(4));
         addScreenshot.prefWidthProperty().bind(buttonBox.widthProperty().divide(4));
         cssWindow.prefWidthProperty().bind(buttonBox.widthProperty().divide(4));
-        clipBoard.prefWidthProperty().bind(buttonBox.widthProperty().divide(4));
+        clipboard.prefWidthProperty().bind(buttonBox.widthProperty().divide(4));
         
-        buttonBox.getChildren().addAll(addImage, addScreenshot, cssWindow, clipBoard);
+        buttonBox.getChildren().addAll(addImage, addScreenshot, cssWindow, clipboard);
     }
     
     private void setOnActions()
@@ -251,7 +257,7 @@ public class ImagesTab extends Tab
             model.addImage(captureScene());
         });
         
-        clipBoard.setOnAction(event -> 
+        clipboard.setOnAction(event -> 
         {
             // Retrieve the image on a background thread.
             JobManager.schedule("Fetch Image From Clipboard", monitor ->
