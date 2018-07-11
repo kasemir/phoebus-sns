@@ -25,6 +25,7 @@ import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.Tab;
+import javafx.scene.control.Tooltip;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
@@ -118,6 +119,7 @@ public class FilesTab extends Tab
     {
         setText("Files");
         setClosable(false);
+        setTooltip(new Tooltip("Add files to log entry."));
         
         addFileDialog.setInitialDirectory(new File(System.getProperty("user.home")));
         
@@ -155,8 +157,13 @@ public class FilesTab extends Tab
 
     private void formatButtonBox()
     {
+        // TODO Add an addContext tool tip when addContext is implemented.
+        attachFile.setTooltip(new Tooltip("Attach a file to the log entry."));
+        removeSelected.setTooltip(new Tooltip("Remove the selected file(s)."));
+        
         buttonBox.setSpacing(10);
         VBox.setMargin(buttonBox, new Insets(0, 10, 0, 10));
+        
         attachContext.prefWidthProperty().bind(buttonBox.widthProperty().divide(3));
         attachFile.prefWidthProperty().bind(buttonBox.widthProperty().divide(3));
         removeSelected.prefWidthProperty().bind(buttonBox.widthProperty().divide(3));

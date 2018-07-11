@@ -113,7 +113,8 @@ public class ImagesTab extends Tab
     {
         setText("Images");
         setClosable(false);
-        
+        setTooltip(new Tooltip("Add images to log entry."));
+
         addImageDialog.setInitialDirectory(new File(System.getProperty("user.home")));
         addImageDialog.getExtensionFilters().addAll(
                 new ExtensionFilter("Image Files", "*.png", "*.jpg", "*.ppm" , "*.pgm"));
