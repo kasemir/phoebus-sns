@@ -47,7 +47,8 @@ public class LogbookEntryViewDemo extends Application
                                .build();
                 
                 Node node = (Node) this;
-                LogbookEntryDialog logDialog = new LogbookEntryDialog(node, template);
+                LogbookEntryDialog logDialog = new LogbookEntryDialog(node);
+                logDialog.setModelTemplate(template);
                 logDialog.showAndWait();
             });
             cm.getItems().add(mi);

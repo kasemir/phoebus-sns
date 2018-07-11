@@ -14,6 +14,8 @@ import java.util.List;
 
 import org.phoebus.logging.LogEntry;
 import org.phoebus.logging.LogEntryImpl.LogEntryBuilder;
+import org.phoebus.logging.LogFactory;
+import org.phoebus.logging.LogService;
 import org.phoebus.logging.LogbookImpl;
 import org.phoebus.logging.TagImpl;
 
@@ -31,6 +33,8 @@ import javafx.scene.image.Image;
  */
 public class LogEntryModel
 {
+    private static final LogService logService = LogService.getInstance();
+
     private Node   node;
     private String username, password;
     private String date, level;
@@ -331,8 +335,8 @@ public class LogEntryModel
     /**
      * Create and return a log entry with the current data in the log entry form.
      */
-    public LogEntry getEntry()
-    {
+    public LogEntry submitEntry()
+    {    
         // Create a log entry with the form data.
         LogEntryBuilder logEntryBuilder = new LogEntryBuilder();
         //logEntryBuilder.title(title);
@@ -351,17 +355,26 @@ public class LogEntryModel
         
         // Anything else???
         
-        return logEntryBuilder.build();
-    }
-    
-    // Make it so the model handles passing credentials to the log book client? Prevent data leaks that way.
-    public String getUsername()
-    {
-        return username;
-    }
-    
-    public String getPassword()
-    {
-        return password;
+        LogEntry logEntry = logEntryBuilder.build();
+        
+        LogFactory logFactory = logService.getLogFactories().get("org.phoebus.sns.logbook");
+        if (logFactory != null)
+        {
+            System.out.println("Factory successfully retrieved: " + logFactory.getId());
+        }
+        
+        
+        /*
+        JobManager.schedule("Submit Log Entry", monitor ->
+        {
+            LogClient client = logFactory.getLogClient(username, password);
+        
+            client.set(logEntry);
+        });
+        */
+        
+        // TODO Once implemented, remove.
+        //return logEntry;
+        return null;
     }
 }

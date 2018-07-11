@@ -11,8 +11,6 @@ import java.util.Collection;
 
 import org.phoebus.framework.preferences.PhoebusPreferenceService;
 import org.phoebus.logging.LogEntry;
-import org.phoebus.logging.LogFactory;
-import org.phoebus.logging.LogService;
 import org.phoebus.logging.Logbook;
 import org.phoebus.logging.Tag;
 import org.phoebus.ui.dialog.DialogHelper;
@@ -33,9 +31,7 @@ public class LogbookEntryDialog extends Dialog<LogEntry>
 {
     /** Width of labels on views leftmost column. */
     public static final int labelWidth = 80;
-    
-    private static final LogService logService = LogService.getInstance();
-    
+        
     /** Purveyor of log entry application state. */
     private final LogEntryModel           model;
     
@@ -57,10 +53,9 @@ public class LogbookEntryDialog extends Dialog<LogEntry>
     /** Button type for submitting log entry. */
     private final ButtonType submit;
 
-    public LogbookEntryDialog(final Node parent, LogEntry template)
+    public LogbookEntryDialog(final Node parent)
     {   
         model = new LogEntryModel(parent);
-        initModel(template);
         
         content = new VBox();
         
@@ -101,11 +96,15 @@ public class LogbookEntryDialog extends Dialog<LogEntry>
         
         setResultConverter(button ->
         {
-            return button == submit ? model.getEntry() : null;
+            return button == submit ? model.submitEntry() : null;
         });
     }
 
-    private void initModel(LogEntry template)
+    /**
+     * The model will be initialized to contain the same data as the template.
+     * @param template
+     */
+    public void setModelTemplate(LogEntry template)
     {
         // model.setTitle(template.getTitle());
         model.setText(template.getDescription());
@@ -121,20 +120,10 @@ public class LogbookEntryDialog extends Dialog<LogEntry>
         {
             model.addSelectedTag(tag.getName());
         });
-    }
-    
-    public void submitEntry()
-    {
-        LogFactory logFactory = logService.getLogFactories().get("org.phoebus.sns.logbook");
-        if (logFactory != null)
-        {
-            System.out.println("Factory successfully retrieved: " + logFactory.getId());
-        }
         
-        LogEntry logEntry = model.getEntry();
+        // Add Images
+        // Add Files
         
-        //LogClient client = logFactory.getLogClient(model.getUsername(), model.getPassword());
-        
-        //client.set(logEntry);
+        // Anything else???
     }
 }
