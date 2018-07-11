@@ -165,6 +165,7 @@ public class ImagesTab extends Tab
     
     private void formatRemoveBox()
     {
+        removeImage.setTooltip(new Tooltip("Remove the selected image."));
         removeBox.setMinWidth(110);
         removeImage.setPrefSize(100, 30);
         removeBox.getChildren().add(removeImage);
