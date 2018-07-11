@@ -55,9 +55,12 @@ public class LogbookEntryDialog extends Dialog<LogEntry>
     /** Button type for submitting log entry. */
     private final ButtonType submit;
 
-    public LogbookEntryDialog(final Node parent)
-    {   
+    public LogbookEntryDialog(final Node parent, LogEntry template)
+    {         
         model = new LogEntryModel(parent);
+        
+        if (null != template)
+            setModelTemplate(template);
         
         content = new VBox();
         
@@ -106,11 +109,10 @@ public class LogbookEntryDialog extends Dialog<LogEntry>
      * The model will be initialized to contain the same data as the template.
      * @param template
      */
-    public void setModelTemplate(LogEntry template)
+    private void setModelTemplate(LogEntry template)
     {
         // model.setTitle(template.getTitle());
         model.setText(template.getDescription());
-        
         Collection<Logbook> logbooks = template.getLogbooks();
         logbooks.forEach(logbook-> 
         {
