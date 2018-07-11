@@ -94,6 +94,18 @@ public class LogbooksTagsView extends VBox
                 logbookDropDown.hide();
         });
         
+        logbookDropDown.showingProperty().addListener((changeListener, oldVal, newVal) ->
+        {
+            if (newVal && tagSelector.isSelected())
+                tagSelector.setSelected(false);
+        });
+        
+        logbookSelector.focusedProperty().addListener((changeListener, oldVal, newVal) ->
+        {
+            if (!newVal && !tagDropDown.isShowing() && !logbookDropDown.isShowing())
+                logbookSelector.setSelected(false);
+        });
+        
         logbookField.setEditable(false);
        
         HBox.setHgrow(logbookField, Priority.ALWAYS);
@@ -153,6 +165,18 @@ public class LogbooksTagsView extends VBox
                 tagDropDown.show(tagField, Side.BOTTOM, 0, 0);
             else
                 tagDropDown.hide();
+        });
+        
+        tagDropDown.showingProperty().addListener((changeListener, oldVal, newVal) ->
+        {
+            if (newVal && logbookSelector.isSelected())
+                logbookSelector.setSelected(false);
+        });
+        
+        tagSelector.focusedProperty().addListener((changeListener, oldVal, newVal) ->
+        {
+            if (!newVal && !tagDropDown.isShowing() && !logbookDropDown.isShowing())
+                tagSelector.setSelected(false);
         });
         
         tagField.setEditable(false);

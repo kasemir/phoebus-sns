@@ -162,7 +162,7 @@ public class FilesTab extends Tab
         removeSelected.setTooltip(new Tooltip("Remove the selected file(s)."));
         
         buttonBox.setSpacing(10);
-        VBox.setMargin(buttonBox, new Insets(0, 10, 0, 10));
+        VBox.setMargin(buttonBox, new Insets(0, 10, 10, 10));
         
         attachContext.prefWidthProperty().bind(buttonBox.widthProperty().divide(3));
         attachFile.prefWidthProperty().bind(buttonBox.widthProperty().divide(3));
