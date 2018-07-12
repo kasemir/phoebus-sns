@@ -235,7 +235,7 @@ public class ImagesTab extends Tab
         
         clipboard.setOnAction(event -> 
         {
-            Image image = Screenshot.getImageFromClipBoard();
+            Image image = Screenshot.getImageFromClipboard();
             model.addImage(image);
         });
     }  
