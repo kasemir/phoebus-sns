@@ -359,8 +359,8 @@ public class LogEntryModel
     {    
         // Create a log entry with the form data.
         LogEntryBuilder logEntryBuilder = new LogEntryBuilder();
-        //logEntryBuilder.title(title);
-        logEntryBuilder.description(text)
+        logEntryBuilder.title(title)
+            .description(text)
             .createdDate(Instant.parse(date))
             .modifiedDate(Instant.parse(date))
             .level(level);
@@ -373,29 +373,16 @@ public class LogEntryModel
         // Add Images
         // Add Files
         
-        // Anything else???
-        
         LogEntry logEntry = logEntryBuilder.build();
-        
-        
-        if (logFactory != null)
-        {
-            System.out.println("Factory successfully retrieved: " + logFactory.getId());
-        }
-        
-        
+
         /*
         JobManager.schedule("Submit Log Entry", monitor ->
         {
-            LogClient client = logFactory.getLogClient(username, password);
-        
-            client.set(logEntry);
+            logFactory.getLogClient(new SimpleAuthenticationToken(username, password));
         });
         */
         
-        // TODO Once implemented, remove.
-        //return logEntry;
-        return null;
+        return logEntry;
     }
 
     /** Fetch the log book and tag lists on a separate thread. */
