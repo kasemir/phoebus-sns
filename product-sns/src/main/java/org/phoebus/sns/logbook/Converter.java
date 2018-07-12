@@ -10,9 +10,9 @@ package org.phoebus.sns.logbook;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.phoebus.logging.Attachment;
-import org.phoebus.logging.Logbook;
-import org.phoebus.logging.Tag;
+import org.phoebus.logbook.Attachment;
+import org.phoebus.logbook.Logbook;
+import org.phoebus.logbook.Tag;
 import org.phoebus.sns.logbook.elog.ELog;
 import org.phoebus.sns.logbook.elog.ELogAttachment;
 import org.phoebus.sns.logbook.elog.ELogCategory;

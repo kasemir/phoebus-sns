@@ -12,12 +12,12 @@ import java.time.Instant;
 import java.util.Comparator;
 import java.util.List;
 
-import org.phoebus.logging.LogEntry;
-import org.phoebus.logging.LogEntryImpl.LogEntryBuilder;
-import org.phoebus.logging.LogFactory;
-import org.phoebus.logging.LogService;
-import org.phoebus.logging.LogbookImpl;
-import org.phoebus.logging.TagImpl;
+import org.phoebus.logbook.LogEntry;
+import org.phoebus.logbook.LogEntryImpl.LogEntryBuilder;
+import org.phoebus.logbook.LogFactory;
+import org.phoebus.logbook.LogService;
+import org.phoebus.logbook.LogbookImpl;
+import org.phoebus.logbook.TagImpl;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
