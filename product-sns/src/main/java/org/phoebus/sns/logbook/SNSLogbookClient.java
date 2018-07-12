@@ -6,12 +6,12 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
-import org.phoebus.logging.Attachment;
-import org.phoebus.logging.LogClient;
-import org.phoebus.logging.LogEntry;
-import org.phoebus.logging.Logbook;
-import org.phoebus.logging.Property;
-import org.phoebus.logging.Tag;
+import org.phoebus.logbook.Attachment;
+import org.phoebus.logbook.LogClient;
+import org.phoebus.logbook.LogEntry;
+import org.phoebus.logbook.Logbook;
+import org.phoebus.logbook.Property;
+import org.phoebus.logbook.Tag;
 
 public class SNSLogbookClient implements LogClient
 {

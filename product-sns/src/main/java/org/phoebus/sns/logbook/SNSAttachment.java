@@ -1,9 +1,10 @@
 package org.phoebus.sns.logbook;
 
 import java.io.ByteArrayInputStream;
+import java.io.File;
 import java.io.InputStream;
 
-import org.phoebus.logging.Attachment;
+import org.phoebus.logbook.Attachment;
 import org.phoebus.sns.logbook.elog.ELogAttachment;
 
 public class SNSAttachment implements Attachment
@@ -19,12 +20,6 @@ public class SNSAttachment implements Attachment
     {
         return new ByteArrayInputStream(attachment.getData());
     }
-    
-    @Override
-    public String getFileName()
-    {
-        return attachment.getName();
-    }
 
     @Override
     public String getContentType()
@@ -39,9 +34,10 @@ public class SNSAttachment implements Attachment
     }
 
     @Override
-    public Long getFileSize()
+    public File getFile()
     {
-        return Long.valueOf(attachment.getData().length);
+        // TODO Auto-generated method stub
+        return null;
     }
 
 }

@@ -6,11 +6,11 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import org.phoebus.logging.Attachment;
-import org.phoebus.logging.LogEntry;
-import org.phoebus.logging.Logbook;
-import org.phoebus.logging.Property;
-import org.phoebus.logging.Tag;
+import org.phoebus.logbook.Attachment;
+import org.phoebus.logbook.LogEntry;
+import org.phoebus.logbook.Logbook;
+import org.phoebus.logbook.Property;
+import org.phoebus.logbook.Tag;
 import org.phoebus.sns.logbook.elog.ELogEntry;
 
 public class SNSLogEntry implements LogEntry
@@ -101,6 +101,13 @@ public class SNSLogEntry implements LogEntry
     public Property getProperty(String propertyName)
     {
         // TODO Auto-generated method stub 
+        return null;
+    }
+
+    @Override
+    public String getTitle()
+    {
+        // TODO Auto-generated method stub
         return null;
     }
 

@@ -1,6 +1,6 @@
 package org.phoebus.sns.logbook;
 
-import org.phoebus.logging.Tag;
+import org.phoebus.logbook.Tag;
 
 public class SNSTag implements Tag
 {

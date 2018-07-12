@@ -1,7 +1,7 @@
 package org.phoebus.sns.logbook;
 
-import org.phoebus.logging.LogClient;
-import org.phoebus.logging.LogFactory;
+import org.phoebus.logbook.LogClient;
+import org.phoebus.logbook.LogFactory;
 
 public class SNSLogFactory implements LogFactory
 {
@@ -23,6 +23,13 @@ public class SNSLogFactory implements LogFactory
     public LogClient getLogClient(final String user, final String password)
     {
         // return new SNSLogbookClient(user, password);
+        return null;
+    }
+
+    @Override
+    public LogClient getLogClient(Object authToken)
+    {
+        // TODO Auto-generated method stub
         return null;
     }
 
