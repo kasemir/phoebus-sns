@@ -9,6 +9,6 @@
 	<classpathentry combineaccessrules="false" exported="true" kind="src" path="/dependencies"/>
 	<classpathentry exported="true" kind="lib" path="/dependencies/target/lib/ojdbc8-12.2.0.1.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/core-pv"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/applications-databrowser"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/app-databrowser"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>
