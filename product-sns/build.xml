@@ -21,13 +21,13 @@
     <copy todir="${build}/lib" flatten="true">
       <!-- Copy all application dependencies -->
       <path refid="app-classpath" />
-      <!-- Copy all applications -->
+      <!-- Copy all app -->
       <fileset dir="../../phoebus">
-        <include name="applications/**/*.jar"/>
-      	<exclude name="applications/**/greeting*.jar"/>
-      	<exclude name="applications/**/channel*.jar"/>
-      	<exclude name="applications/**/alarm-server*.jar"/>
-      	<exclude name="applications/**/scan-server*.jar"/>
+        <include name="app/**/*.jar"/>
+      	<exclude name="app/**/app-greeting*.jar"/>
+      	<exclude name="app/**/*channel*.jar"/>
+      	<exclude name="app/**/app-alarm-server*.jar"/>
+      	<exclude name="app/**/app-scan-server*.jar"/>
         <include name="phoebus-product/target/*.jar"/>
       </fileset>
     </copy>
