@@ -12,6 +12,7 @@ import org.phoebus.logbook.LogEntry;
 import org.phoebus.logbook.Logbook;
 import org.phoebus.logbook.Property;
 import org.phoebus.logbook.Tag;
+import org.phoebus.sns.logbook.elog.ELog;
 
 public class SNSLogbookClient implements LogClient
 {
@@ -29,14 +30,34 @@ public class SNSLogbookClient implements LogClient
     @Override
     public Collection<Logbook> listLogbooks()
     {
-        // TODO Auto-generated method stub
+        try
+        (
+            final ELog elog = new ELog(url, user, password);
+        )
+        {
+            return Converter.convertLogbooks(elog.getLogbooks());
+        } 
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
         return null;
     }
 
     @Override
     public Collection<Tag> listTags()
     {
-        // TODO Auto-generated method stub
+        try
+        (
+            final ELog elog = new ELog(url, user, password);
+        )
+        {
+            return Converter.convertCategories(elog.getCategories());
+        } 
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
         return null;
     }
 

@@ -15,6 +15,7 @@ import java.util.logging.Level;
 
 import org.phoebus.ui.javafx.ImageCache;
 
+import javafx.collections.ListChangeListener;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Pos;
@@ -224,17 +225,24 @@ public class LogbooksTagsView extends VBox
         tagBox.setAlignment(Pos.CENTER);
     }
     
-    /** Initialize the drop down context menu. */
+    /** Initialize the drop down context menus by adding listeners to their content lists. */
     private void initializeSelectors()
     {
-        for (final String logbook :model.getLogbooks())
+        model.addLogbookListener((ListChangeListener.Change<? extends String> c) -> 
         {
-            addToLogbookDropDown(logbook);
-        }
-        for (final String tag :model.getTags())
+            if (c.next())
+                c.getAddedSubList().forEach(newLogbook -> addToLogbookDropDown(newLogbook));
+        });
+
+        model.addTagListener((ListChangeListener.Change<? extends String> c) -> 
         {
-            addToTagDropDown(tag);
-        }
+            if (c.next())
+                c.getAddedSubList().forEach(newTag -> addToTagDropDown(newTag));
+        });
+        
+        // Once the listeners are added ask the model to fetch the lists.
+        // This is done on a separate thread so only start it once the listeners are in place.
+        model.fetchLists();
     }
     
     /**

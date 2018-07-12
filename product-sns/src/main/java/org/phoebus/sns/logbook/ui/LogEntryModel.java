@@ -9,16 +9,21 @@ package org.phoebus.sns.logbook.ui;
 
 import java.io.File;
 import java.time.Instant;
+import java.util.Collection;
 import java.util.Comparator;
-import java.util.List;
 
+import org.phoebus.framework.jobs.JobManager;
+import org.phoebus.logbook.LogClient;
 import org.phoebus.logbook.LogEntry;
 import org.phoebus.logbook.LogEntryImpl.LogEntryBuilder;
 import org.phoebus.logbook.LogFactory;
 import org.phoebus.logbook.LogService;
+import org.phoebus.logbook.Logbook;
 import org.phoebus.logbook.LogbookImpl;
+import org.phoebus.logbook.Tag;
 import org.phoebus.logbook.TagImpl;
 
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
@@ -33,8 +38,9 @@ import javafx.scene.image.Image;
  */
 public class LogEntryModel
 {
-    private static final LogService logService = LogService.getInstance();
-
+    private final LogService logService;
+    private final LogFactory logFactory;
+    
     private Node   node;
     private String username, password;
     private String date, level;
@@ -45,10 +51,12 @@ public class LogEntryModel
     private final ObservableList<File>   files;
     
     public LogEntryModel(final Node callingNode)
-    {  
-        tags     = FXCollections.observableArrayList(List.of("Tag 1", "Tag 2", "Tag 3"));
-        logbooks = FXCollections.observableArrayList(List.of("Logbook 1", "Logbook 2", "Logbook 3"));
-        
+    {   
+        logService = LogService.getInstance();
+        logFactory = logService.getLogFactories().get("org.phoebus.sns.logbook");
+        tags     = FXCollections.observableArrayList();
+        logbooks = FXCollections.observableArrayList();
+ 
         selectedLogbooks = FXCollections.observableArrayList();
         selectedTags     = FXCollections.observableArrayList();
 
@@ -369,7 +377,7 @@ public class LogEntryModel
         
         LogEntry logEntry = logEntryBuilder.build();
         
-        LogFactory logFactory = logService.getLogFactories().get("org.phoebus.sns.logbook");
+        
         if (logFactory != null)
         {
             System.out.println("Factory successfully retrieved: " + logFactory.getId());
@@ -388,5 +396,31 @@ public class LogEntryModel
         // TODO Once implemented, remove.
         //return logEntry;
         return null;
+    }
+
+    /** Fetch the log book and tag lists on a separate thread. */
+    public void fetchLists()
+    {
+        JobManager.schedule("Fetch Logbooks and Tags", monitor ->
+        {
+            LogClient initClient = logFactory.getLogClient();
+            Collection<Logbook> logList = initClient.listLogbooks();
+            Collection<Tag> tagList = initClient.listTags();
+            Platform.runLater(() ->
+            {
+                logList.forEach(logbook -> logbooks.add(logbook.getName()));
+                tagList.forEach(tag -> tags.add(tag.getName()));
+            });
+        });
+    }
+
+    public void addTagListener(ListChangeListener<String> changeListener)
+    {
+        tags.addListener(changeListener);
+    }
+
+    public void addLogbookListener(ListChangeListener<String> changeListener)
+    {
+        logbooks.addListener(changeListener);
     }
 }
