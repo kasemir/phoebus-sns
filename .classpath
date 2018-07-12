@@ -1,14 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER">
+		<attributes>
+			<attribute name="module" value="true"/>
+		</attributes>
+	</classpathentry>
 	<classpathentry kind="src" output="target/classes" path="product-sns/src/main/java"/>
 	<classpathentry kind="src" path="product-sns/src/main/resources"/>
 	<classpathentry kind="src" path="product-sns/src/test/java"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/core-framework"/>
-	<classpathentry combineaccessrules="false" exported="true" kind="src" path="/dependencies"/>
 	<classpathentry exported="true" kind="lib" path="/dependencies/target/lib/ojdbc8-12.2.0.1.jar"/>
+	<classpathentry kind="src" path="/core-security"/>
+	<classpathentry kind="src" path="/core-logbook"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/app-databrowser"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/core-framework"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/dependencies"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/core-pv"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/applications-databrowser"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/core-ui"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>
