@@ -9,13 +9,17 @@ package org.phoebus.sns.logbook.ui;
 
 import static org.phoebus.ui.application.PhoebusApplication.logger;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.util.Collection;
 import java.util.logging.Level;
 
 import org.phoebus.framework.preferences.PhoebusPreferenceService;
-import org.phoebus.logging.LogEntry;
-import org.phoebus.logging.Logbook;
-import org.phoebus.logging.Tag;
+import org.phoebus.logbook.Attachment;
+import org.phoebus.logbook.LogEntry;
+import org.phoebus.logbook.Logbook;
+import org.phoebus.logbook.Tag;
 import org.phoebus.ui.dialog.DialogHelper;
 
 import javafx.geometry.Insets;
@@ -23,6 +27,7 @@ import javafx.scene.Node;
 import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Dialog;
+import javafx.scene.image.Image;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 /**
@@ -137,9 +142,21 @@ public class LogbookEntryDialog extends Dialog<LogEntry>
             }
         });
         
-        // Add Images
-        // Add Files
-        
-        // Anything else???
+        for (Attachment attachment : template.getAttachments())
+        {
+            File file = attachment.getFile();
+            // Once the API is updated to allow the Attachment.contentType to be set, check the content type to differentiate from files and images.
+            Image image = null;
+            try
+            {
+                image = new Image(new FileInputStream(file));
+            } 
+            catch (FileNotFoundException e)
+            {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+            model.addImage(image);
+        }
     }
 }

@@ -7,26 +7,13 @@
  *******************************************************************************/
 package org.phoebus.sns.logbook.ui;
 
-import static org.phoebus.ui.application.PhoebusApplication.logger;
-
-import java.awt.AWTException;
-import java.awt.Rectangle;
-import java.awt.Robot;
-import java.awt.Toolkit;
-import java.awt.datatransfer.DataFlavor;
-import java.awt.datatransfer.Transferable;
-import java.awt.image.BufferedImage;
 import java.io.File;
 import java.util.List;
-import java.util.logging.Level;
 
-import org.phoebus.framework.jobs.JobManager;
 import org.phoebus.ui.javafx.ImageCache;
 import org.phoebus.ui.javafx.Screenshot;
 
-import javafx.application.Platform;
 import javafx.collections.ListChangeListener;
-import javafx.embed.swing.SwingFXUtils;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
@@ -81,7 +68,7 @@ public class ImagesTab extends Tab
     private final HBox        imageBox, imageViewBox;
     private final ImageView   imageView;
     private final HBox        buttonBox;
-    private final Button      addImage, addScreenshot, cssWindow, clipboard, removeImage;
+    private final Button      addImage, captureWindow, clipboard, removeImage;
     private final FileChooser addImageDialog;
     private final ListView<Image>  imageList;
 
@@ -100,8 +87,7 @@ public class ImagesTab extends Tab
         imageList     = new ListView<Image>(model.getImages());        
         buttonBox     = new HBox();
         addImage      = new Button("Add Image");
-        addScreenshot = new Button("Add Screenshot");
-        cssWindow     = new Button("CSS Window");
+        captureWindow     = new Button("CSS Window");
         clipboard     = new Button("Clipboard Image");
         
         addImageDialog = new FileChooser();
@@ -188,8 +174,7 @@ public class ImagesTab extends Tab
     private void formatButtonBox()
     {
         addImage.setTooltip(new Tooltip("Add an image to the log entry."));
-        addScreenshot.setTooltip(new Tooltip("Add a screenshot to the log entry."));
-        cssWindow.setTooltip(new Tooltip("Add a capture of the application window to the log entry."));
+        captureWindow.setTooltip(new Tooltip("Add a capture of the application window to the log entry."));
         clipboard.setTooltip(new Tooltip("Add an image from the clipboard to the log entry."));
 
         buttonBox.setSpacing(10);
@@ -200,12 +185,11 @@ public class ImagesTab extends Tab
         buttonBox.setAlignment(Pos.CENTER);
         
         // Give each button 1/4 of the room.
-        addImage.prefWidthProperty().bind(buttonBox.widthProperty().divide(4));
-        addScreenshot.prefWidthProperty().bind(buttonBox.widthProperty().divide(4));
-        cssWindow.prefWidthProperty().bind(buttonBox.widthProperty().divide(4));
-        clipboard.prefWidthProperty().bind(buttonBox.widthProperty().divide(4));
+        addImage.prefWidthProperty().bind(buttonBox.widthProperty().divide(3));
+        captureWindow.prefWidthProperty().bind(buttonBox.widthProperty().divide(3));
+        clipboard.prefWidthProperty().bind(buttonBox.widthProperty().divide(3));
         
-        buttonBox.getChildren().addAll(addImage, addScreenshot, cssWindow, clipboard);
+        buttonBox.getChildren().addAll(addImage, captureWindow, clipboard);
     }
     
     private void setOnActions()
@@ -235,16 +219,6 @@ public class ImagesTab extends Tab
             }
         });
         
-        addScreenshot.setOnAction(event -> 
-        {
-            JobManager.schedule("Take Screenshot", monitor ->
-            {
-                // This has been observed to cause platform thread freezes, so should be run in background thread.
-                Image image = captureScreen();
-                Platform.runLater(() -> model.addImage(image));
-            });
-        });
-        
         removeImage.setOnAction(event ->
         {
             Image image = imageView.getImage();
@@ -254,75 +228,15 @@ public class ImagesTab extends Tab
             }
         });
 
-        cssWindow.setOnAction(event ->
+        captureWindow.setOnAction(event ->
         {
-            model.addImage(captureScene());
+            model.addImage(Screenshot.imageFromNode(model.getScene().getRoot()));
         });
         
         clipboard.setOnAction(event -> 
         {
-            // Retrieve the image on a background thread.
-            JobManager.schedule("Fetch Image From Clipboard", monitor ->
-            {
-                Image image = getImageFromClipBoard();
-                // Update the model, which the UI listens to, on the UI thread.
-                Platform.runLater( () -> model.addImage(image));
-            });
+            Image image = Screenshot.getImageFromClipBoard();
+            model.addImage(image);
         });
-    }
-    
-    /**
-     * Capture an image of the calling JavaFX node.
-     * @return Image
-     */
-    private Image captureScreen()
-    {
-        try {
-            Robot robot = new Robot();
-            
-            // Create an image of the main screen with the retrieved screen dimensions.
-            Rectangle screenDimensions = new Rectangle(Toolkit.getDefaultToolkit().getScreenSize());
-            BufferedImage screenCapture = robot.createScreenCapture(screenDimensions);
-             
-            return SwingFXUtils.toFXImage(screenCapture, null);
-        } catch (AWTException ex) {
-            logger.log(Level.WARNING, "Screen capture failed.", ex);
-        }
-        
-        return null;
-    }
-    
-    /**
-     * Capture an image of the scene that the calling JavaFX node belongs to.
-     * @return Image
-     */
-    private Image captureScene()
-    {
-        BufferedImage bufImg = Screenshot.fromNode(model.getScene().getRoot());
-        return SwingFXUtils.toFXImage(bufImg, null);
-    }
-    
-    /**
-     * Get an image from the clip board.
-     * @return Image
-     */
-    private Image getImageFromClipBoard()
-    {
-        Transferable transferable = Toolkit.getDefaultToolkit().getSystemClipboard().getContents(null);
-        if (transferable != null && transferable.isDataFlavorSupported(DataFlavor.imageFlavor))
-        {
-            try
-            {
-                BufferedImage bufImg = (BufferedImage) transferable.getTransferData(DataFlavor.imageFlavor);
-                return (SwingFXUtils.toFXImage(bufImg, null));
-            }
-            catch (Exception ex)
-            {
-                logger.log(Level.WARNING, "Clipboard IO failed.", ex);
-            }
-        }
-        
-        // Wasn't an image on the clip board.
-        return null;
-    }
+    }  
 }

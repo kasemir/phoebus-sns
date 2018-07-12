@@ -7,10 +7,15 @@
  *******************************************************************************/
 package org.phoebus.sns.logbook.ui;
 
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.time.Instant;
 
-import org.phoebus.logging.LogEntry;
-import org.phoebus.logging.LogEntryImpl.LogEntryBuilder;
+import org.phoebus.logbook.Attachment;
+import org.phoebus.logbook.AttachmentImpl;
+import org.phoebus.logbook.LogEntry;
+import org.phoebus.logbook.LogEntryImpl.LogEntryBuilder;
+import org.phoebus.ui.javafx.Screenshot;
 
 import javafx.application.Application;
 import javafx.scene.Node;
@@ -24,6 +29,11 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.RowConstraints;
 import javafx.stage.Stage;
 
+/**
+ * A simple and somewhat dumb view with four buttons. Each button has a context menu that will allow a LogEntryDialog to be requested.
+ * <p> Requesting the dialog from different buttons changes the default contents of the log entry.
+ * @author Evan Smith
+ */
 public class LogbookEntryViewDemo extends Application
 {
     private class MyButton extends Button
@@ -40,9 +50,27 @@ public class LogbookEntryViewDemo extends Application
             MenuItem mi = new MenuItem("Create Log Entry");
             mi.setOnAction(value -> 
             {
+                Screenshot screenshot = new Screenshot(this.getScene());
+                File tmp = null;
+                Attachment attachment = null;
+                try
+                {
+                    tmp = screenshot.writeToTempfile("tmp_image");
+                    attachment = AttachmentImpl.of(tmp);
+                } 
+                catch (FileNotFoundException e)
+                {
+                    e.printStackTrace();
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                }
                 
+                // Add content type to attachment.
                 LogEntryBuilder logEntryBuilder = new LogEntryBuilder();
                 LogEntry template = logEntryBuilder.appendDescription("Log entry from " + getText())
+                               .attach(attachment)
                                .createdDate(Instant.now())
                                .build();
                 
@@ -54,6 +82,7 @@ public class LogbookEntryViewDemo extends Application
             setContextMenu(cm);
         }
     }
+    
     private class DemoView extends GridPane
     {
         public DemoView()
