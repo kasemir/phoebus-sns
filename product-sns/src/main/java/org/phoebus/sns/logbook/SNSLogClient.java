@@ -289,7 +289,6 @@ public class SNSLogClient implements LogClient
             final ELog elog = new ELog(url, user, password);
         )
         {
-            
             for (LogEntry entry : logEntries)
                 set(entry);
         } 
@@ -304,7 +303,7 @@ public class SNSLogClient implements LogClient
     /** @{inheritDoc} */
     public Tag set(Tag tag)
     {
-        // TODO Auto-generated method stub
+        // This is set by the RDB, not users ... ignore??
         return null;
     }
 
@@ -312,7 +311,18 @@ public class SNSLogClient implements LogClient
     /** @{inheritDoc} */
     public Tag set(Tag tag, Collection<Long> logIds)
     {
-        // TODO Auto-generated method stub
+        try
+        (
+            final ELog elog = new ELog(url, user, password);
+        )
+        {
+            for (Long logId : logIds)
+                elog.addCategory(logId,tag.getName());
+        } 
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
         return null;
     }
 
@@ -328,7 +338,20 @@ public class SNSLogClient implements LogClient
     /** @{inheritDoc} */
     public Logbook set(Logbook logbook, Collection<Long> logIds)
     {
-        // TODO Auto-generated method stub
+        try
+        (
+            final ELog elog = new ELog(url, user, password);
+        )
+        {
+            for (Long logId : logIds)
+            {
+                elog.addLogbook(logId, logbook.getName());
+            }
+        } 
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
         return null;
     }
 
