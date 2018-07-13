@@ -21,8 +21,9 @@ import javafx.event.EventHandler;
 import javafx.geometry.Pos;
 import javafx.geometry.Side;
 import javafx.scene.control.Button;
-import javafx.scene.control.CheckMenuItem;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.ContextMenu;
+import javafx.scene.control.CustomMenuItem;
 import javafx.scene.control.Label;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextField;
@@ -251,12 +252,14 @@ public class LogbooksTagsView extends VBox
      */
     private void addToLogbookDropDown(String item)
     {
-        CheckMenuItem newLogbook = new CheckMenuItem(item);
-        newLogbook.setOnAction(new EventHandler<ActionEvent>()
+        CheckBox checkBox = new CheckBox(item);
+        CustomMenuItem newLogbook = new CustomMenuItem(checkBox);
+        newLogbook.setHideOnClick(false);
+        checkBox.setOnAction(new EventHandler<ActionEvent>()
         {
             public void handle(ActionEvent e)
             {
-                CheckMenuItem source = (CheckMenuItem) e.getSource();
+                CheckBox source = (CheckBox) e.getSource();
                 String text = source.getText();
                 if (model.getSelectedLogbooks().contains(text))
                 {
@@ -283,11 +286,9 @@ public class LogbooksTagsView extends VBox
                     setFieldText(logbookDropDown, model.getSelectedLogbooks(), logbookField);
                 }
                 
-                if (logbookSelector.isSelected())
-                    logbookSelector.setSelected(false);
             }
         });
-        logbookDropDown.getItems().add(newLogbook);        
+        logbookDropDown.getItems().add(newLogbook);
     }
     
     /**
@@ -296,12 +297,14 @@ public class LogbooksTagsView extends VBox
      */
     private void addToTagDropDown(String item)
     {
-        CheckMenuItem newTag = new CheckMenuItem(item);
-        newTag.setOnAction(new EventHandler<ActionEvent>()
+        CheckBox checkBox = new CheckBox(item);
+        CustomMenuItem newTag = new CustomMenuItem(checkBox);
+        newTag.setHideOnClick(false);
+        checkBox.setOnAction(new EventHandler<ActionEvent>()
         {
             public void handle(ActionEvent e)
             {
-                CheckMenuItem source = (CheckMenuItem) e.getSource();
+                CheckBox source = (CheckBox) e.getSource();
                 String text = source.getText();
                 if (model.getSelectedTags().contains(text))
                 {
@@ -327,9 +330,7 @@ public class LogbooksTagsView extends VBox
                     }
                     setFieldText(tagDropDown, model.getSelectedTags(), tagField);
                 }
-
-                if (tagSelector.isSelected())
-                    tagSelector.setSelected(false);
+                
             }
         });
         tagDropDown.getItems().add(newTag);        
@@ -341,7 +342,8 @@ public class LogbooksTagsView extends VBox
         // Handle drop down menu item checking.
         for (MenuItem menuItem : dropDown.getItems())
         {
-            CheckMenuItem check = (CheckMenuItem) menuItem;
+            CustomMenuItem custom = (CustomMenuItem) menuItem;
+            CheckBox check = (CheckBox) custom.getContent();
             // If the item is selected make sure it is checked.
             if (selectedItems.contains(check.getText()))
             {
