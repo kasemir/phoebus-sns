@@ -2,6 +2,9 @@ package org.phoebus.sns.logbook;
 
 import java.io.File;
 import java.io.InputStream;
+import java.sql.Date;
+import java.time.Instant;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -13,20 +16,28 @@ import org.phoebus.logbook.Logbook;
 import org.phoebus.logbook.Property;
 import org.phoebus.logbook.Tag;
 import org.phoebus.sns.logbook.elog.ELog;
+import org.phoebus.sns.logbook.elog.ELogEntry;
 
-public class SNSLogbookClient implements LogClient
+public class SNSLogClient implements LogClient
 {
     final private String url;
     final private String user;
     final private String password;
-    
-    public SNSLogbookClient(final String url, final String user, final String password)
+
+    /**
+     * LogClient that uses ELog
+     * @param url URL to RDB
+     * @param user
+     * @param password
+     */
+    public SNSLogClient(final String url, final String user, final String password)
     {
         this.url = url;
         this.user = user;
         this.password = password;
     }
     
+    /** @{inheritDoc} */
     @Override
     public Collection<Logbook> listLogbooks()
     {
@@ -44,6 +55,7 @@ public class SNSLogbookClient implements LogClient
         return null;
     }
 
+    /** @{inheritDoc} */
     @Override
     public Collection<Tag> listTags()
     {
@@ -61,6 +73,7 @@ public class SNSLogbookClient implements LogClient
         return null;
     }
 
+    /** @{inheritDoc} */
     @Override
     public Collection<Property> listProperties()
     {
@@ -68,6 +81,7 @@ public class SNSLogbookClient implements LogClient
         return null;
     }
 
+    /** @{inheritDoc} */
     @Override
     public Collection<String> listAttributes(String propertyName)
     {
@@ -75,10 +89,30 @@ public class SNSLogbookClient implements LogClient
         return null;
     }
 
+    /** @{inheritDoc} */
     @Override
     public Collection<LogEntry> listLogs()
     {
-        // TODO Auto-generated method stub
+        
+        try
+        (
+            final ELog elog = new ELog(url, user, password);
+        )
+        {
+            List<ELogEntry> elogEntries = elog.getEntries(Date.from(Instant.ofEpochSecond(0, 0)), Date.from(Instant.now()));
+            // Create a list of SNSLogEntries that each wrap a ELogEntry
+            Collection<LogEntry> entries = new ArrayList<LogEntry>();
+            for (ELogEntry entry : elogEntries)
+            {
+                entries.add(new SNSLogEntry(entry));
+            }
+            
+            return entries;
+        } 
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
         return null;
     }
 
