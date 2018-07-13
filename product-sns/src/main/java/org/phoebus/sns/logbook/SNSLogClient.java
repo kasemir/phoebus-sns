@@ -8,11 +8,14 @@
 package org.phoebus.sns.logbook;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.sql.Date;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -26,6 +29,7 @@ import org.phoebus.logbook.Tag;
 import org.phoebus.sns.logbook.elog.ELog;
 import org.phoebus.sns.logbook.elog.ELogAttachment;
 import org.phoebus.sns.logbook.elog.ELogEntry;
+import org.phoebus.sns.logbook.elog.ELogPriority;
 
 /**
  * SNS implementation of org.phoebus.logbook.LogClient
@@ -184,7 +188,17 @@ public class SNSLogClient implements LogClient
         Collection<Attachment> attachments = listAttachments(logId);
         Optional<Attachment> result = attachments.stream().filter(a -> attachment.equals(a)).findFirst();
         if (result.isPresent())
-            return ((SNSAttachment) result.get()).getInputStream();
+        {
+            try
+            {
+                return new FileInputStream(result.get().getFile());
+            } catch (FileNotFoundException e)
+            {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+                return null;
+            }
+        }
         else
             return null;
     }
@@ -193,8 +207,23 @@ public class SNSLogClient implements LogClient
     /** @{inheritDoc} */
     public InputStream getAttachment(Long logId, String attachmentName)
     {
-        // TODO Auto-generated method stub
-        return null;
+     // TODO Work on this. Is the attachmentName the name of the attachment file??? Attachments don't have a name field ...
+        Collection<Attachment> attachments = listAttachments(logId);
+        Optional<Attachment> result = attachments.stream().filter(a -> attachmentName.equals(a.getFile().getName())).findFirst();
+        if (result.isPresent())
+        {
+            try
+            {
+                return new FileInputStream(result.get().getFile());
+            } catch (FileNotFoundException e)
+            {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+                return null;
+            }
+        }
+        else
+            return null;
     }
 
     @Override
@@ -209,7 +238,45 @@ public class SNSLogClient implements LogClient
     /** @{inheritDoc} */
     public LogEntry set(LogEntry log)
     {
-        // TODO Auto-generated method stub
+        try
+        (
+            final ELog elog = new ELog(url, user, password);
+        )
+        {
+            
+            Collection<Logbook> logbooks = log.getLogbooks();
+            Iterator<Logbook> logIter = logbooks.iterator();
+            
+            Collection<Tag> tags = log.getTags();
+            Iterator<Tag> tagIter = tags.iterator();
+            
+            Collection<Attachment> attachments = log.getAttachments();
+            Iterator<Attachment> attachIter = attachments.iterator();
+            
+            long id = elog.createEntry(logIter.hasNext() ? logIter.next().getName() : "", log.getTitle(), log.getDescription(), ELogPriority.forName(log.getLevel()));
+            
+            while (attachIter.hasNext())
+            {
+                Attachment a = attachIter.next();
+                elog.addAttachment(id, a.getFile().getName(), /* Caption? */a.getContentType(), new FileInputStream(a.getFile()));
+            }
+            
+            while(logIter.hasNext())
+            {
+                Logbook l = logIter.next();
+                elog.addLogbook(id, l.getName());
+            }
+            
+            while(tagIter.hasNext())
+            {
+                Tag t = tagIter.next();
+                elog.addCategory(id, t.getName());
+            }
+        } 
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
         return null;
     }
 
