@@ -184,7 +184,7 @@ public class SNSLogClient implements LogClient
     /** @{inheritDoc} */
     public InputStream getAttachment(Long logId, Attachment attachment)
     {
-        // TODO Work on this.
+        // TODO Is this how this is supposed to work??????
         Collection<Attachment> attachments = listAttachments(logId);
         Optional<Attachment> result = attachments.stream().filter(a -> attachment.equals(a)).findFirst();
         if (result.isPresent())
@@ -282,9 +282,21 @@ public class SNSLogClient implements LogClient
 
     @Override
     /** @{inheritDoc} */
-    public Collection<LogEntry> set(Collection<LogEntry> logs)
+    public Collection<LogEntry> set(Collection<LogEntry> logEntries)
     {
-        // TODO Auto-generated method stub
+        try
+        (
+            final ELog elog = new ELog(url, user, password);
+        )
+        {
+            
+            for (LogEntry entry : logEntries)
+                set(entry);
+        } 
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
         return null;
     }
 
@@ -372,7 +384,19 @@ public class SNSLogClient implements LogClient
     /** @{inheritDoc} */
     public Logbook update(Logbook logbook, Long logId)
     {
-        // TODO Auto-generated method stub
+        try
+        (
+            final ELog elog = new ELog(url, user, password);
+        )
+        {
+            elog.addLogbook(logId, logbook.getName());
+            return logbook;
+        } 
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+        
         return null;
     }
 
@@ -380,7 +404,21 @@ public class SNSLogClient implements LogClient
     /** @{inheritDoc} */
     public Logbook update(Logbook logbook, Collection<Long> logIds)
     {
-        // TODO Auto-generated method stub
+        try
+        (
+            final ELog elog = new ELog(url, user, password);
+        )
+        {
+            for (Long logId : logIds)
+                elog.addLogbook(logId, logbook.getName());
+            
+            return logbook;
+        } 
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+        
         return null;
     }
 
@@ -404,7 +442,19 @@ public class SNSLogClient implements LogClient
     /** @{inheritDoc} */
     public LogEntry findLogById(Long logId)
     {
-        // TODO Auto-generated method stub
+        try
+        (
+            final ELog elog = new ELog(url, user, password);
+        )
+        {
+            ELogEntry elogEntry = elog.getEntry(logId);
+            return new SNSLogEntry(elogEntry);
+        } 
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+        
         return null;
     }
 
