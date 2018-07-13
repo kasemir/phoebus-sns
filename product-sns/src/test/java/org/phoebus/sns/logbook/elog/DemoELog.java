@@ -3,13 +3,64 @@ package org.phoebus.sns.logbook.elog;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
-import java.io.InputStreamReader;
 import java.time.Instant;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
-public class DemoELog
+import org.phoebus.security.tokens.SimpleAuthenticationToken;
+
+import javafx.application.Application;
+import javafx.geometry.Insets;
+import javafx.scene.Scene;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.Dialog;
+import javafx.scene.control.Label;
+import javafx.scene.control.PasswordField;
+import javafx.scene.control.TextArea;
+import javafx.scene.control.TextField;
+import javafx.scene.layout.GridPane;
+import javafx.stage.Stage;
+
+public class DemoELog extends Application
 {
+    
+    private TextArea textArea;
+    
+    private class CredentialDialog extends Dialog<SimpleAuthenticationToken>
+    {
+        private final TextField     username;
+        private final PasswordField password;
+        
+        public CredentialDialog()
+        {
+            super();
+            
+            setTitle("Log In");
+            
+            GridPane grid = new GridPane();
+            
+            username = new TextField();
+            password = new PasswordField();
+            
+            grid.setHgap(10);
+            grid.setVgap(10);
+            grid.setPadding(new Insets(10));
+            
+            grid.add(new Label("Username: "), 0, 0);
+            grid.add(username, 1, 0);
+            grid.add(new Label("Password"), 0, 1);
+            grid.add(password, 1, 1);
+            
+            getDialogPane().setContent(grid);
+            getDialogPane().getButtonTypes().addAll(ButtonType.CANCEL, ButtonType.OK);
+            
+            this.setResultConverter(button -> 
+            {
+                return button == ButtonType.OK ? new SimpleAuthenticationToken(username.getText(), password.getText()) : null;
+            });
+        }
+    }
     
     private String url = "???", user = "???", password = "???";
     
@@ -21,12 +72,12 @@ public class DemoELog
             ELog elog = new ELog(url, user, password);
         )
         {
-            System.out.println("Current Logbooks:");
+            textArea.appendText("Current Logbooks:\n");
             for (String logbook : elog.getLogbooks())
             {
-                System.out.println("\t" + logbook);
+               textArea.appendText("\t" + logbook + "\n");
             }
-            System.out.println();
+            textArea.appendText("\n");
         }
     }
     
@@ -38,12 +89,12 @@ public class DemoELog
             ELog elog = new ELog(url, user, password);
         )
         {
-            System.out.println("Current Log Categories:");
+            textArea.appendText("Current Log Categories:\n");
             for (ELogCategory category : elog.getCategories())
             {
-                System.out.println("\t" + category.toString());
+                textArea.appendText("\t" + category.toString() + "\n");
             }
-            System.out.println();
+            textArea.appendText("\n");
         }
     }
     
@@ -68,16 +119,16 @@ public class DemoELog
             // Get all log entries from the last hour.
             List<ELogEntry> entries = elog.getEntries(start, end);
             
-            System.out.println("The last hours log entries: ");
+            textArea.appendText("The last hour's log entries: \n");
             for (ELogEntry entry : entries)
             {
-                System.out.println("\t" + entry.toString());
+                textArea.appendText("\t" + entry.toString() + "\n");
             }
-            System.out.println();
         }
     }
 
     /** Demonstrate ELog.createEntry() by creating an entry in the "Scratch Pad" log book. */
+    /*
     private void DemoELogCreateEntry() throws Exception
     {
         try
@@ -103,9 +154,15 @@ public class DemoELog
                 System.out.println("Entry creation canceled.");
         }
     }
+    */
     
-    private DemoELog()
+    @Override
+    public void start(Stage primaryStage) throws Exception
     {
+        textArea = new TextArea();
+        primaryStage.setTitle("Demo ELog");
+        primaryStage.setScene(new Scene(textArea, 700, 1000));
+        primaryStage.show();
         try
         {
             /**
@@ -114,15 +171,25 @@ public class DemoELog
              * # URL of relational database.
              * url=url_to_rdb
              * 
-             * # User credentials
-             * user=user_name
-             * password=user_password
-             * 
              * Any lines beginning with # will be ignored.
              * The terms after the "=" should be replaced with the user's specific information.
+             * 
+             * It is expected to be located in the user's home directory.
              */
-            File credentialFile = new File("test_cred");
-
+            
+            File credentialFile = new File(System.getProperty("user.home") + "/test_cred");
+            CredentialDialog cd = new CredentialDialog();
+            Optional<SimpleAuthenticationToken> result = cd.showAndWait();
+            if (result.isPresent())
+            {
+                user = result.get().getUsername();
+                password = result.get().getPassword();
+            }
+            else
+            {
+                System.exit(0);
+            }
+            
             try
             (
                 FileReader fReader = new FileReader(credentialFile);
@@ -139,31 +206,23 @@ public class DemoELog
                     {
                         url = line.substring(4);
                     }
-                    else if (line.startsWith("user="))
-                    {
-                        user = line.substring(5);
-                    }
-                    else if (line.startsWith("password="))
-                    {
-                        password = line.substring(9);
-                    }
                 }
             }
-            
+
             DemoELogListLogbooks();
             DemoELogGetCategories();
             DemoELogGetEntries();
-            DemoELogCreateEntry();
         }
         catch(Exception ex)
         {
-            System.out.println(ex.toString());
-            System.exit(1);
+            ex.printStackTrace();
         }
     }
-
+    
+    
     public static void main(String[] args)
     {
-        new DemoELog();
+        launch(args);
     }
+
 }
