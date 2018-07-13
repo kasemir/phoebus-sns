@@ -23,13 +23,13 @@ public class SNSLogFactory implements LogFactory
     @Override
     public LogClient getLogClient()
     {
-        return new SNSLogbookClient(rdb_url, read_only_username, read_only_password);
+        return new SNSLogClient(rdb_url, read_only_username, read_only_password);
     }
 
     @Override
     public LogClient getLogClient(Object authToken)
     {
         SimpleAuthenticationToken simpleAuth = (SimpleAuthenticationToken) authToken;
-        return new SNSLogbookClient(rdb_url, simpleAuth.getUsername(), simpleAuth.getPassword());
+        return new SNSLogClient(rdb_url, simpleAuth.getUsername(), simpleAuth.getPassword());
     }
 }
