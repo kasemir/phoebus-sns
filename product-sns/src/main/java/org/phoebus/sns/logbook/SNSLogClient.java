@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.phoebus.logbook.Attachment;
 import org.phoebus.logbook.LogClient;
@@ -179,8 +180,13 @@ public class SNSLogClient implements LogClient
     /** @{inheritDoc} */
     public InputStream getAttachment(Long logId, Attachment attachment)
     {
-        // TODO Auto-generated method stub
-        return null;
+        // TODO Work on this.
+        Collection<Attachment> attachments = listAttachments(logId);
+        Optional<Attachment> result = attachments.stream().filter(a -> attachment.equals(a)).findFirst();
+        if (result.isPresent())
+            return ((SNSAttachment) result.get()).getInputStream();
+        else
+            return null;
     }
 
     @Override
