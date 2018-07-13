@@ -378,7 +378,8 @@ public class LogEntryModel
         /*
         JobManager.schedule("Submit Log Entry", monitor ->
         {
-            logFactory.getLogClient(new SimpleAuthenticationToken(username, password));
+            LogClient client = logFactory.getLogClient(new SimpleAuthenticationToken(username, password));
+            client.set(logEnty);
         });
         */
         
