@@ -489,13 +489,19 @@ public class ELog implements Closeable
     private long fetchImageTypes(final String extension) throws Exception
     {
         final Connection connection = rdb.getConnection();
-        final PreparedStatement statement = connection.prepareStatement(
-            "SELECT image_type_id FROM LOGBOOK.IMAGE_TYPE WHERE ?=UPPER(file_extension)");
-        statement.setString(1, extension.toUpperCase());
-        long result = fetchLongResult(statement);
+        try
+        (
+            final PreparedStatement statement = connection.prepareStatement(
+                "SELECT image_type_id FROM LOGBOOK.IMAGE_TYPE WHERE ?=UPPER(file_extension)");
+        )
+        {
+            statement.setString(1, extension.toUpperCase());
+            return fetchLongResult(statement);
+        }
+        finally
+        {
         rdb.releaseConnection(connection);
-        
-        return result;
+        }
     }
 
     /** Execute statement and return the first 'long' result
@@ -530,13 +536,19 @@ public class ELog implements Closeable
     private long fetchAttachmentTypes(final String extension) throws Exception
     {
         Connection connection = rdb.getConnection();
-        final PreparedStatement statement = connection.prepareStatement(
-            "SELECT attachment_type_id FROM LOGBOOK.ATTACHMENT_TYPE WHERE ?=UPPER(file_extension)");
-        statement.setString(1, extension.toUpperCase());
-        long result = fetchLongResult(statement);
-        rdb.releaseConnection(connection);
-
-        return result;
+        try
+        (
+            final PreparedStatement statement = connection.prepareStatement(
+                "SELECT attachment_type_id FROM LOGBOOK.ATTACHMENT_TYPE WHERE ?=UPPER(file_extension)");
+        )
+        {
+            statement.setString(1, extension.toUpperCase());
+            return fetchLongResult(statement);
+        }
+        finally
+        {
+            rdb.releaseConnection(connection);
+        }
     }
 
     /** Add another logbook reference to existing entry.
