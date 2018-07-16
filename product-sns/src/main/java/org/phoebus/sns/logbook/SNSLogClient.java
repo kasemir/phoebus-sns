@@ -7,6 +7,8 @@
  *******************************************************************************/
 package org.phoebus.sns.logbook;
 
+import static org.phoebus.ui.application.PhoebusApplication.logger;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -19,6 +21,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.logging.Level;
 
 import org.phoebus.logbook.Attachment;
 import org.phoebus.logbook.LogClient;
@@ -30,6 +33,7 @@ import org.phoebus.sns.logbook.elog.ELog;
 import org.phoebus.sns.logbook.elog.ELogAttachment;
 import org.phoebus.sns.logbook.elog.ELogEntry;
 import org.phoebus.sns.logbook.elog.ELogPriority;
+
 
 /**
  * SNS implementation of org.phoebus.logbook.LogClient
@@ -94,7 +98,7 @@ public class SNSLogClient implements LogClient
     /** @{inheritDoc} */
     public Collection<Property> listProperties()
     {
-        // TODO Auto-generated method stub
+        logger.log(Level.WARNING, "listProperties method not supported by SNSLogClient.");
         return null;
     }
 
@@ -102,7 +106,7 @@ public class SNSLogClient implements LogClient
     /** @{inheritDoc} */
     public Collection<String> listAttributes(String propertyName)
     {
-        // TODO Auto-generated method stub
+        logger.log(Level.WARNING, "listAttributes method not supported by SNSLogClient.");
         return null;
     }
 
@@ -116,6 +120,7 @@ public class SNSLogClient implements LogClient
             final ELog elog = new ELog(url, user, password);
         )
         {
+            // Get every log entry from the epoch until now.
             List<ELogEntry> elogEntries = elog.getEntries(Date.from(Instant.ofEpochSecond(0, 0)), Date.from(Instant.now()));
             // Create a list of SNSLogEntries that each wrap an ELogEntry
             Collection<LogEntry> entries = new ArrayList<LogEntry>();
@@ -184,7 +189,7 @@ public class SNSLogClient implements LogClient
     /** @{inheritDoc} */
     public InputStream getAttachment(Long logId, Attachment attachment)
     {
-        // TODO Is this how this is supposed to work??????
+        // TODO Is this how this is supposed to work??
         Collection<Attachment> attachments = listAttachments(logId);
         Optional<Attachment> result = attachments.stream().filter(a -> attachment.equals(a)).findFirst();
         if (result.isPresent())
@@ -194,7 +199,6 @@ public class SNSLogClient implements LogClient
                 return new FileInputStream(result.get().getFile());
             } catch (FileNotFoundException e)
             {
-                // TODO Auto-generated catch block
                 e.printStackTrace();
                 return null;
             }
@@ -207,7 +211,7 @@ public class SNSLogClient implements LogClient
     /** @{inheritDoc} */
     public InputStream getAttachment(Long logId, String attachmentName)
     {
-     // TODO Work on this. Is the attachmentName the name of the attachment file??? Attachments don't have a name field ...
+        // TODO Work on this. Is the attachmentName the name of the attachment file? Attachments don't have a name field ...
         Collection<Attachment> attachments = listAttachments(logId);
         Optional<Attachment> result = attachments.stream().filter(a -> attachmentName.equals(a.getFile().getName())).findFirst();
         if (result.isPresent())
@@ -217,7 +221,6 @@ public class SNSLogClient implements LogClient
                 return new FileInputStream(result.get().getFile());
             } catch (FileNotFoundException e)
             {
-                // TODO Auto-generated catch block
                 e.printStackTrace();
                 return null;
             }
@@ -230,7 +233,7 @@ public class SNSLogClient implements LogClient
     /** @{inheritDoc} */
     public Property getProperty(String property)
     {
-        // TODO Auto-generated method stub
+        logger.log(Level.WARNING, "getProperty method not supported by SNSLogClient.");
         return null;
     }
 
@@ -284,18 +287,7 @@ public class SNSLogClient implements LogClient
     /** @{inheritDoc} */
     public Collection<LogEntry> set(Collection<LogEntry> logEntries)
     {
-        try
-        (
-            final ELog elog = new ELog(url, user, password);
-        )
-        {
-            for (LogEntry entry : logEntries)
-                set(entry);
-        } 
-        catch (Exception e)
-        {
-            e.printStackTrace();
-        }
+        logger.log(Level.WARNING, "set(Collection<LogEntry>) not supported by SNSLogClient.");
         return null;
     }
 
@@ -303,7 +295,7 @@ public class SNSLogClient implements LogClient
     /** @{inheritDoc} */
     public Tag set(Tag tag)
     {
-        // This is set by the RDB, not users ... ignore??
+        logger.log(Level.WARNING, "set(Tag) not supported by SNSLogClient.");
         return null;
     }
 
@@ -311,26 +303,15 @@ public class SNSLogClient implements LogClient
     /** @{inheritDoc} */
     public Tag set(Tag tag, Collection<Long> logIds)
     {
-        try
-        (
-            final ELog elog = new ELog(url, user, password);
-        )
-        {
-            for (Long logId : logIds)
-                elog.addCategory(logId,tag.getName());
-        } 
-        catch (Exception e)
-        {
-            e.printStackTrace();
-        }
+        logger.log(Level.WARNING, "set(Tag, Collection<Long>) not supported by SNSLogClient.");
         return null;
     }
 
     @Override
     /** @{inheritDoc} */
-    public Logbook set(Logbook Logbook)
+    public Logbook set(Logbook logbook)
     {
-        // TODO Auto-generated method stub
+        logger.log(Level.WARNING, "set(Logbook) not supported by SNSLogClient.");
         return null;
     }
 
@@ -359,7 +340,7 @@ public class SNSLogClient implements LogClient
     /** @{inheritDoc} */
     public Property set(Property property)
     {
-        // TODO Auto-generated method stub
+        logger.log(Level.WARNING, "set(Property) method not supported by SNSLogClient.");
         return null;
     }
 
@@ -367,7 +348,7 @@ public class SNSLogClient implements LogClient
     /** @{inheritDoc} */
     public LogEntry update(LogEntry log)
     {
-        // TODO Auto-generated method stub
+        logger.log(Level.WARNING, "update(LogEntry) method not supported by SNSLogClient.");
         return null;
     }
 
@@ -375,7 +356,7 @@ public class SNSLogClient implements LogClient
     /** @{inheritDoc} */
     public Collection<LogEntry> update(Collection<LogEntry> logs)
     {
-        // TODO Auto-generated method stub
+        logger.log(Level.WARNING, "update(Collection<LogEntry>) method not supported by SNSLogClient.");
         return null;
     }
 
@@ -383,7 +364,7 @@ public class SNSLogClient implements LogClient
     /** @{inheritDoc} */
     public Property update(Property property)
     {
-        // TODO Auto-generated method stub
+        logger.log(Level.WARNING, "update(Property) method not supported by SNSLogClient.");
         return null;
     }
 
@@ -391,7 +372,19 @@ public class SNSLogClient implements LogClient
     /** @{inheritDoc} */
     public Tag update(Tag tag, Long logId)
     {
-        // TODO Auto-generated method stub
+        try
+        (
+            final ELog elog = new ELog(url, user, password);
+        )
+        {
+            elog.addLogbook(logId, tag.getName());
+            return tag;
+        } 
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+        
         return null;
     }
 
@@ -399,7 +392,20 @@ public class SNSLogClient implements LogClient
     /** @{inheritDoc} */
     public Tag update(Tag tag, Collection<Long> logIds)
     {
-        // TODO Auto-generated method stub
+        try
+        (
+            final ELog elog = new ELog(url, user, password);
+        )
+        {
+            for (Long logId : logIds)
+                elog.addLogbook(logId, tag.getName());
+            return tag;
+        } 
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+        
         return null;
     }
 
@@ -427,21 +433,7 @@ public class SNSLogClient implements LogClient
     /** @{inheritDoc} */
     public Logbook update(Logbook logbook, Collection<Long> logIds)
     {
-        try
-        (
-            final ELog elog = new ELog(url, user, password);
-        )
-        {
-            for (Long logId : logIds)
-                elog.addLogbook(logId, logbook.getName());
-            
-            return logbook;
-        } 
-        catch (Exception e)
-        {
-            e.printStackTrace();
-        }
-        
+        logger.log(Level.WARNING, "update(Logbook, Collection<Long>) not supported by SNSLogClient.");
         return null;
     }
 
@@ -449,7 +441,7 @@ public class SNSLogClient implements LogClient
     /** @{inheritDoc} */
     public LogEntry update(Property property, Long logId)
     {
-        // TODO Auto-generated method stub
+        logger.log(Level.WARNING, "update(Property, Long) not supported by SNSLogClient.");
         return null;
     }
 
@@ -457,7 +449,18 @@ public class SNSLogClient implements LogClient
     /** @{inheritDoc} */
     public Attachment add(File local, Long logId)
     {
-        // TODO Auto-generated method stub
+        try
+        (
+            final ELog elog = new ELog(url, user, password);
+        )
+        {
+            elog.addAttachment(logId, local.getName(), "", new FileInputStream(local));
+        } 
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+        
         return null;
     }
 
@@ -485,7 +488,7 @@ public class SNSLogClient implements LogClient
     /** @{inheritDoc} */
     public List<LogEntry> findLogsBySearch(String pattern)
     {
-        // TODO Auto-generated method stub
+        // TODO Is it matching the LogEntry titles, texts, log books, tags, .... etc??
         return null;
     }
 
@@ -493,7 +496,7 @@ public class SNSLogClient implements LogClient
     /** @{inheritDoc} */
     public List<LogEntry> findLogsByTag(String pattern)
     {
-        // TODO Auto-generated method stub
+        // TODO Implement in ELog then implement method.
         return null;
     }
 
@@ -501,7 +504,7 @@ public class SNSLogClient implements LogClient
     /** @{inheritDoc} */
     public List<LogEntry> findLogsByLogbook(String logbook)
     {
-        // TODO Auto-generated method stub
+        // TODO Implement in ELog then implement method.
         return null;
     }
 
@@ -509,7 +512,7 @@ public class SNSLogClient implements LogClient
     /** @{inheritDoc} */
     public List<LogEntry> findLogsByProperty(String propertyName, String attributeName, String attributeValue)
     {
-        // TODO Auto-generated method stub
+        logger.log(Level.WARNING, "findLogsByProperty method not supported by SNSLogClient.");
         return null;
     }
 
@@ -517,7 +520,7 @@ public class SNSLogClient implements LogClient
     /** @{inheritDoc} */
     public List<LogEntry> findLogsByProperty(String propertyName)
     {
-        // TODO Auto-generated method stub
+        logger.log(Level.WARNING, "findLogsByProperty method not supported by SNSLogClient.");
         return null;
     }
 
@@ -525,98 +528,85 @@ public class SNSLogClient implements LogClient
     /** @{inheritDoc} */
     public List<LogEntry> findLogs(Map<String, String> map)
     {
-        // TODO Auto-generated method stub
+        // TODO What's supposed to be in the map?
         return null;
     }
 
     @Override
     public void deleteTag(String tag)
     {
-        // TODO Auto-generated method stub
-        
+        logger.log(Level.WARNING, "delete operations not supported by SNSLogClient.");
     }
 
     @Override
     public void deleteLogbook(String logbook)
     {
-        // TODO Auto-generated method stub
-        
+        logger.log(Level.WARNING, "delete operations not supported by SNSLogClient.");
     }
 
     @Override
     public void deleteProperty(String property)
     {
-        // TODO Auto-generated method stub
-        
+        logger.log(Level.WARNING, "delete operations not supported by SNSLogClient."); 
     }
 
     @Override
     public void delete(LogEntry log)
     {
-        // TODO Auto-generated method stub
-        
+        logger.log(Level.WARNING, "delete operations not supported by SNSLogClient.");
     }
 
     @Override
     public void delete(Long logId)
     {
-        // TODO Auto-generated method stub
-        
+        logger.log(Level.WARNING, "delete operations not supported by SNSLogClient.");
     }
 
     @Override
     public void delete(Collection<LogEntry> logs)
     {
-        // TODO Auto-generated method stub
-        
+        logger.log(Level.WARNING, "delete operations not supported by SNSLogClient.");
     }
 
     @Override
     public void delete(Tag tag, Long logId)
     {
-        // TODO Auto-generated method stub
-        
+        logger.log(Level.WARNING, "delete operations not supported by SNSLogClient.");
     }
 
     @Override
     public void delete(Tag tag, Collection<Long> logIds)
     {
-        // TODO Auto-generated method stub
-        
+        logger.log(Level.WARNING, "delete operations not supported by SNSLogClient.");
     }
 
     @Override
     public void delete(Logbook logbook, Long logId)
     {
-        // TODO Auto-generated method stub
-        
+        logger.log(Level.WARNING, "delete operations not supported by SNSLogClient.");
     }
 
     @Override
     public void delete(Logbook logbook, Collection<Long> logIds)
     {
-        // TODO Auto-generated method stub
-        
+        logger.log(Level.WARNING, "delete operations not supported by SNSLogClient.");
     }
 
     @Override
     public void delete(Property property, Long logId)
     {
-        // TODO Auto-generated method stub
-        
+        logger.log(Level.WARNING, "delete operations not supported by SNSLogClient.");
     }
 
     @Override
     public void delete(Property property, Collection<Long> logIds)
     {
-        // TODO Auto-generated method stub
-        
+        logger.log(Level.WARNING, "delete operations not supported by SNSLogClient.");
     }
 
     @Override
     public void delete(String fileName, Long logId)
     {
-        // TODO Auto-generated method stub
-        
+        logger.log(Level.WARNING, "delete operations not supported by SNSLogClient.");
     }
 }
