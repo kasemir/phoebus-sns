@@ -122,7 +122,6 @@ public class SNSLogClient implements LogClient
             final ELog elog = new ELog(url, user, password);
         )
         {
-            
             Instant now = Instant.now();
             Instant twoDaysAgo = Instant.ofEpochSecond(now.getEpochSecond() - seconds48Hours);
             
