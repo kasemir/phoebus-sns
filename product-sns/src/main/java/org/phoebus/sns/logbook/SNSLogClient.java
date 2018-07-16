@@ -41,6 +41,9 @@ import org.phoebus.sns.logbook.elog.ELogPriority;
  */
 public class SNSLogClient implements LogClient
 {
+    /** Number of seconds in 48 hours. */
+    final private static Long seconds48Hours = (long) (60 * 60 * 48);
+    
     final private String url;
     final private String user;
     final private String password;
@@ -114,15 +117,19 @@ public class SNSLogClient implements LogClient
     /** @{inheritDoc} */
     public Collection<LogEntry> listLogs()
     {
-        
         try
         (
             final ELog elog = new ELog(url, user, password);
         )
         {
-            // Get every log entry from the epoch until now.
-            List<ELogEntry> elogEntries = elog.getEntries(Date.from(Instant.ofEpochSecond(0, 0)), Date.from(Instant.now()));
-            // Create a list of SNSLogEntries that each wrap an ELogEntry
+            
+            Instant now = Instant.now();
+            Instant twoDaysAgo = Instant.ofEpochSecond(now.getEpochSecond() - seconds48Hours);
+            
+            // Get every log entry from the last 48 hours.
+            List<ELogEntry> elogEntries = elog.getEntries( Date.from(twoDaysAgo), Date.from(Instant.now()));
+            
+            // Create a list of SNSLogEntries
             Collection<LogEntry> entries = new ArrayList<LogEntry>();
             for (ELogEntry entry : elogEntries)
             {
