@@ -132,5 +132,12 @@ public class SNSLogEntry implements LogEntry
         // TODO Auto-generated method stub 
         return null;
     }
+    
+    @Override
+    /** Return the log entry in a string format. */
+    public String toString()
+    {
+        return entry.toString();
+    }
 
 }
