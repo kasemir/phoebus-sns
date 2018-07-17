@@ -33,6 +33,7 @@ import org.phoebus.sns.logbook.elog.ELog;
 import org.phoebus.sns.logbook.elog.ELogAttachment;
 import org.phoebus.sns.logbook.elog.ELogEntry;
 import org.phoebus.sns.logbook.elog.ELogPriority;
+import org.phoebus.util.time.TimestampFormats;
 
 
 /**
@@ -267,7 +268,18 @@ public class SNSLogClient implements LogClient
             while (attachIter.hasNext())
             {
                 Attachment a = attachIter.next();
-                elog.addAttachment(id, a.getFile().getName(), /* Caption? */a.getContentType(), new FileInputStream(a.getFile()));
+                
+                // Get the file extension.
+                int extIndex = a.getFile().getName().lastIndexOf(".");
+                String extension = a.getFile().getName().substring(extIndex);
+                
+                // Get the last modified date.
+                Instant date = Instant.ofEpochMilli(a.getFile().lastModified());
+                
+                // Build the attachment caption.
+                String caption = TimestampFormats.SECONDS_FORMAT.format(date) + extension;
+                
+                elog.addAttachment(id, a.getFile().getName(), caption, new FileInputStream(a.getFile()));
             }
             
             while(logIter.hasNext())
@@ -439,7 +451,20 @@ public class SNSLogClient implements LogClient
     /** @{inheritDoc} */
     public Logbook update(Logbook logbook, Collection<Long> logIds)
     {
-        logger.log(Level.WARNING, "update(Logbook, Collection<Long>) not supported by SNSLogClient.");
+        try
+        (
+            final ELog elog = new ELog(url, user, password);
+        )
+        {
+            for (Long logId : logIds)
+                elog.addLogbook(logId, logbook.getName());
+            return logbook;
+        } 
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+        
         return null;
     }
 
