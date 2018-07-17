@@ -16,6 +16,7 @@
   </target>
 
   <target name="dist" depends="product" description="Pack for distribution">
+    <ant target="dist" dir="../phoebus"/>
     <ant target="dist" dir="product-sns"/>
   </target>
 
