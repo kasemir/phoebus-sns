@@ -16,6 +16,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.phoebus.framework.autocomplete.Proposal;
+import org.phoebus.framework.preferences.PreferencesReader;
 import org.phoebus.framework.rdb.RDBConnectionPool;
 import org.phoebus.framework.spi.PVProposalProvider;
 
@@ -28,18 +29,12 @@ public class SNSPVProposals implements PVProposalProvider
     public static final String NAME = "SNS PVs";
 
     /** URL, user, pass, URL, user, pass, ... */
-    private static final List<String> infos = List.of
-    (
-        "jdbc:oracle:thin:@(DESCRIPTION=(LOAD_BALANCE=OFF)(FAILOVER=ON)" +
-        "(ADDRESS=(PROTOCOL=TCP)(HOST=snsappa.sns.ornl.gov)(PORT=1610))" +
-        "(ADDRESS=(PROTOCOL=TCP)(HOST=snsappb.sns.ornl.gov)(PORT=1610))" +
-        "(CONNECT_DATA=(SERVICE_NAME=prod_controls)))",
-        "sns_reports",
-        "sns",
-        "jdbc:oracle:thin:@snsoroda-scan.sns.gov:1521/scprod_controls",
-        "sns_reports",
-        "sns"
-    );
+    private static final List<String> infos;
+    static
+    {
+        final PreferencesReader prefs = new PreferencesReader(SNSPVProposals.class, "/pv_proposals_preferences.properties");
+        infos = List.of(prefs.get("sources").split(","));
+    }
 
     private final List<RDBConnectionPool> pools;
 
