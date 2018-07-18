@@ -126,6 +126,18 @@ public class SNSLogClient implements LogClient
             Instant now = Instant.now();
             Instant twoDaysAgo = Instant.ofEpochSecond(now.getEpochSecond() - seconds48Hours);
             
+            /*
+             * TODO
+             * 
+             * The elog.getEntries(...) call causes "exceeded simultaneous SESSIONS_PER_USER limit" SQL exceptions.
+             * 
+             * Should investigate into Elog.getEntries to determine if this can be avoided.
+             * 
+             * Possible, but not preferred, solution is to break the retrieval up into smaller pieces.
+             * For example: retrieve 6 hours of log entries at a time 8 times.
+             * 
+             */
+            
             // Get every log entry from the last 48 hours.
             List<ELogEntry> elogEntries = elog.getEntries( Date.from(twoDaysAgo), Date.from(Instant.now()));
             
@@ -263,8 +275,10 @@ public class SNSLogClient implements LogClient
             Collection<Attachment> attachments = log.getAttachments();
             Iterator<Attachment> attachIter = attachments.iterator();
             
+            // Create the entry
             long id = elog.createEntry(logIter.hasNext() ? logIter.next().getName() : "", log.getTitle(), log.getDescription(), ELogPriority.forName(log.getLevel()));
             
+            // Add all attached files to the entry
             while (attachIter.hasNext())
             {
                 Attachment a = attachIter.next();
@@ -282,12 +296,14 @@ public class SNSLogClient implements LogClient
                 elog.addAttachment(id, a.getFile().getName(), caption, new FileInputStream(a.getFile()));
             }
             
+            // Add the log books to the entry
             while(logIter.hasNext())
             {
                 Logbook l = logIter.next();
                 elog.addLogbook(id, l.getName());
             }
             
+            // Add the categories (tags) to the entry
             while(tagIter.hasNext())
             {
                 Tag t = tagIter.next();
