@@ -24,7 +24,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.phoebus.framework.rdb.RDBConnectionPool;
-import org.phoebus.sns.logbook.StreamHelper;
+import org.phoebus.framework.util.IOUtils;
 
 import oracle.jdbc.OracleTypes;
 
@@ -38,12 +38,12 @@ public class ELog implements Closeable
 {
     /**
      *  NOTE:
-     *  
-     *  When requesting connections, it is important to keep the Connection out of try with resource 
+     *
+     *  When requesting connections, it is important to keep the Connection out of try with resource
      *  blocks. The RDBConnectionPool keeps all the connections in its pool open and expects the connection
-     *  to be released, _not_ closed, when it is done being used. The connections in the pool are all closed 
+     *  to be released, _not_ closed, when it is done being used. The connections in the pool are all closed
      *  when the RDBCollectionPool.clear() method is called.
-     *  
+     *
      *  If the connections are put in try with resource blocks they will be closed automatically,
      *  which the connection pool does not expect.
      */
@@ -51,12 +51,12 @@ public class ELog implements Closeable
 
     /** Maximum allowed size for title and text entry */
     final private int MAX_TITLE_SIZE, MAX_TEXT_SIZE;
-    
+
     private static final String DEFAULT_BADGE_NUMBER = "999992"; //$NON-NLS-1$
     final private String badge_number;
-    
+
     private static List<ELogbook> logbooks = null;
-    
+
     private static List<ELogCategory> categories = null;
 
     /** Initialize
@@ -89,7 +89,7 @@ public class ELog implements Closeable
      *  @throws Exception
      */
     private String getBadgeNumber(final String user) throws Exception
-    { 
+    {
         final Connection connection = rdb.getConnection();
         try
         (
@@ -113,7 +113,7 @@ public class ELog implements Closeable
         {
             rdb.releaseConnection(connection);
         }
-        
+
         return DEFAULT_BADGE_NUMBER;
     }
 
@@ -131,10 +131,10 @@ public class ELog implements Closeable
             throw new Exception("Unable to locate LOGBOOK.LOG_ENTRY." + column);
         final int max_elog_text = tables.getInt("COLUMN_SIZE");
         rdb.releaseConnection(connection);
-        
+
         return max_elog_text;
     }
-    
+
     /** Read available logbooks from RDB
      *  @return Available logbooks
      *  @throws Exception on error
@@ -157,10 +157,10 @@ public class ELog implements Closeable
         {
             rdb.releaseConnection(connection);
         }
-        
+
         return logbooks;
     }
-    
+
     /** Locate logbook by name
      *  @param name Name of logbook
      *  @return {@link ELogbook}
@@ -204,7 +204,7 @@ public class ELog implements Closeable
                 tags.add(new ELogCategory(result.getString(1), result.getString(2)));
         }
         rdb.releaseConnection(connection);
-        
+
         return tags;
     }
 
@@ -213,7 +213,7 @@ public class ELog implements Closeable
     {
         return categories;
     }
-    
+
     /** Read logbook entry
      *  @param entry_id Log entry ID
      *  @return {@link ELogEntry}
@@ -226,9 +226,9 @@ public class ELog implements Closeable
         final Date date;
         final String title;
         final String text;
-        
+
         final Connection connection = rdb.getConnection();
-        
+
         try
         (
             final PreparedStatement statement = connection.prepareStatement(
@@ -255,18 +255,18 @@ public class ELog implements Closeable
         {
             rdb.releaseConnection(connection);
         }
-        
+
         final List<String> logbooks = getLogbooks(entry_id);
         final List<ELogCategory> categories = getCategories(entry_id);
-        
+
         // Get attachments
         final List<ELogAttachment> images = getImageAttachments(entry_id);
         final List<ELogAttachment> attachments = getOtherAttachments(entry_id);
 
-        // Return entry        
+        // Return entry
         return new ELogEntry(entry_id, prio, user, date, title, text, logbooks, categories, images, attachments);
     }
-    
+
     /** Read logbook entries
      *  @param start Start date
      *  @param end End date
@@ -312,10 +312,10 @@ public class ELog implements Closeable
         {
             rdb.releaseConnection(connection);
         }
-        
+
         return entries;
     }
-    
+
     /** @param entry_id Log entry ID
      *  @return Names of logbooks for this entry
      *  @throws Exception on error
@@ -343,7 +343,7 @@ public class ELog implements Closeable
         {
             rdb.releaseConnection(connection);
         }
-        
+
         return logbooks;
     }
 
@@ -374,7 +374,7 @@ public class ELog implements Closeable
         {
             rdb.releaseConnection(connection);
         }
-        
+
         return logbooks;
     }
 
@@ -399,7 +399,7 @@ public class ELog implements Closeable
                 text = "..." + title.substring(MAX_TITLE_SIZE-4) + "\n" + text;
             title = title.substring(0, MAX_TITLE_SIZE-4) + "...";
         }
-        
+
         if (text.length() < MAX_TEXT_SIZE)
         {
             // Short text goes into entry
@@ -419,7 +419,7 @@ public class ELog implements Closeable
             addAttachment(entry_id, "FullEntry.txt", "Full Text", stream);
             stream.close();
         }
-        
+
         final Connection connection = rdb.getConnection();
         try
         (
@@ -440,7 +440,7 @@ public class ELog implements Closeable
         {
             rdb.releaseConnection(connection);
         }
-        
+
         return entry_id;
     }
 
@@ -470,14 +470,14 @@ public class ELog implements Closeable
             statement.setString(5, text);
             statement.registerOutParameter(6, OracleTypes.NUMBER);
             statement.executeQuery();
-            
+
             result = statement.getLong(6);
         }
-        finally 
+        finally
         {
             rdb.releaseConnection(connection);
         }
-        
+
         return result;
     }
 
@@ -527,7 +527,7 @@ public class ELog implements Closeable
             statement.close();
         }
     }
-    
+
     /** Fetch ID for attachment
      *  @param extension Attachment file extension.
      *  @return attachment_type_id from the RDB, -1 if not found
@@ -576,7 +576,7 @@ public class ELog implements Closeable
             rdb.releaseConnection(connection);
         }
     }
-    
+
     /** Determine the type of attachment, based on file extension, and add it
      *  to the elog entry with the entry_id.
      *
@@ -596,7 +596,7 @@ public class ELog implements Closeable
         if (ndx <= 0)
             throw new Exception("Attachment has no file extension: " + fname);
         final String extension = fname.substring(ndx + 1);
-        
+
         // Determine file type ID used in RDB. First try image
         long fileTypeID = fetchImageTypes(extension);
         final boolean is_image = fileTypeID != -1;
@@ -608,12 +608,12 @@ public class ELog implements Closeable
 
         // Buffer the attachment data so that we can return it
         ByteArrayOutputStream data_buf = new ByteArrayOutputStream();
-        StreamHelper.copy(stream, data_buf);
+        IOUtils.copy(stream, data_buf);
         stream.close();
         final byte[] data = data_buf.toByteArray();
         data_buf.close();
         data_buf = null;
-        
+
         // Submit to RDB
         final Connection connection = rdb.getConnection();
         try
@@ -671,7 +671,7 @@ public class ELog implements Closeable
         {
             rdb.releaseConnection(connection);
         }
-        
+
         return images;
     }
 
@@ -709,10 +709,10 @@ public class ELog implements Closeable
         {
             rdb.releaseConnection(connection);
         }
-        
+
         return attachments;
     }
-    
+
     /** Add category to entry
      *  @param entry_id Log entry ID
      *  @param tag_name Name of tag to add
@@ -738,7 +738,7 @@ public class ELog implements Closeable
             rdb.releaseConnection(connection);
         }
     }
-    
+
     /** @param category_name Category name
      *  @return Category ID
      *  @throws Exception when category not known
