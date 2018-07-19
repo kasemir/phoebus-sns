@@ -12,7 +12,7 @@ public class SNSLogFactory implements LogFactory
     private static final String read_only_username = prefs.get("read_only_username");
     private static final String read_only_password = prefs.get("read_only_password");
     
-    private static final String ID = "org.phoebus.sns.logbook";
+    private static final String ID = "SNS";
     
     @Override
     public String getId()
