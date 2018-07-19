@@ -276,7 +276,10 @@ public class SNSLogClient implements LogClient
             Iterator<Attachment> attachIter = attachments.iterator();
             
             // Create the entry
-            long id = elog.createEntry(logIter.hasNext() ? logIter.next().getName() : "", log.getTitle(), log.getDescription(), ELogPriority.forName(log.getLevel()));
+            String level = log.getLevel();
+            
+            ELogPriority priority = (level.isEmpty()) ? ELogPriority.Normal : ELogPriority.forName(level);
+            long id = elog.createEntry(logIter.hasNext() ? logIter.next().getName() : "", log.getTitle(), log.getDescription(), priority);
             
             // Add all attached files to the entry
             while (attachIter.hasNext())
@@ -309,6 +312,8 @@ public class SNSLogClient implements LogClient
                 Tag t = tagIter.next();
                 elog.addCategory(id, t.getName());
             }
+            
+            return log;
         } 
         catch (Exception e)
         {
