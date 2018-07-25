@@ -27,9 +27,15 @@ public class SNSAttachment implements Attachment
 
     public SNSAttachment(final ELogAttachment attachment)
     {
-        this.attachment = attachment;       
+        this.attachment = attachment;
     }
-    
+
+    @Override
+    public String getName()
+    {
+        return file.getName();
+    }
+
     /** Get a stream of the attachments data. */
     public InputStream getInputStream()
     {
@@ -58,26 +64,26 @@ public class SNSAttachment implements Attachment
         {
             // TODO This is in /tmp so will get cleaned by OS, is that OK?
             file = File.createTempFile("attachment", null);
-        } 
+        }
         catch (IOException ex)
         {
             // TODO How to handle this? Gracefully or loudly? Can't throw without changing interface ...
             file = null;
             ex.printStackTrace();
         }
-        try 
+        try
         (
             FileOutputStream stream = new FileOutputStream(file);
         )
         {
             stream.write(attachment.getData());
-        } 
+        }
         catch (IOException ex1)
         {
             // TODO How to handle this? Gracefully or loudly?
             ex1.printStackTrace();
         }
-        
+
         return file;
     }
 
