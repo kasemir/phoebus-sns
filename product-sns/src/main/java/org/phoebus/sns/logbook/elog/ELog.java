@@ -303,19 +303,11 @@ public class ELog implements Closeable
                 final String title = result.getString(6);
                 final String text = result.getString(7);
                 final List<String> logbooks = getLogbooks(entry_id);
-                System.out.println("Got logbooks");
                 final List<ELogCategory> categories = getCategories(entry_id);
-                System.out.println("Got categories");                
                 final List<ELogAttachment> images = getImageAttachments(entry_id);
-                System.out.println("Got images");
                 final List<ELogAttachment> attachments = getOtherAttachments(entry_id);
-                System.out.println("Got attachments");
                 entries.add(new ELogEntry(entry_id, prio, user, date, title, text, logbooks, categories, images, attachments));
             }
-        }
-        finally
-        {
-            rdb.clear();
         }
 
         return entries;
