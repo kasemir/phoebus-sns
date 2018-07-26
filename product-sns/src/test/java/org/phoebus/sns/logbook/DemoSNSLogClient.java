@@ -32,7 +32,7 @@ import javafx.util.Pair;
 public class DemoSNSLogClient extends Application
 {
     private final static LogService logService = LogService.getInstance();
-    private final static LogFactory logFactory = logService.getLogFactories().get("org.phoebus.sns.logbook");
+    private final static LogFactory logFactory = logService.getLogFactories().get("SNS");
     private static LogClient logClient;
     
     private VBox     vbox;

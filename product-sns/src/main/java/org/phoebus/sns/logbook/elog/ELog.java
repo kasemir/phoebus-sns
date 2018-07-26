@@ -293,6 +293,7 @@ public class ELog implements Closeable
             statement.setTimestamp(1, new java.sql.Timestamp(start.getTime()));
             statement.setTimestamp(2, new java.sql.Timestamp(end.getTime()));
             final ResultSet result = statement.executeQuery();
+            rdb.releaseConnection(connection);
             while (result.next())
             {
                 final long entry_id = result.getLong(1);
@@ -302,15 +303,19 @@ public class ELog implements Closeable
                 final String title = result.getString(6);
                 final String text = result.getString(7);
                 final List<String> logbooks = getLogbooks(entry_id);
+                System.out.println("Got logbooks");
                 final List<ELogCategory> categories = getCategories(entry_id);
+                System.out.println("Got categories");                
                 final List<ELogAttachment> images = getImageAttachments(entry_id);
+                System.out.println("Got images");
                 final List<ELogAttachment> attachments = getOtherAttachments(entry_id);
+                System.out.println("Got attachments");
                 entries.add(new ELogEntry(entry_id, prio, user, date, title, text, logbooks, categories, images, attachments));
             }
         }
         finally
         {
-            rdb.releaseConnection(connection);
+            rdb.clear();
         }
 
         return entries;
