@@ -43,8 +43,7 @@ import org.phoebus.util.time.TimestampFormats;
 public class SNSLogClient implements LogClient
 {
     /** Number of seconds in 48 hours. */
-    final private static Long seconds48Hours = (long) (60 * 60 * 48);
-    
+    final private static Long seconds24Hours = (long) (60 * 60 * 24);
     final private String url;
     final private String user;
     final private String password;
@@ -124,7 +123,9 @@ public class SNSLogClient implements LogClient
         )
         {
             Instant now = Instant.now();
-            Instant twoDaysAgo = Instant.ofEpochSecond(now.getEpochSecond() - seconds48Hours);
+            Instant yesterday = Instant.ofEpochSecond(now.getEpochSecond() - seconds24Hours);
+            
+           
             
             /*
              * TODO
@@ -138,8 +139,8 @@ public class SNSLogClient implements LogClient
              * 
              */
             
-            // Get every log entry from the last 48 hours.
-            List<ELogEntry> elogEntries = elog.getEntries( Date.from(twoDaysAgo), Date.from(Instant.now()));
+            // Get every log entry from the last 24 hours.
+            List<ELogEntry> elogEntries = elog.getEntries( Date.from(yesterday), Date.from(Instant.now()));
             
             // Create a list of SNSLogEntries
             Collection<LogEntry> entries = new ArrayList<LogEntry>();
@@ -540,7 +541,37 @@ public class SNSLogClient implements LogClient
     /** @{inheritDoc} */
     public List<LogEntry> findLogsBySearch(String pattern)
     {
-        // TODO Is it matching the LogEntry titles, texts, log books, tags, .... etc??
+        /* 
+         *  Thus far there is no way to perform such searches in ELog without creating the code first.
+         *  
+         *  So just ignore the search string and return the last days worth of logs regardless of what the pattern is. 
+         *  This will allow the code that uses this method to at least work. 
+         */
+        
+        try
+        (
+            final ELog elog = new ELog(url, user, password);
+        )
+        {
+            Instant now = Instant.now();
+            Instant yesterday = Instant.ofEpochSecond(now.getEpochSecond() - seconds24Hours);
+            
+            // Get every log entry from the last 48 hours.
+            List<ELogEntry> elogEntries = elog.getEntries( Date.from(yesterday), Date.from(Instant.now()));
+            
+            // Create a list of SNSLogEntries
+            List<LogEntry> entries = new ArrayList<LogEntry>();
+            for (ELogEntry entry : elogEntries)
+            {
+                entries.add(new SNSLogEntry(entry));
+            }
+            
+            return entries;
+        } 
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
         return null;
     }
 
