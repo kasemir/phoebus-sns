@@ -86,11 +86,4 @@ public class SNSAttachment implements Attachment
 
         return file;
     }
-
-    @Override
-    public String getName()
-    {
-        return file.getName();
-    }
-
 }
