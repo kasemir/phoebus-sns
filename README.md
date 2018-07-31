@@ -38,7 +38,6 @@ ant dist
 
 
 ```
-
 git clone https://github.com/kasemir/phoebus-doc.git
 git clone https://github.com/shroffk/phoebus.git
 git clone https://github.com/kasemir/phoebus-sns.git
