@@ -13,7 +13,7 @@
     </copy>
   </target>
 
-  <target name="module-sns">
+  <target name="module-sns" depends="copy-doc" description="Assemble product">
     <mkdir dir="${classes}"/>
     <javac srcdir="${src}" destdir="${classes}" classpathref="app-classpath"/>
 
