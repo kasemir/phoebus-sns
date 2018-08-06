@@ -746,6 +746,12 @@ public class ELog implements Closeable
         }
     }
     
+    /**
+     * Get the category name from a string containing a category name and logbook name that are delimited by a colon.
+     * @param logbook_and_category
+     * @return category_name
+     * @throws Exception if logbook name, category name, or delimiter are missing.
+     */
     public static String getCategoryFromLogbookCategoryString(final String logbook_and_category) throws Exception
     {
         final String[] tokens = logbook_and_category.split(":");
