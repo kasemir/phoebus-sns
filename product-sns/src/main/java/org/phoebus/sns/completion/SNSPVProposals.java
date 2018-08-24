@@ -88,11 +88,17 @@ public class SNSPVProposals implements PVProposalProvider
                     pool.releaseConnection(connection);
                 }
             }
+            catch (InterruptedException ex)
+            {
+                // System.out.println("Ignoring interruption...");
+            }
             catch (Exception ex)
             {   // Ignore interruptions (new lookup replaced this one)
-                if (! Thread.currentThread().isInterrupted())
+                if (! (Thread.currentThread().isInterrupted() ||
+                       ex.getMessage().contains("interrupt")))
                     Logger.getLogger(getClass().getPackageName())
                           .log(Level.WARNING, "Cannot search for PV names", ex);
+                // else System.out.println("Ignoring " + ex);
             }
 
         return result;
