@@ -29,7 +29,7 @@
     <!-- Add _all_ dependencies, incl. JDBC drivers etc. which may not be used by generic product -->
     <dependency>
       <groupId>org.phoebus</groupId>
-      <artifactId>dependencies</artifactId>
+      <artifactId>phoebus-target</artifactId>
       <version>0.0.1-SNAPSHOT</version>
     </dependency>
   </dependencies>

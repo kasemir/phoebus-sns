@@ -9,8 +9,8 @@
 	<classpathentry kind="src" output="target/classes" path="product-sns/src/main/java"/>
 	<classpathentry kind="src" path="product-sns/src/main/resources"/>
 	<classpathentry kind="src" path="product-sns/src/test/java"/>
-	<classpathentry exported="true" kind="lib" path="/dependencies/target/lib/ojdbc8-12.2.0.1.jar"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/dependencies"/>
+	<classpathentry exported="true" kind="lib" path="/phoebus-target/target/lib/ojdbc8-12.2.0.1.jar"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/phoebus-target"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/core-framework"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/core-security"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/core-logbook"/>
