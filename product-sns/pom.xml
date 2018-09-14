@@ -26,11 +26,11 @@
       <artifactId>product</artifactId>
       <version>0.0.1-SNAPSHOT</version>
     </dependency>
-    <!-- Add _all_ dependencies, incl. JDBC drivers etc. which may not be used by generic product -->
+    <!-- Add JDBC drivers etc. which may not be used by generic product -->
     <dependency>
-      <groupId>org.phoebus</groupId>
-      <artifactId>phoebus-target</artifactId>
-      <version>0.0.1-SNAPSHOT</version>
+      <groupId>com.oracle.jdbc</groupId>
+      <artifactId>ojdbc8</artifactId>
+      <version>12.2.0.1</version>
     </dependency>
   </dependencies>
   <build>
