@@ -30,4 +30,4 @@ OPT="-server 4918"
 
 # Java 9 & 10 require '--add-modules=java.corba'
 # For Java 11, that is not available and instead a new pvAccess lib is needed.
-java --add-modules=java.corba -jar $JAR $OPT "$@" &
+java -jar $JAR $OPT "$@" &

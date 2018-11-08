@@ -11,5 +11,5 @@ IF EXIST product-sns-%V%.jar (
 
 )
 
-java --add-modules=java.corba -jar %JAR% %*
+java -jar %JAR% %*
 
