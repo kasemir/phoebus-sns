@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2017 Oak Ridge National Laboratory.
+ * Copyright (c) 2017-2018 Oak Ridge National Laboratory.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -11,11 +11,11 @@ import java.io.File;
 import java.time.Duration;
 import java.time.Instant;
 
+import org.epics.vtype.VType;
 import org.junit.Test;
 import org.phoebus.archive.reader.ArchiveReader;
 import org.phoebus.archive.reader.ArchiveReaders;
 import org.phoebus.archive.reader.ValueIterator;
-import org.phoebus.vtype.VType;
 
 /** Test/Demo of the Channel Archiver file reader
  *  @author Kay Kasemir
