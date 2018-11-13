@@ -57,8 +57,8 @@
   </target>
 
   <!-- Create ZIP of the product.jar, lib/, [doc/,] phoebus.sh launcher -->
-  <target name="dist" depends="module-sns" description="Pack for distribution">
-    <zip destfile="${build}/product-sns-${version}.zip">
+  <target name="dist" depends="jfxarch, module-sns" description="Pack for distribution">
+    <zip destfile="${build}/product-sns-${version}-${jfxarch}.zip">
       <zipfileset dir="${build}" includes="**/*.jar" prefix="product-sns-${version}"/>
       <zipfileset dir="." includes="settings.ini" fullpath="product-sns-${version}/settings.ini"/>
       <zipfileset dir="." includes="phoebus.sh" fullpath="product-sns-${version}/phoebus.sh" filemode="755"/>
