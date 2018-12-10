@@ -30,10 +30,15 @@ public class SNSPVProposals implements PVProposalProvider
 
     /** URL, user, pass, URL, user, pass, ... */
     private static final List<String> infos;
+
+    /** Limit the number of results to return */
+    private static final int limit;
+
     static
     {
         final PreferencesReader prefs = new PreferencesReader(SNSPVProposals.class, "/pv_proposals_preferences.properties");
         infos = List.of(prefs.get("sources").split(","));
+        limit = prefs.getInt("limit");
     }
 
     private final List<RDBConnectionPool> pools;
@@ -75,7 +80,7 @@ public class SNSPVProposals implements PVProposalProvider
                 final Connection connection = pool.getConnection();
                 try
                 {
-                    final PreparedStatement stmt = connection.prepareStatement("SELECT name FROM chan_arch.channel WHERE name LIKE ? FETCH FIRST 30 ROWS ONLY");
+                    final PreparedStatement stmt = connection.prepareStatement("SELECT name FROM chan_arch.channel WHERE name LIKE ? FETCH FIRST " + limit + " ROWS ONLY");
                     stmt.setString(1, "%" + text + "%");
                     final ResultSet rs = stmt.executeQuery();
                     while (rs.next())
