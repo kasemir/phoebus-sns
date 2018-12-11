@@ -83,7 +83,7 @@ public class SNSPVProposals implements PVProposalProvider
                     final PreparedStatement stmt = connection.prepareStatement("SELECT name FROM chan_arch.channel WHERE name LIKE ? FETCH FIRST " + limit + " ROWS ONLY");
                     stmt.setString(1, "%" + text + "%");
                     final ResultSet rs = stmt.executeQuery();
-                    while (rs.next())
+                    while (rs.next()  &&  result.size() < limit)
                         result.add(new Proposal(rs.getString(1)));
                     rs.close();
                     stmt.close();
