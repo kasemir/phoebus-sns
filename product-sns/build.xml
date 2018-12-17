@@ -63,6 +63,7 @@
       <zipfileset dir="." includes="settings.ini" fullpath="product-sns-${version}/settings.ini"/>
       <zipfileset dir="." includes="phoebus.sh" fullpath="product-sns-${version}/phoebus.sh" filemode="755"/>
       <zipfileset dir="." includes="phoebus.bat" fullpath="product-sns-${version}/phoebus.bat"/>
+      <zipfileset dir="." includes="site_splash.png" fullpath="product-sns-${version}/site_splash.png"/>
       <zipfileset dir="${build}" includes="doc/**" prefix="product-sns-${version}"/>
     </zip>
   </target>
