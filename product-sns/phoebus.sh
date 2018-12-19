@@ -25,9 +25,27 @@ else
   JAR="${TOP}/product-sns-${V}-SNAPSHOT.jar"
 fi
 
-# To get one instance, use server mode
-OPT="-server 4918"
+# Reduce VIRT memory
+export MALLOC_ARENA_MAX=4
+
+# Memory
+export JDK_JAVA_OPTIONS="-Xms500M -Xmx2G"
 
 # Java 9 & 10 require '--add-modules=java.corba'
-# For Java 11, that is not available and instead a new pvAccess lib is needed.
-java -Djdk.gtk.verbose=false -Djdk.gtk.version=3 -jar $JAR $OPT "$@" &
+
+# Don't start a CA Repeater
+JDK_JAVA_OPTIONS+=" -DCA_DISABLE_REPEATER=true "
+
+# Use GTK 2 (GTK 3 drag/drop doesn't always work)
+JDK_JAVA_OPTIONS+=" -Djdk.gtk.verbose=false -Djdk.gtk.version=2"
+
+# Drawing pipeling
+JDK_JAVA_OPTIONS+=" -Dprism.verbose=false -Dprism.forceGPU=true"
+# Disable acceleration
+# JDK_JAVA_OPTIONS+=" -Dprism.order=sw"
+
+OPT=""
+# To get one instance, use server mode
+# OPT+=" -server 4918"
+
+java -jar $JAR $OPT "$@" &
