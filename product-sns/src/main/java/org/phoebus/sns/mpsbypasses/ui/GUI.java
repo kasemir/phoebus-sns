@@ -2,6 +2,7 @@ package org.phoebus.sns.mpsbypasses.ui;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
 import org.phoebus.framework.jobs.JobManager;
@@ -18,6 +19,7 @@ import org.phoebus.ui.dialog.ExceptionDetailsErrorDialog;
 import org.phoebus.ui.javafx.UpdateThrottle;
 
 import javafx.application.Platform;
+import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
@@ -25,14 +27,22 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
+import javafx.scene.layout.Border;
+import javafx.scene.layout.BorderStroke;
+import javafx.scene.layout.BorderStrokeStyle;
+import javafx.scene.layout.BorderWidths;
+import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
-import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
 
 @SuppressWarnings("nls")
-public class GUI extends VBox implements BypassModelListener
+public class GUI extends GridPane implements BypassModelListener
 {
+    private static final Border BORDER = new Border(new BorderStroke(Color.GRAY, BorderStrokeStyle.SOLID, new CornerRadii(5), BorderWidths.DEFAULT, new Insets(5)));
+    private static final Insets BORDER_INSETS = new Insets(10);
+
     private final BypassModel model;
 
     private final ComboBox<MachineMode> sel_mode = new ComboBox<>();
@@ -53,6 +63,7 @@ public class GUI extends VBox implements BypassModelListener
     private final TextField machine_switch = new TextField();
 
     private final TableView<BypassRow> bypasses = new TableView<>();
+    private final ConcurrentHashMap<Bypass, BypassRow> model2gui = new ConcurrentHashMap<>();
 
     private final BeamModeMonitor beam_monitor;
     private final MachineModeMonitor machine_monitor;
@@ -64,11 +75,16 @@ public class GUI extends VBox implements BypassModelListener
     {
         this.model = model;
 
-        setSpacing(5);
-        createTable();
-        HBox.setHgrow(bypasses, Priority.ALWAYS);
-        bypasses.setMaxHeight(Double.MAX_VALUE);
-        getChildren().addAll(createSelector(), createCounts(), createOpState(), bypasses);
+        // setGridLinesVisible(true);
+        // setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
+
+        add(createSelector(), 0, 0);
+        add(createCounts(), 0, 1);
+        add(new HBox(createOpState()), 0, 2);
+
+
+        add(createTable(), 0, 3);
+
 
         beam_monitor = new BeamModeMonitor(this::updateBeamMode);
         beam_monitor.start();
@@ -97,6 +113,8 @@ public class GUI extends VBox implements BypassModelListener
         sel_mode.setOnAction(event -> reload());
         reload.setOnAction(event -> reload());
 
+        row.setPadding(new Insets(5, 0, 0, 15));
+
         return row;
     }
 
@@ -117,9 +135,12 @@ public class GUI extends VBox implements BypassModelListener
                 ((TextField)n).setEditable(false);
                 ((TextField)n).setPrefWidth(80);
             }
+
+        row.setBorder(BORDER);
+        row.setPadding(BORDER_INSETS);
+
         return row;
     }
-
 
     private Node createOpState()
     {
@@ -141,6 +162,9 @@ public class GUI extends VBox implements BypassModelListener
         grid.add(new Label("Machine Mode"), 0, 2);
         grid.add(machine_rtdl, 1, 2);
         grid.add(machine_switch, 2, 2);
+
+        grid.setBorder(BORDER);
+        grid.setPadding(BORDER_INSETS);
 
         return grid;
     }
@@ -164,6 +188,10 @@ public class GUI extends VBox implements BypassModelListener
         col = new TableColumn<>("Request Date");
         col.setCellValueFactory(cell -> cell.getValue().date);
         bypasses.getColumns().add(col);
+
+        bypasses.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
+        GridPane.setHgrow(bypasses, Priority.ALWAYS);
+        GridPane.setVgrow(bypasses, Priority.ALWAYS);
 
         return bypasses;
     }
@@ -263,16 +291,22 @@ public class GUI extends VBox implements BypassModelListener
     @Override
     public void bypassChanged(final Bypass bypass)
     {
-        // TODO Update only affected BypassRow
-        // System.out.println(bypass);
-        full_table_update.trigger();
+        // Update affected row
+        final BypassRow row = model2gui.get(bypass);
+        if (row != null)
+            row.update();
     }
 
     private void updateAllTableRows()
     {
+        model2gui.clear();
         final List<BypassRow> rows = new ArrayList<>();
         for (Bypass bypass : model.getBypasses())
-            rows.add(new BypassRow(bypass));
+        {
+            final BypassRow row = new BypassRow(bypass);
+            model2gui.put(bypass, row);
+            rows.add(row);
+        }
 
         System.out.println("Got " + rows.size() + " bypasses");
 

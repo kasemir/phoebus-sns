@@ -29,7 +29,7 @@ class BypassRow
         final Request request = bypass.getRequest();
         if (request == null)
         {
-            requestor.set("-- none --");
+            requestor.set("");
             date.set("");
         }
         else
