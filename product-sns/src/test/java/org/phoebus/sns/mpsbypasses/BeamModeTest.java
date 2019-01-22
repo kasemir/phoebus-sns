@@ -15,7 +15,7 @@ import org.phoebus.sns.mpsbypasses.modes.BeamModeMonitor;
  *  @author Kay Kasemir
  */
 @SuppressWarnings("nls")
-public class BeamModeUnitTest implements BeamModeListener
+public class BeamModeTest implements BeamModeListener
 {
     final private CountDownLatch done = new CountDownLatch(1);
 

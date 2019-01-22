@@ -14,7 +14,7 @@ import org.phoebus.sns.mpsbypasses.modes.MachineModeMonitor;
  *  @author Kay Kasemir
  */
 @SuppressWarnings("nls")
-public class MachineModeUnitTest implements MachineModeListener
+public class MachineModeTest implements MachineModeListener
 {
     final private CountDownLatch done = new CountDownLatch(1);
 
