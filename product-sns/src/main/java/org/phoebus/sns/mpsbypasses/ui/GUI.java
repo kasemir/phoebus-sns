@@ -46,7 +46,11 @@ import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
+import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontPosture;
+import javafx.scene.text.FontWeight;
 
 /** GUI
  *  @author Kay Kasemir
@@ -56,6 +60,7 @@ public class GUI extends GridPane implements BypassModelListener
 {
     private static final Border BORDER = new Border(new BorderStroke(Color.GRAY, BorderStrokeStyle.SOLID, new CornerRadii(5), BorderWidths.DEFAULT, new Insets(5)));
     private static final Insets BORDER_INSETS = new Insets(10);
+    private static final Font BOLD = Font.font(Font.getDefault().getFamily(), FontWeight.BOLD, FontPosture.REGULAR, Font.getDefault().getSize());
 
     private final BypassModel model;
 
@@ -145,6 +150,9 @@ public class GUI extends GridPane implements BypassModelListener
 
     private Node createCounts()
     {
+        final Label l = new Label("Counts");
+        l.setFont(BOLD);
+
         final HBox row = new HBox(5,
                 new Label("Total:"),  cnt_total,
                 new Label("Bypassed:"), cnt_bypassed,
@@ -161,10 +169,11 @@ public class GUI extends GridPane implements BypassModelListener
                 ((TextField)n).setPrefWidth(80);
             }
 
-        row.setBorder(BORDER);
-        row.setPadding(BORDER_INSETS);
+        final VBox box = new VBox(5, l, row);
+        box.setBorder(BORDER);
+        box.setPadding(BORDER_INSETS);
 
-        return row;
+        return box;
     }
 
     private Node createOpState()
@@ -173,20 +182,24 @@ public class GUI extends GridPane implements BypassModelListener
         grid.setHgap(5);
         grid.setVgap(5);
 
-        grid.add(new Label("RTDL"), 1, 0);
-        grid.add(new Label("Switch"), 2, 0);
+        final Label l = new Label("Operating State");
+        l.setFont(BOLD);
+        grid.add(l, 0, 0);
+
+        grid.add(new Label("RTDL"), 1, 1);
+        grid.add(new Label("Switch"), 2, 1);
 
         beam_rtdl.setEditable(false);
         beam_switch.setEditable(false);
-        grid.add(new Label("Beam Mode"), 0, 1);
-        grid.add(beam_rtdl, 1, 1);
-        grid.add(beam_switch, 2, 1);
+        grid.add(new Label("Beam Mode"), 0, 2);
+        grid.add(beam_rtdl, 1, 2);
+        grid.add(beam_switch, 2, 2);
 
         machine_rtdl.setEditable(false);
         machine_switch.setEditable(false);
-        grid.add(new Label("Machine Mode"), 0, 2);
-        grid.add(machine_rtdl, 1, 2);
-        grid.add(machine_switch, 2, 2);
+        grid.add(new Label("Machine Mode"), 0, 3);
+        grid.add(machine_rtdl, 1, 3);
+        grid.add(machine_switch, 2, 3);
 
         grid.setBorder(BORDER);
         grid.setPadding(BORDER_INSETS);
@@ -200,23 +213,26 @@ public class GUI extends GridPane implements BypassModelListener
         grid.setHgap(5);
         grid.setVgap(5);
 
-        // Requested
+        Label l = new Label("Legend");
+        l.setFont(BOLD);
+        grid.add(l, 0, 0);
+
         int col = 0;
         for (BypassState state : BypassState.values())
         {
             if (state == BypassState.All)
                 continue;
 
-            Label l = new Label(state.name());
-            grid.add(l, col, 0);
+            l = new Label(state.name());
+            grid.add(l, col, 1);
 
             l = new Label("Requested");
             l.setBackground(BypassColors.getBypassColor(state, true));
-            grid.add(l, col, 1);
+            grid.add(l, col, 2);
 
             l = new Label("Not Requested");
             l.setBackground(BypassColors.getBypassColor(state, false));
-            grid.add(l, col, 2);
+            grid.add(l, col, 3);
 
             ++col;
         }
