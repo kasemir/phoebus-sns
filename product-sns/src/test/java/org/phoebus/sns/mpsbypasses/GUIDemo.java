@@ -2,8 +2,6 @@ package org.phoebus.sns.mpsbypasses;
 
 import org.phoebus.pv.PVPool;
 import org.phoebus.sns.mpsbypasses.model.BypassModel;
-import org.phoebus.sns.mpsbypasses.model.BypassState;
-import org.phoebus.sns.mpsbypasses.model.RequestState;
 import org.phoebus.sns.mpsbypasses.ui.GUI;
 
 import javafx.application.Application;
@@ -17,7 +15,6 @@ public class GUIDemo extends Application
     public void start(final Stage stage) throws Exception
     {
         final BypassModel model = new BypassModel();
-        model.setFilter(BypassState.All, RequestState.All);
 
         final GUI gui = new GUI(model);
 

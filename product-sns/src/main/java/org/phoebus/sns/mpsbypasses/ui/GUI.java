@@ -6,6 +6,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
 import org.phoebus.framework.jobs.JobManager;
+import org.phoebus.sns.mpsbypasses.MPSBypasses;
 import org.phoebus.sns.mpsbypasses.model.Bypass;
 import org.phoebus.sns.mpsbypasses.model.BypassModel;
 import org.phoebus.sns.mpsbypasses.model.BypassModelListener;
@@ -25,7 +26,9 @@ import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
+import javafx.scene.control.MenuItem;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
@@ -84,6 +87,8 @@ public class GUI extends GridPane implements BypassModelListener
         add(createCounts(), 0, 1);
         add(new HBox(createOpState(), createLegend()), 0, 2);
         add(createTable(), 0, 3);
+
+        createContextMenu();
 
         beam_monitor = new BeamModeMonitor(this::updateBeamMode);
         beam_monitor.start();
@@ -245,6 +250,17 @@ public class GUI extends GridPane implements BypassModelListener
         return bypasses;
     }
 
+    private void createContextMenu()
+    {
+        final MenuItem enter_request = new OpenWeb("Enter Bypass Request", MPSBypasses.url_enter_bypass);
+        final MenuItem display_request = new OpenWeb("Bypass Display", MPSBypasses.url_view_bypass);
+
+        final ContextMenu menu = new ContextMenu(enter_request, display_request);
+        bypasses.setOnContextMenuRequested(event ->
+        {
+            menu.show(bypasses.getScene().getWindow(), event.getScreenX(), event.getScreenY());
+        });
+    }
 
     private void updateBeamMode(final BeamMode new_rtdl_mode, final BeamMode new_switch_mode)
     {
