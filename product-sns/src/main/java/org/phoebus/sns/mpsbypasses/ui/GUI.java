@@ -19,6 +19,8 @@ import org.phoebus.ui.dialog.ExceptionDetailsErrorDialog;
 import org.phoebus.ui.javafx.UpdateThrottle;
 
 import javafx.application.Platform;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
@@ -78,16 +80,10 @@ public class GUI extends GridPane implements BypassModelListener
     {
         this.model = model;
 
-        // setGridLinesVisible(true);
-        // setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
-
         add(createSelector(), 0, 0);
         add(createCounts(), 0, 1);
         add(new HBox(createOpState(), createLegend()), 0, 2);
-
-
         add(createTable(), 0, 3);
-
 
         beam_monitor = new BeamModeMonitor(this::updateBeamMode);
         beam_monitor.start();
@@ -100,8 +96,11 @@ public class GUI extends GridPane implements BypassModelListener
     private Node createSelector()
     {
         sel_mode.getItems().addAll(MachineMode.values());
+        sel_mode.setValue(MachineMode.Site);
         sel_state.getItems().addAll(BypassState.values());
+        sel_state.setValue(BypassState.All);
         sel_req.getItems().addAll(RequestState.values());
+        sel_req.setValue(RequestState.All);
 
         final HBox row = new HBox(5,
                 new Label("Machine Mode:"), sel_mode,
@@ -117,6 +116,16 @@ public class GUI extends GridPane implements BypassModelListener
         reload.setOnAction(event -> reload());
 
         row.setPadding(new Insets(5, 0, 0, 15));
+
+        final EventHandler<ActionEvent> filter_handler = event ->
+        {
+            model.setFilter(sel_state.getValue(), sel_req.getValue());
+        };
+        sel_state.setOnAction(filter_handler);
+        sel_req.setOnAction(filter_handler);
+        // Initial setting
+        filter_handler.handle(null);
+        reload();
 
         return row;
     }
@@ -284,7 +293,6 @@ public class GUI extends GridPane implements BypassModelListener
 
     private void reload()
     {
-        System.out.println("Selected " + sel_mode.getValue());
         JobManager.schedule("MPS Bypasses", monitor ->
         {
             model.stop();
@@ -303,12 +311,6 @@ public class GUI extends GridPane implements BypassModelListener
 
         System.out.println("Model loaded, got " + model.getBypasses().length + " bypasses");
         full_table_update.trigger();
-
-        Platform.runLater(() ->
-        {
-            displayCount(cnt_total, model.getTotal());
-            displayCounts();
-        });
 
         // Start model updates
         try
@@ -334,7 +336,11 @@ public class GUI extends GridPane implements BypassModelListener
         // Update affected row
         final BypassRow row = model2gui.get(bypass);
         if (row != null)
-            row.update();
+            Platform.runLater(() ->
+            {
+                row.update();
+                displayCounts();
+            });
     }
 
     private void updateAllTableRows()
@@ -353,6 +359,8 @@ public class GUI extends GridPane implements BypassModelListener
         Platform.runLater(() ->
         {
             bypasses.getItems().setAll(rows);
+            displayCount(cnt_total, model.getTotal());
+            displayCounts();
         });
     }
 
