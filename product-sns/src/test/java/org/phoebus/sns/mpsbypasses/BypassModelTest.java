@@ -62,14 +62,6 @@ public class BypassModelTest implements BypassModelListener
 		        System.out.println(bypass);
 
 			System.out.println("RDB data arrived, starting model...");
-			try
-			{
-				model.start();
-			}
-			catch (Exception ex)
-			{
-				ex.printStackTrace();
-			}
 		}
     }
 

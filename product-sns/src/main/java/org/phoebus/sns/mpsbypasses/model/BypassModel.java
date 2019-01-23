@@ -13,7 +13,7 @@ import org.phoebus.framework.rdb.RDBConnectionPool;
 import org.phoebus.sns.mpsbypasses.MPSBypasses;
 import org.phoebus.sns.mpsbypasses.modes.MachineMode;
 
-/** Model of all the bypass info
+/** Model of all the bypass infos
  *
  *  <p>Meant to be thread-safe
  *
@@ -67,11 +67,12 @@ public class BypassModel implements BypassListener
     }
 
 	/** Connect to PVs, ... */
-    public synchronized void start() throws Exception
+    private synchronized void start()
     {
+        System.out.println("Start: " + this + " on " + Thread.currentThread());
     	if (running)
-    		throw new Exception("Already running");
-    	for (Bypass bypass : mode_bypasses)
+    	    return;
+	    for (Bypass bypass : mode_bypasses)
     		bypass.start();
     	running = true;
     }
@@ -79,6 +80,7 @@ public class BypassModel implements BypassListener
 	/** Disconnect PVs, ... */
     public synchronized void stop()
     {
+        System.out.println("Stop: " + this + " on " + Thread.currentThread());
     	if (! running)
     		return;
     	for (Bypass bypass : mode_bypasses)
@@ -132,52 +134,43 @@ public class BypassModel implements BypassListener
 	 *
 	 *  <p>This is a long running operation because it reads from the RDB.
 	 *
-	 *  <p>Can be called at any time.
-	 *  If model was already started, it will be stopped.
+	 *  <p>Can be called at any time, but will block until model
+	 *  stopped, RDB read, model started.
 	 *
 	 *  @param monitor Progress monitor
 	 *  @param mode
 	 *  @see BypassModelListener#modelLoaded(BypassModel)
 	 */
-	public void selectMachineMode(final JobMonitor monitor, final MachineMode mode)
+	public synchronized void selectMachineMode(final JobMonitor monitor, final MachineMode mode)
 	{
+	    System.out.println("Select " + mode);
 		monitor.beginTask("Clearing old information");
 		stop();
 
-		synchronized (this)
-        {
-			machine_mode = mode;
-            mode_bypasses = new Bypass[] { new Bypass("Reading Bypass Info", mode.toString()) };
-			filtered_bypasses = mode_bypasses;
-    		updateCounts();
+		machine_mode = mode;
+        mode_bypasses = new Bypass[] { new Bypass("Reading Bypass Info", mode.toString()) };
+		filtered_bypasses = mode_bypasses;
+		updateCounts();
 
-    		// Notify listeners
-    		for (BypassModelListener listener : listeners)
-    			listener.bypassesChanged();
-        }
+		// Notify listeners
+		for (BypassModelListener listener : listeners)
+			listener.bypassesChanged();
 
 		monitor.beginTask("Reading bypasses from RDB");
 		Exception error = null;
-
 
 		RDBConnectionPool rdb = null;
 		try
 		{
 	        rdb = new RDBConnectionPool(MPSBypasses.url, MPSBypasses.user, MPSBypasses.password);
 			final Bypass[] new_bypasses = readBypassInfo(monitor, rdb.getConnection(), mode);
-			synchronized (this)
-            {
-				machine_mode = mode;
-	            mode_bypasses = new_bypasses;
-            }
+			machine_mode = mode;
+            mode_bypasses = new_bypasses;
 		}
 		catch (Exception ex)
 		{
 			error = ex;
-			synchronized (this)
-	        {
-		        mode_bypasses = new Bypass[0];
-	        }
+	        mode_bypasses = new Bypass[0];
 		}
 		if (rdb != null)
 		    rdb.clear();
@@ -196,6 +189,8 @@ public class BypassModel implements BypassListener
 		// Notify listeners
 		for (BypassModelListener listener : listeners)
 			listener.modelLoaded(this, null);
+
+		start();
 	}
 
 	/** @return Currently selected machine mode of this model */
@@ -259,6 +254,7 @@ public class BypassModel implements BypassListener
 	 */
 	public void setFilter(final BypassState state, final RequestState request)
     {
+	    System.out.println("Filter on " + state + ", " + request);
 		// Update model
 		synchronized (this)
 		{
@@ -439,4 +435,17 @@ public class BypassModel implements BypassListener
 				listener.bypassesChanged();
 		}
     }
+
+	@Override
+	public synchronized String toString()
+	{
+	    final StringBuilder buf = new StringBuilder();
+
+	    buf.append("BypassModel ").append(machine_mode).append(": ");
+	    buf.append(mode_bypasses.length).append(" bypasses @ ").append(System.identityHashCode(mode_bypasses));
+	    if (running)
+	        buf.append(" (running)");
+
+	    return buf.toString();
+	}
 }

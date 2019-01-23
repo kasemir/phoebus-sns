@@ -142,38 +142,45 @@ public class Bypass
 	}
 
 	/** Connect to PVs */
-	public void start() throws Exception
+	public void start()
 	{
 		if (pv_basename == null)
 			return;
 
-		jumper_pv = PVPool.getPV(pv_basename + "_sw_jump_status");
-		jumper_pv_listener = jumper_pv.onValueEvent()
-		                              .throttleLatest(MPSBypasses.update_throttle_ms, TimeUnit.MILLISECONDS)
-		                              .subscribe(value ->
-        {
-            if (PV.isDisconnected(value))
+		try
+		{
+    		jumper_pv = PVPool.getPV(pv_basename + "_sw_jump_status");
+    		jumper_pv_listener = jumper_pv.onValueEvent()
+    		                              .throttleLatest(MPSBypasses.update_throttle_ms, TimeUnit.MILLISECONDS)
+    		                              .subscribe(value ->
             {
-                logger.log(Level.WARNING, "Jumper PV Disconnected: " + jumper_pv.getName());
-                updateState(null, mask);
-            }
-            else
-                updateState(value, mask);
-        });
+                if (PV.isDisconnected(value))
+                {
+                    logger.log(Level.WARNING, "Jumper PV Disconnected: " + jumper_pv.getName());
+                    updateState(null, mask);
+                }
+                else
+                    updateState(value, mask);
+            });
 
-		mask_pv = PVPool.getPV(pv_basename + "_swmask");
-		mask_pv_listener = mask_pv.onValueEvent()
-                    		      .throttleLatest(MPSBypasses.update_throttle_ms, TimeUnit.MILLISECONDS)
-                                  .subscribe(value ->
-        {
-            if (PV.isDisconnected(value))
+    		mask_pv = PVPool.getPV(pv_basename + "_swmask");
+    		mask_pv_listener = mask_pv.onValueEvent()
+                        		      .throttleLatest(MPSBypasses.update_throttle_ms, TimeUnit.MILLISECONDS)
+                                      .subscribe(value ->
             {
-                logger.log(Level.WARNING, "Mask PV Disconnected: " + mask_pv.getName());
-                updateState(jumper, null);
-            }
-            else
-                updateState(jumper, value);
-        });
+                if (PV.isDisconnected(value))
+                {
+                    logger.log(Level.WARNING, "Mask PV Disconnected: " + mask_pv.getName());
+                    updateState(jumper, null);
+                }
+                else
+                    updateState(jumper, value);
+            });
+		}
+		catch (Exception ex)
+		{
+		    logger.log(Level.WARNING, "Cannot start " + this, ex);
+		}
 	}
 
 	/** Disconnect PVs */
@@ -181,6 +188,7 @@ public class Bypass
 	{
 		if (pv_basename == null)
 			return;
+
 		mask_pv_listener.dispose();
 	    jumper_pv_listener.dispose();
 		PVPool.releasePV(jumper_pv);

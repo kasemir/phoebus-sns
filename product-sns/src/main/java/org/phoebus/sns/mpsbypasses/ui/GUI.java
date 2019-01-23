@@ -108,6 +108,11 @@ public class GUI extends GridPane implements BypassModelListener
         machine_monitor.start();
 
         model.addListener(this);
+
+        // Initial load
+        System.out.println("Initial reload()");
+        reload();
+        // If a memento was saved, that might soon trigger another reload()...
     }
 
     private Node createSelector()
@@ -143,7 +148,6 @@ public class GUI extends GridPane implements BypassModelListener
         sel_state.setOnAction(filter_handler);
         sel_req.setOnAction(filter_handler);
 
-        // Initial load will be performed from restore(memento)
         return row;
     }
 
@@ -358,7 +362,6 @@ public class GUI extends GridPane implements BypassModelListener
     {
         JobManager.schedule("MPS Bypasses", monitor ->
         {
-            model.stop();
             model.selectMachineMode(monitor, sel_mode.getValue());
         });
     }
@@ -373,16 +376,6 @@ public class GUI extends GridPane implements BypassModelListener
         }
 
         full_table_update.trigger();
-
-        // Start model updates
-        try
-        {
-            model.start();
-        }
-        catch (Exception ex)
-        {
-            ExceptionDetailsErrorDialog.openError(this, "Error", "Cannot start MPS Bypass updates", ex);
-        }
     }
 
     @Override
@@ -429,6 +422,7 @@ public class GUI extends GridPane implements BypassModelListener
         memento.getString("state").ifPresent(req -> sel_state.setValue(BypassState.fromString(req)));
         memento.getString("request").ifPresent(req -> sel_req.setValue(RequestState.fromString(req)));
 
+        System.out.println("Retoring from memento");
         model.setFilter(sel_state.getValue(), sel_req.getValue());
         reload();
     }
