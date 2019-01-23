@@ -12,6 +12,7 @@
 	<classpathentry exported="true" kind="lib" path="/phoebus-target/target/lib/ojdbc8-12.2.0.1.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/phoebus-target"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/core-framework"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/core-types"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/core-security"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/core-logbook"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/core-pv"/>

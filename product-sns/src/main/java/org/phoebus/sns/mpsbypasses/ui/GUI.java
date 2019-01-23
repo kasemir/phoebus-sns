@@ -5,7 +5,9 @@ import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
+import org.phoebus.core.types.ProcessVariable;
 import org.phoebus.framework.jobs.JobManager;
+import org.phoebus.framework.selection.SelectionService;
 import org.phoebus.sns.mpsbypasses.MPSBypasses;
 import org.phoebus.sns.mpsbypasses.model.Bypass;
 import org.phoebus.sns.mpsbypasses.model.BypassModel;
@@ -16,6 +18,7 @@ import org.phoebus.sns.mpsbypasses.modes.BeamMode;
 import org.phoebus.sns.mpsbypasses.modes.BeamModeMonitor;
 import org.phoebus.sns.mpsbypasses.modes.MachineMode;
 import org.phoebus.sns.mpsbypasses.modes.MachineModeMonitor;
+import org.phoebus.ui.application.ContextMenuHelper;
 import org.phoebus.ui.dialog.ExceptionDetailsErrorDialog;
 import org.phoebus.ui.javafx.UpdateThrottle;
 
@@ -29,9 +32,12 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.SelectionMode;
+import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
+import javafx.scene.control.Tooltip;
 import javafx.scene.layout.Border;
 import javafx.scene.layout.BorderStroke;
 import javafx.scene.layout.BorderStrokeStyle;
@@ -106,6 +112,8 @@ public class GUI extends GridPane implements BypassModelListener
         sel_state.setValue(BypassState.All);
         sel_req.getItems().addAll(RequestState.values());
         sel_req.setValue(RequestState.All);
+
+        reload.setTooltip(new Tooltip("Re-load bypass information from Relational Database"));
 
         final HBox row = new HBox(5,
                 new Label("Machine Mode:"), sel_mode,
@@ -225,6 +233,7 @@ public class GUI extends GridPane implements BypassModelListener
     private Node createTable()
     {
         bypasses.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+        bypasses.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
 
         TableColumn<BypassRow, String> col = new TableColumn<>("Bypass");
         col.setCellValueFactory(cell -> cell.getValue().name);
@@ -252,12 +261,28 @@ public class GUI extends GridPane implements BypassModelListener
 
     private void createContextMenu()
     {
+        final MenuItem info = new ShowInfo(bypasses);
         final MenuItem enter_request = new OpenWeb("Enter Bypass Request", MPSBypasses.url_enter_bypass);
         final MenuItem display_request = new OpenWeb("Bypass Display", MPSBypasses.url_view_bypass);
 
-        final ContextMenu menu = new ContextMenu(enter_request, display_request);
+        final ContextMenu menu = new ContextMenu(info, enter_request, display_request);
         bypasses.setOnContextMenuRequested(event ->
         {
+            menu.getItems().setAll(info, enter_request, display_request);
+            // Publish PVs of selected rows
+            final List<ProcessVariable> pvs = new ArrayList<>();
+            for (BypassRow row : bypasses.getSelectionModel().getSelectedItems())
+            {
+                pvs.add(new ProcessVariable(row.bypass.getJumperPVName()));
+                pvs.add(new ProcessVariable(row.bypass.getMaskPVName()));
+            }
+            SelectionService.getInstance().setSelection(bypasses, pvs);
+
+            // Add PV entries
+            if (ContextMenuHelper.addSupportedEntries(bypasses, menu))
+                menu.getItems().add(3, new SeparatorMenuItem());
+
+
             menu.show(bypasses.getScene().getWindow(), event.getScreenX(), event.getScreenY());
         });
     }
