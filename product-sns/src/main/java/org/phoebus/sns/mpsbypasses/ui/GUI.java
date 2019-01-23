@@ -37,6 +37,9 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.paint.Color;
 
+/** GUI
+ *  @author Kay Kasemir
+ */
 @SuppressWarnings("nls")
 public class GUI extends GridPane implements BypassModelListener
 {
@@ -80,7 +83,7 @@ public class GUI extends GridPane implements BypassModelListener
 
         add(createSelector(), 0, 0);
         add(createCounts(), 0, 1);
-        add(new HBox(createOpState()), 0, 2);
+        add(new HBox(createOpState(), createLegend()), 0, 2);
 
 
         add(createTable(), 0, 3);
@@ -169,6 +172,42 @@ public class GUI extends GridPane implements BypassModelListener
         return grid;
     }
 
+    private Node createLegend()
+    {
+        final GridPane grid = new GridPane();
+        grid.setHgap(5);
+        grid.setVgap(5);
+
+        // Requested
+        int col = 0;
+        for (BypassState state : BypassState.values())
+        {
+            if (state == BypassState.All)
+                continue;
+
+            Label l = new Label(state.name());
+            grid.add(l, col, 0);
+
+            l = new Label("Requested");
+            l.setBackground(BypassColors.getBypassColor(state, true));
+            grid.add(l, col, 1);
+
+            l = new Label("Not Requested");
+            l.setBackground(BypassColors.getBypassColor(state, false));
+            grid.add(l, col, 2);
+
+            ++col;
+        }
+
+        grid.setBorder(BORDER);
+        grid.setPadding(BORDER_INSETS);
+
+        grid.setMaxWidth(Double.MAX_VALUE);
+        HBox.setHgrow(grid, Priority.ALWAYS);
+
+        return grid;
+    }
+
     private Node createTable()
     {
         bypasses.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
@@ -179,6 +218,7 @@ public class GUI extends GridPane implements BypassModelListener
 
         col = new TableColumn<>("State");
         col.setCellValueFactory(cell -> cell.getValue().state);
+        col.setCellFactory(c -> new StateCell());
         bypasses.getColumns().add(col);
 
         col = new TableColumn<>("Requestor");

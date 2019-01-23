@@ -21,7 +21,7 @@ public class GUIDemo extends Application
 
         final GUI gui = new GUI(model);
 
-        final Scene scene = new Scene(gui, 1000, 600);
+        final Scene scene = new Scene(gui, 1100, 600);
         stage.setTitle("MPS Bypasses");
         stage.setScene(scene);
         stage.show();
