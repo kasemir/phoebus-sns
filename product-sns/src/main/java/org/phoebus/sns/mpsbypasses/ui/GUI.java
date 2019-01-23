@@ -250,7 +250,14 @@ public class GUI extends GridPane implements BypassModelListener
         bypasses.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
         bypasses.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
 
-        TableColumn<BypassRow, String> col = new TableColumn<>("Bypass");
+        TableColumn<BypassRow, String> col = new TableColumn<>("#");
+        col.setCellValueFactory(cell -> cell.getValue().name);
+        col.setCellFactory(c -> new RowIndexCell());
+        col.setPrefWidth(300);
+        col.setMaxWidth(300);
+        bypasses.getColumns().add(col);
+
+        col = new TableColumn<>("Bypass");
         col.setCellValueFactory(cell -> cell.getValue().name);
         bypasses.getColumns().add(col);
 
