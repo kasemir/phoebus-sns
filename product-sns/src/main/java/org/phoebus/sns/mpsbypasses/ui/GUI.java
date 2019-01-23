@@ -7,6 +7,7 @@ import java.util.concurrent.TimeUnit;
 
 import org.phoebus.core.types.ProcessVariable;
 import org.phoebus.framework.jobs.JobManager;
+import org.phoebus.framework.persistence.Memento;
 import org.phoebus.framework.selection.SelectionService;
 import org.phoebus.sns.mpsbypasses.MPSBypasses;
 import org.phoebus.sns.mpsbypasses.model.Bypass;
@@ -141,10 +142,8 @@ public class GUI extends GridPane implements BypassModelListener
         };
         sel_state.setOnAction(filter_handler);
         sel_req.setOnAction(filter_handler);
-        // Initial setting
-        filter_handler.handle(null);
-        reload();
 
+        // Initial load will be performed from restore(memento)
         return row;
     }
 
@@ -366,7 +365,6 @@ public class GUI extends GridPane implements BypassModelListener
             return;
         }
 
-        System.out.println("Model loaded, got " + model.getBypasses().length + " bypasses");
         full_table_update.trigger();
 
         // Start model updates
@@ -383,7 +381,6 @@ public class GUI extends GridPane implements BypassModelListener
     @Override
     public void bypassesChanged()
     {
-        System.out.println("Bypasses changed");
         full_table_update.trigger();
     }
 
@@ -411,14 +408,29 @@ public class GUI extends GridPane implements BypassModelListener
             rows.add(row);
         }
 
-        System.out.println("Got " + rows.size() + " bypasses");
-
         Platform.runLater(() ->
         {
             bypasses.getItems().setAll(rows);
             displayCount(cnt_total, model.getTotal());
             displayCounts();
         });
+    }
+
+    public void restore(Memento memento)
+    {
+        memento.getString("mode").ifPresent(req -> sel_mode.setValue(MachineMode.fromString(req)));
+        memento.getString("state").ifPresent(req -> sel_state.setValue(BypassState.fromString(req)));
+        memento.getString("request").ifPresent(req -> sel_req.setValue(RequestState.fromString(req)));
+
+        model.setFilter(sel_state.getValue(), sel_req.getValue());
+        reload();
+    }
+
+    public void save(final Memento memento)
+    {
+        memento.setString("mode", sel_mode.getValue().name());
+        memento.setString("state", sel_state.getValue().name());
+        memento.setString("request", sel_req.getValue().name());
     }
 
     public void dispose()

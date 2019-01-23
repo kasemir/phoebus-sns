@@ -1,5 +1,6 @@
 package org.phoebus.sns.mpsbypasses;
 
+import org.phoebus.framework.persistence.Memento;
 import org.phoebus.framework.spi.AppDescriptor;
 import org.phoebus.framework.spi.AppInstance;
 import org.phoebus.sns.mpsbypasses.model.BypassModel;
@@ -26,7 +27,7 @@ class MPSBypassesInstance implements AppInstance
         try
         {
             final BypassModel model = new BypassModel();
-            final GUI gui = new GUI(model);
+            gui = new GUI(model);
             dock_item = new DockItem(this, gui);
             dock_item.addClosedNotification(this::dispose);
             DockPane.getActiveDockPane().addTab(dock_item);
@@ -46,6 +47,20 @@ class MPSBypassesInstance implements AppInstance
     public void raise()
     {
         dock_item.select();
+    }
+
+    @Override
+    public void restore(final Memento memento)
+    {
+        if (gui != null)
+            gui.restore(memento);
+    }
+
+    @Override
+    public void save(final Memento memento)
+    {
+        if (gui != null)
+            gui.save(memento);
     }
 
     private void dispose()
