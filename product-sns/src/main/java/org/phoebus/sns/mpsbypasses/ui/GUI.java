@@ -1,11 +1,22 @@
+/*******************************************************************************
+ * Copyright (c) 2019 Oak Ridge National Laboratory.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ ******************************************************************************/
 package org.phoebus.sns.mpsbypasses.ui;
+
+import static org.phoebus.sns.mpsbypasses.MPSBypasses.logger;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
+import java.util.logging.Level;
 
 import org.phoebus.core.types.ProcessVariable;
+import org.phoebus.framework.jobs.Job;
 import org.phoebus.framework.jobs.JobManager;
 import org.phoebus.framework.persistence.Memento;
 import org.phoebus.framework.selection.SelectionService;
@@ -89,6 +100,7 @@ public class GUI extends GridPane implements BypassModelListener
     private final MachineModeMonitor machine_monitor;
 
     private final UpdateThrottle full_table_update = new UpdateThrottle(500, TimeUnit.MILLISECONDS, this::updateAllTableRows);
+    private volatile Job initial_load = null;
 
 
     public GUI(final BypassModel model) throws Exception
@@ -109,10 +121,17 @@ public class GUI extends GridPane implements BypassModelListener
 
         model.addListener(this);
 
-        // Initial load
-        System.out.println("Initial reload()");
-        reload();
-        // If a memento was saved, that might soon trigger another reload()...
+        // Schedule initial load
+        initial_load = JobManager.schedule("MPS Bypasses", monitor ->
+        {
+            // If a memento was saved, that might soon cancel this and trigger another reload()
+            Thread.sleep(2000);
+            if (monitor.isCanceled())
+                return;
+            logger.log(Level.FINE, "Initial reload()");
+            reload();
+        });
+
     }
 
     private Node createSelector()
@@ -253,6 +272,7 @@ public class GUI extends GridPane implements BypassModelListener
     {
         bypasses.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
         bypasses.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+        bypasses.setPlaceholder(new Label("No Bypasses"));
 
         TableColumn<BypassRow, String> col = new TableColumn<>("#");
         col.setCellValueFactory(cell -> cell.getValue().name);
@@ -363,6 +383,7 @@ public class GUI extends GridPane implements BypassModelListener
         JobManager.schedule("MPS Bypasses", monitor ->
         {
             model.selectMachineMode(monitor, sel_mode.getValue());
+            initial_load = null;
         });
     }
 
@@ -418,12 +439,16 @@ public class GUI extends GridPane implements BypassModelListener
 
     public void restore(Memento memento)
     {
+        final Job safe = initial_load;
+        if (safe != null)
+            safe.cancel();
         memento.getString("mode").ifPresent(req -> sel_mode.setValue(MachineMode.fromString(req)));
         memento.getString("state").ifPresent(req -> sel_state.setValue(BypassState.fromString(req)));
         memento.getString("request").ifPresent(req -> sel_req.setValue(RequestState.fromString(req)));
 
-        System.out.println("Retoring from memento");
+        logger.log(Level.FINE, "Restoring from memento");
         model.setFilter(sel_state.getValue(), sel_req.getValue());
+
         reload();
     }
 

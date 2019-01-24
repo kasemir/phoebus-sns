@@ -1,4 +1,13 @@
+/*******************************************************************************
+ * Copyright (c) 2019 Oak Ridge National Laboratory.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ ******************************************************************************/
 package org.phoebus.sns.mpsbypasses.model;
+
+import static org.phoebus.sns.mpsbypasses.MPSBypasses.logger;
 
 import java.sql.CallableStatement;
 import java.sql.Connection;
@@ -7,6 +16,7 @@ import java.sql.Types;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.logging.Level;
 
 import org.phoebus.framework.jobs.JobMonitor;
 import org.phoebus.framework.rdb.RDBConnectionPool;
@@ -69,7 +79,7 @@ public class BypassModel implements BypassListener
 	/** Connect to PVs, ... */
     private synchronized void start()
     {
-        System.out.println("Start: " + this + " on " + Thread.currentThread());
+        logger.log(Level.FINE, "Start: " + this + " on " + Thread.currentThread());
     	if (running)
     	    return;
 	    for (Bypass bypass : mode_bypasses)
@@ -80,7 +90,7 @@ public class BypassModel implements BypassListener
 	/** Disconnect PVs, ... */
     public synchronized void stop()
     {
-        System.out.println("Stop: " + this + " on " + Thread.currentThread());
+        logger.log(Level.FINE, "Stop: " + this + " on " + Thread.currentThread());
     	if (! running)
     		return;
     	for (Bypass bypass : mode_bypasses)
@@ -143,7 +153,7 @@ public class BypassModel implements BypassListener
 	 */
 	public synchronized void selectMachineMode(final JobMonitor monitor, final MachineMode mode)
 	{
-	    System.out.println("Select " + mode);
+	    logger.log(Level.FINE, "Select " + mode);
 		monitor.beginTask("Clearing old information");
 		stop();
 
@@ -254,7 +264,7 @@ public class BypassModel implements BypassListener
 	 */
 	public void setFilter(final BypassState state, final RequestState request)
     {
-	    System.out.println("Filter on " + state + ", " + request);
+	    logger.log(Level.FINE, "Filter on " + state + ", " + request);
 		// Update model
 		synchronized (this)
 		{

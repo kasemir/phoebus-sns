@@ -1,3 +1,10 @@
+/*******************************************************************************
+ * Copyright (c) 2018 Oak Ridge National Laboratory.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ ******************************************************************************/
 package org.phoebus.sns.logbook;
 
 import org.phoebus.framework.preferences.PreferencesReader;
@@ -11,9 +18,9 @@ public class SNSLogFactory implements LogFactory
     private static final String rdb_url = prefs.get("rdb_url");
     private static final String read_only_username = prefs.get("read_only_username");
     private static final String read_only_password = prefs.get("read_only_password");
-    
+
     private static final String ID = "SNS";
-    
+
     @Override
     public String getId()
     {

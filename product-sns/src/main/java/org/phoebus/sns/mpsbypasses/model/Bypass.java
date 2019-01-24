@@ -1,8 +1,16 @@
+/*******************************************************************************
+ * Copyright (c) 2019 Oak Ridge National Laboratory.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ ******************************************************************************/
 package org.phoebus.sns.mpsbypasses.model;
+
+import static org.phoebus.sns.mpsbypasses.MPSBypasses.logger;
 
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import org.epics.vtype.VEnum;
 import org.epics.vtype.VNumber;
@@ -31,8 +39,6 @@ import io.reactivex.disposables.Disposable;
 @SuppressWarnings("nls")
 public class Bypass
 {
-    final private static Logger logger = Logger.getLogger(Bypass.class.getName());
-
     final private String pv_basename;
 	final private String name;
 	final private String chain;

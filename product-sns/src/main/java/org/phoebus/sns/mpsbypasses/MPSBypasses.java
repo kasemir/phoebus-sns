@@ -1,6 +1,14 @@
+/*******************************************************************************
+ * Copyright (c) 2019 Oak Ridge National Laboratory.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ ******************************************************************************/
 package org.phoebus.sns.mpsbypasses;
 
 import java.net.URL;
+import java.util.logging.Logger;
 
 import org.phoebus.framework.preferences.PreferencesReader;
 import org.phoebus.framework.spi.AppDescriptor;
@@ -9,6 +17,8 @@ import org.phoebus.framework.spi.AppInstance;
 @SuppressWarnings("nls")
 public class MPSBypasses implements AppDescriptor
 {
+    public static final Logger logger = Logger.getLogger(MPSBypasses.class.getPackageName());
+
     public static final String NAME = "mps_bypasses";
     public static final String DISPLAY_NAME = "MPS Bypasses";
 
