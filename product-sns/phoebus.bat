@@ -21,8 +21,23 @@
 @set V=0.0.1
 
 if EXIST "update" (
-    move /Y update\* .
+    @ECHO Installing update...
+    cd doc
+    del /F/Q/S *.*
+    cd ..
+    rmdir doc
+    
+    cd lib
+    del /F/Q/S *.*
+    cd ..
+    rmdir lib
+    
+    move /Y update\*.* .
+    move /Y update\doc .
+    move /Y update\lib .
+
     rmdir update
+    @ECHO Updated.
 )
 
 @IF EXIST product-sns-%V%.jar (
