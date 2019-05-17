@@ -56,6 +56,7 @@ fi
 
 java -jar $JAR $OPT "$@" &
 '
+
 chmod +x phoebus
 
 cd ../../..
