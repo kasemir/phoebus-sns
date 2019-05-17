@@ -20,6 +20,11 @@
 
 @set V=0.0.1
 
+if EXIST "update" (
+    move /Y update\* .
+    rmdir update
+)
+
 @IF EXIST product-sns-%V%.jar (
   SET JAR=product-sns-%V%.jar
 ) ELSE (
