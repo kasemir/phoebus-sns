@@ -22,15 +22,8 @@
 
 if EXIST "update" (
     @ECHO Installing update...
-    cd doc
-    del /F/Q/S *.*
-    cd ..
-    rmdir doc
-    
-    cd lib
-    del /F/Q/S *.*
-    cd ..
-    rmdir lib
+    rd /S/Q doc
+	rd /S/Q lib
     
     move /Y update\*.* .
     move /Y update\doc .

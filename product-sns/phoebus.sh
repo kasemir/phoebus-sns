@@ -10,10 +10,22 @@ TOP="."
 # export JAVA_HOME=/opt/jdk-9
 # export PATH="$JAVA_HOME/bin:$PATH"
 
-if [ -d $TOP/target ]
+if [ -d ${TOP}/target ]
 then
-  TOP="$TOP/target"
+  TOP="${TOP}/target"
 fi
+
+
+if [ -d "${TOP}/update" ]
+then
+  echo "Installing update..."
+  cd ${TOP}
+  rm -rf doc lib
+  mv update/* .
+  rmdir update
+  echo "Updated."
+fi
+
 
 V="0.0.1"
 
@@ -30,8 +42,6 @@ export MALLOC_ARENA_MAX=4
 
 # Memory
 export JDK_JAVA_OPTIONS="-Xms500M -Xmx2G"
-
-# Java 9 & 10 require '--add-modules=java.corba'
 
 # Don't start a CA Repeater
 JDK_JAVA_OPTIONS+=" -DCA_DISABLE_REPEATER=true "
