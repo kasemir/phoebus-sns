@@ -15,7 +15,6 @@ then
   TOP="${TOP}/target"
 fi
 
-
 if [ -d "${TOP}/update" ]
 then
   echo "Installing update..."

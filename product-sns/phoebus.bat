@@ -6,6 +6,8 @@
 @REM replace the following with
 @REM    set JAVA_HOME=c:\path\to\that\runtime
 
+@cd %~P0
+
 @IF EXIST "%~P0%..\jdk" (
     set JAVA_HOME=%~P0%..\jdk
     @path %JAVA_HOME%\bin
@@ -14,9 +16,7 @@
     @ECHO Cannot locate JDK
 )
 
-@cd %~P0
-
-if EXIST "update" (
+@if EXIST "update" (
     @ECHO Installing update...
     @rd /S/Q doc
     @rd /S/Q lib
@@ -30,7 +30,6 @@ if EXIST "update" (
 @java -version
 
 @set V=0.0.1
-
 
 @IF EXIST product-sns-%V%.jar (
     SET JAR=product-sns-%V%.jar
