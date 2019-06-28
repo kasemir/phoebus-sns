@@ -19,7 +19,7 @@ import org.phoebus.ui.docking.DockPane;
 @SuppressWarnings("nls")
 class MPSBypassesInstance implements AppInstance
 {
-    // Singleton instance maintained by MPSBypasses#create
+    /** Singleton instance maintained by {@link MPSBypasses#create()} */
     static MPSBypassesInstance INSTANCE;
 
     private final AppDescriptor app;

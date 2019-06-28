@@ -25,7 +25,6 @@ public class OpenMPSBypasses implements MenuEntry
     @Override
     public Image getIcon()
     {
-        // TODO Auto-generated method stub
         return ImageCache.getImage(MPSBypasses.class, "/icons/mpsbypasses.png");
     }
 
