@@ -45,10 +45,13 @@ export JDK_JAVA_OPTIONS="-Xms500M -Xmx2G"
 # Don't start a CA Repeater
 JDK_JAVA_OPTIONS+=" -DCA_DISABLE_REPEATER=true "
 
+# Disable warnings
+JDK_JAVA_OPTIONS+=" -Dnashorn.args=--no-deprecation-warning "
+
 # Use GTK 2 (GTK 3 drag/drop doesn't always work)
 JDK_JAVA_OPTIONS+=" -Djdk.gtk.verbose=false -Djdk.gtk.version=2"
 
-# Drawing pipeling
+# Drawing pipeline
 JDK_JAVA_OPTIONS+=" -Dprism.verbose=false -Dprism.forceGPU=true"
 # Disable acceleration
 # JDK_JAVA_OPTIONS+=" -Dprism.order=sw"
