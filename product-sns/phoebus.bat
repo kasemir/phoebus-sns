@@ -9,7 +9,7 @@
 @cd %~P0
 
 @IF EXIST "%~P0%..\jdk" (
-    set JAVA_HOME=%~P0%..\jdk
+    setx JAVA_HOME %~P0%..\jdk
     @path %JAVA_HOME%\bin
     @ECHO Found JDK %JAVA_HOME%
 ) ELSE (
