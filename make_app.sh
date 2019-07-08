@@ -16,7 +16,7 @@ rm product-sns-*-mac.zip
 mkdir -p phoebus.app/Contents/MacOS
 cd phoebus.app
 cp -r ${JDK} .
-mv ../product-sns-* .
+mv ../product-sns-${V} .
 cd Contents/MacOS
 echo >phoebus '#!/bin/sh
 #
