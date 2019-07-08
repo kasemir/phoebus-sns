@@ -28,7 +28,7 @@ CONTENTS_MacOS="$( cd "$(dirname "$0")" ; pwd -P )"
 # Phoebus TOP
 TOP=`echo "$CONTENTS_MacOS/../../product-sns-*"`
 
-if [ -d "${TOP}/update" ]
+if [ -d ${TOP}/update ]
 then
   echo "Installing update..."
   cd ${TOP}
