@@ -38,10 +38,9 @@ then
   echo "Updated."
 fi
 
-export JAVA_HOME="$TOP/../jdk/Contents/Home/"
+export JAVA_HOME="$( cd $TOP/../jdk/Contents/Home/ ; pwd -P )"
 export PATH="$JAVA_HOME/bin:$PATH"
 
-# Use ant or maven jar?
 JAR=`echo "${TOP}/product-sns-*.jar"`
 
 # To get one instance, use server mode
