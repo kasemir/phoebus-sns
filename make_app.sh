@@ -8,33 +8,31 @@
 # phoebus.app/product-sns-0.0.1
 # phoebus.app/Contents/MacOS/phoebus
 
-V="0.0.1"
+V="4.6.0"
 JDK="/opt/jdks/mac/jdk"
 
-
-unzip product-sns-${V}-mac.zip
+unzip product-sns-*-mac.zip
+rm product-sns-*-mac.zip
 mkdir -p phoebus.app/Contents/MacOS
 cd phoebus.app
 cp -r ${JDK} .
-mv ../product-sns-${V} .
+mv ../product-sns-* .
 cd Contents/MacOS
 echo >phoebus '#!/bin/sh
 #
 # Phoebus launcher for Mac OS X
 
-V="0.0.1"
-
 # Location of this script
 CONTENTS_MacOS="$( cd "$(dirname "$0")" ; pwd -P )"
 
 # Phoebus TOP
-TOP="$CONTENTS_MacOS/../../product-sns-0.0.1"
+TOP=`echo "$CONTENTS_MacOS/../../product-sns-*"`
 
 if [ -d "${TOP}/update" ]
 then
   echo "Installing update..."
   cd ${TOP}
-  rm -rf doc lib
+  rm -rf doc lib product-sns-*.jar
   mv update/* .
   rmdir update
   echo "Updated."
@@ -44,12 +42,7 @@ export JAVA_HOME="$TOP/../jdk/Contents/Home/"
 export PATH="$JAVA_HOME/bin:$PATH"
 
 # Use ant or maven jar?
-if [ -f ${TOP}/product-sns-${V}.jar ]
-then
-  JAR="${TOP}/product-sns-${V}.jar"
-else
-  JAR="${TOP}/product-sns-${V}-SNAPSHOT.jar"
-fi
+JAR=`echo "${TOP}/product-sns-*.jar"`
 
 # To get one instance, use server mode
 # OPT="-server 4918"
@@ -60,6 +53,5 @@ java -jar $JAR $OPT "$@" &
 chmod +x phoebus
 
 cd ../../..
-rm product-sns-${V}-mac.zip
 zip -r product-sns-${V}-mac.zip phoebus.app
 rm -rf phoebus.app
