@@ -19,22 +19,13 @@ if [ -d "${TOP}/update" ]
 then
   echo "Installing update..."
   cd ${TOP}
-  rm -rf doc lib
+  rm -rf doc lib product*.jar
   mv update/* .
   rmdir update
   echo "Updated."
 fi
 
-
-V="0.0.1"
-
-# Use ant or maven jar?
-if [ -f ${TOP}/product-sns-${V}.jar ]
-then
-  JAR="${TOP}/product-sns-${V}.jar"
-else
-  JAR="${TOP}/product-sns-${V}-SNAPSHOT.jar"
-fi
+JAR="${TOP}/product-sns-*.jar"
 
 # Reduce VIRT memory
 export MALLOC_ARENA_MAX=4
