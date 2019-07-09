@@ -8,10 +8,13 @@
 
 @cd %~P0
 
+@REM Variables inside IF body are replaced early.
+@REM Can set JAVA_HOME, but access to %JAVA_HOME%
+@REM inside IF will get the old value.
 @IF EXIST "%~P0%..\jdk" (
-    setx JAVA_HOME %~P0%..\jdk
-    @path %JAVA_HOME%\bin
-    @ECHO Found JDK %JAVA_HOME%
+    set JAVA_HOME=%~P0%..\jdk
+    @path %~P0%..\jdk\bin
+    @ECHO Found JDK %~P0%..\jdk
 ) ELSE (
     @ECHO Cannot locate JDK
 )
