@@ -12,7 +12,7 @@ import static org.junit.Assert.assertThat;
 
 import java.time.Duration;
 import java.time.Instant;
-import java.util.List;
+import java.util.Collection;
 import java.util.prefs.Preferences;
 
 import org.epics.vtype.VType;
@@ -41,7 +41,7 @@ public class RDBArchiveReaderDemo
     {
         ArchiveReader reader = ArchiveReaders.createReader("jdbc:oracle:thin:@snsoroda-scan.sns.gov:1521/scprod_controls");
 
-        List<String> names = reader.getNamesByPattern("");
+        Collection<String> names = reader.getNamesByPattern("");
         System.out.println(names);
         assertThat(names.size(), equalTo(0));
 
