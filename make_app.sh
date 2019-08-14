@@ -14,6 +14,9 @@ JDK="/opt/jdks/mac/jdk"
 unzip product-sns-*-mac.zip
 rm product-sns-*-mac.zip
 mkdir -p phoebus.app/Contents/MacOS
+mkdir -p phoebus.app/Contents/Resources
+cp css.icns phoebus.app/Contents/Resources
+cp Info.plist phoebus.app/Contents
 cd phoebus.app
 cp -r ${JDK} .
 mv ../product-sns-${V} .
