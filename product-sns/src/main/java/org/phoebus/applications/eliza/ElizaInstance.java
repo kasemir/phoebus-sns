@@ -26,6 +26,7 @@ public class ElizaInstance implements AppInstance
             ui = new ElizaUI();
             dock_item = new DockItem(this, ui);
             DockPane.getActiveDockPane().addTab(dock_item);
+            dock_item.addClosedNotification(() -> INSTANCE = null);
         }
         catch (Exception ex)
         {
