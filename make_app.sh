@@ -1,59 +1,49 @@
 #!/bin/sh
 #
-# Assuming a product-sns-0.0.1-mac.zip of
-# the same basic layout that's used on Linux,
-# package as Mac OS X phoebus.app with JDK:
+# Wrap product-snsproduct-sns/target/product-sns-4.6.0-mac.zip
+# as Mac OS X CSS_Phoebus.app with JDK based on $JAVA_HOME
 #
 # phoebus.app/jdk
-# phoebus.app/product-sns-0.0.1
-# phoebus.app/Contents/MacOS/phoebus
-
-V="4.6.0"
-JDK="/opt/jdks/mac/jdk"
-
-unzip product-sns-*-mac.zip
-rm product-sns-*-mac.zip
-mkdir -p phoebus.app/Contents/MacOS
-mkdir -p phoebus.app/Contents/Resources
-cp css.icns phoebus.app/Contents/Resources
-cp Info.plist phoebus.app/Contents
-cd phoebus.app
-cp -r ${JDK} .
-mv ../product-sns-${V} .
-cd Contents/MacOS
-echo >phoebus '#!/bin/sh
+# phoebus.app/product-sns-4.6.0
+# phoebus.app/Contents/...
 #
-# Phoebus launcher for Mac OS X
+# phoebus.app/Contents started out as mostly the Contents/MacOS/command,
+# but newer versions of Mac OS require more and more content,
+# otherwise *.app is considered "damaged or incomplete".
+# Contents skeleton thanks to https://github.com/thedzy/Run-script-as-an-Applicaiton 
+#
+# Author: Kay Kasemir
 
-# Location of this script
-CONTENTS_MacOS="$( cd "$(dirname "$0")" ; pwd -P )"
+APP=CSS_Phoebus.app
+# *.app skeleton w/ launch script
+rm -rf $APP
+cp -r app_template $APP
 
-# Phoebus TOP
-TOP=`echo "$CONTENTS_MacOS/../../product-sns-*"`
-
-if [ -d ${TOP}/update ]
+# Add JDK
+JDK="${JAVA_HOME%/*/*}"
+if [ -d "$JDK/Contents/Home" ]
 then
-  echo "Installing update..."
-  cd ${TOP}
-  rm -rf doc lib product-sns-*.jar
-  mv update/* .
-  rmdir update
-  echo "Updated."
+  echo "Adding $JDK"
+  cp -r $JDK $APP/jdk
+else
+  echo "Missing $JAVA_HOME set to JDK/Contents/Home"
+  exit 1
 fi
 
-export JAVA_HOME="$( cd $TOP/../jdk/Contents/Home/ ; pwd -P )"
-export PATH="$JAVA_HOME/bin:$PATH"
+# Add product
+PROD=`echo product-sns/target/product-sns-*-mac.zip`
+if [ -r "$PROD" ]
+then
+  echo "Adding $PROD"
+  unzip -q $PROD -d $APP
+else
+  echo "Cannot locate product-sns-*-mac.zip"
+  exit 2
+fi
 
-JAR=`echo "${TOP}/product-sns-*.jar"`
+V=`echo $PROD | egrep -o '[0-9.]+' | head -n1`
 
-# To get one instance, use server mode
-# OPT="-server 4918"
-
-java -jar $JAR $OPT "$@" &
-'
-
-chmod +x phoebus
-
-cd ../../..
-zip -r product-sns-${V}-mac.zip phoebus.app
-rm -rf phoebus.app
+echo "Packing product-sns-${V}-mac.zip"
+rm -f product-sns-${V}-mac.zip
+zip -qr product-sns-${V}-mac.zip $APP
+# rm -rf $APP
