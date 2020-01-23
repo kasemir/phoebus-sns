@@ -109,7 +109,7 @@ public class SNSLogClient implements LogClient
     @Override
     public Collection<String> listLevels()
     {
-        return List.of("None", "Normal", "High", "Urgent");
+        return List.of("Normal", "High", "Urgent");
     }
 
     @Override
@@ -286,7 +286,13 @@ public class SNSLogClient implements LogClient
             // Create the entry
             String level = log.getLevel();
 
-            ELogPriority priority = (level.isEmpty()) ? ELogPriority.Normal : ELogPriority.forName(level);
+            final ELogPriority priority;
+            if ("High".equals(level))
+                priority = ELogPriority.High;
+            else if ("Urgent".equals(level))
+                priority = ELogPriority.Urgent;
+            else
+                priority = ELogPriority.Normal;
             long id = elog.createEntry(logIter.hasNext() ? logIter.next().getName() : "", log.getTitle(), log.getDescription(), priority);
 
             // Add all attached files to the entry
