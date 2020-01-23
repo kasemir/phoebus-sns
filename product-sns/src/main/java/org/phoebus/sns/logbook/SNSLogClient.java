@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2018 Oak Ridge National Laboratory.
+ * Copyright (c) 2018-2020 Oak Ridge National Laboratory.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -40,6 +40,7 @@ import org.phoebus.util.time.TimestampFormats;
  * SNS implementation of org.phoebus.logbook.LogClient
  * @author Evan Smith
  */
+@SuppressWarnings("nls")
 public class SNSLogClient implements LogClient
 {
     /** Number of seconds in 48 hours. */
@@ -60,7 +61,7 @@ public class SNSLogClient implements LogClient
         this.user = user;
         this.password = password;
     }
-    
+
     @Override
     /** @{inheritDoc} */
     public Collection<Logbook> listLogbooks()
@@ -71,7 +72,7 @@ public class SNSLogClient implements LogClient
         )
         {
             return Converter.convertLogbooks(elog.getLogbooks());
-        } 
+        }
         catch (Exception e)
         {
             e.printStackTrace();
@@ -89,7 +90,7 @@ public class SNSLogClient implements LogClient
         )
         {
             return Converter.convertCategories(elog.getCategories());
-        } 
+        }
         catch (Exception e)
         {
             e.printStackTrace();
@@ -103,6 +104,12 @@ public class SNSLogClient implements LogClient
     {
         logger.log(Level.WARNING, "listProperties method not supported by SNSLogClient.");
         return null;
+    }
+
+    @Override
+    public Collection<String> listLevels()
+    {
+        return List.of("None", "Normal", "High", "Urgent");
     }
 
     @Override
@@ -124,33 +131,33 @@ public class SNSLogClient implements LogClient
         {
             Instant now = Instant.now();
             Instant yesterday = Instant.ofEpochSecond(now.getEpochSecond() - seconds24Hours);
-            
-           
-            
+
+
+
             /*
              * TODO
-             * 
+             *
              * The elog.getEntries(...) call causes "exceeded simultaneous SESSIONS_PER_USER limit" SQL exceptions.
-             * 
+             *
              * Should investigate into Elog.getEntries to determine if this can be avoided.
-             * 
+             *
              * Possible, but not preferred, solution is to break the retrieval up into smaller pieces.
              * For example: retrieve 6 hours of log entries at a time 8 times.
-             * 
+             *
              */
-            
+
             // Get every log entry from the last 24 hours.
             List<ELogEntry> elogEntries = elog.getEntries( Date.from(yesterday), Date.from(Instant.now()));
-            
+
             // Create a list of SNSLogEntries
-            Collection<LogEntry> entries = new ArrayList<LogEntry>();
+            Collection<LogEntry> entries = new ArrayList<>();
             for (ELogEntry entry : elogEntries)
             {
                 entries.add(new SNSLogEntry(entry));
             }
-            
+
             return entries;
-        } 
+        }
         catch (Exception e)
         {
             e.printStackTrace();
@@ -168,7 +175,7 @@ public class SNSLogClient implements LogClient
         )
         {
             return new SNSLogEntry(elog.getEntry(logId));
-        } 
+        }
         catch (Exception e)
         {
             e.printStackTrace();
@@ -187,17 +194,17 @@ public class SNSLogClient implements LogClient
         {
             Collection<ELogAttachment> elogImageAttachments = elog.getImageAttachments(logId);
             Collection<ELogAttachment> elogFileAttachments = elog.getOtherAttachments(logId);
-            
-            Collection<Attachment> attachments = new ArrayList<Attachment>();
-            
+
+            Collection<Attachment> attachments = new ArrayList<>();
+
             for (ELogAttachment attachment : elogImageAttachments)
                 attachments.add(new SNSAttachment(attachment));
-            
+
             for (ELogAttachment attachment : elogFileAttachments)
                     attachments.add(new SNSAttachment(attachment));
-            
+
             return attachments;
-        } 
+        }
         catch (Exception e)
         {
             e.printStackTrace();
@@ -266,56 +273,56 @@ public class SNSLogClient implements LogClient
             final ELog elog = new ELog(url, user, password);
         )
         {
-            
+
             Collection<Logbook> logbooks = log.getLogbooks();
             Iterator<Logbook> logIter = logbooks.iterator();
-            
+
             Collection<Tag> tags = log.getTags();
             Iterator<Tag> tagIter = tags.iterator();
-            
+
             Collection<Attachment> attachments = log.getAttachments();
             Iterator<Attachment> attachIter = attachments.iterator();
-            
+
             // Create the entry
             String level = log.getLevel();
-            
+
             ELogPriority priority = (level.isEmpty()) ? ELogPriority.Normal : ELogPriority.forName(level);
             long id = elog.createEntry(logIter.hasNext() ? logIter.next().getName() : "", log.getTitle(), log.getDescription(), priority);
-            
+
             // Add all attached files to the entry
             while (attachIter.hasNext())
             {
                 Attachment a = attachIter.next();
-                
+
                 // Get the file extension.
                 int extIndex = a.getFile().getName().lastIndexOf(".");
                 String extension = a.getFile().getName().substring(extIndex);
-                
+
                 // Get the last modified date.
                 Instant date = Instant.ofEpochMilli(a.getFile().lastModified());
-                
+
                 // Build the attachment caption.
                 String caption = TimestampFormats.SECONDS_FORMAT.format(date) + extension;
-                
+
                 elog.addAttachment(id, a.getFile().getName(), caption, new FileInputStream(a.getFile()));
             }
-            
+
             // Add the log books to the entry
             while(logIter.hasNext())
             {
                 Logbook l = logIter.next();
                 elog.addLogbook(id, l.getName());
             }
-            
+
             // Add the categories (tags) to the entry
             while(tagIter.hasNext())
             {
                 Tag t = tagIter.next();
                 elog.addCategory(id, t.getName());
             }
-            
+
             return log;
-        } 
+        }
         catch (Exception e)
         {
             e.printStackTrace();
@@ -368,7 +375,7 @@ public class SNSLogClient implements LogClient
             {
                 elog.addLogbook(logId, logbook.getName());
             }
-        } 
+        }
         catch (Exception e)
         {
             e.printStackTrace();
@@ -419,12 +426,12 @@ public class SNSLogClient implements LogClient
         {
             elog.addLogbook(logId, tag.getName());
             return tag;
-        } 
+        }
         catch (Exception e)
         {
             e.printStackTrace();
         }
-        
+
         return null;
     }
 
@@ -440,12 +447,12 @@ public class SNSLogClient implements LogClient
             for (Long logId : logIds)
                 elog.addLogbook(logId, tag.getName());
             return tag;
-        } 
+        }
         catch (Exception e)
         {
             e.printStackTrace();
         }
-        
+
         return null;
     }
 
@@ -460,12 +467,12 @@ public class SNSLogClient implements LogClient
         {
             elog.addLogbook(logId, logbook.getName());
             return logbook;
-        } 
+        }
         catch (Exception e)
         {
             e.printStackTrace();
         }
-        
+
         return null;
     }
 
@@ -481,12 +488,12 @@ public class SNSLogClient implements LogClient
             for (Long logId : logIds)
                 elog.addLogbook(logId, logbook.getName());
             return logbook;
-        } 
+        }
         catch (Exception e)
         {
             e.printStackTrace();
         }
-        
+
         return null;
     }
 
@@ -508,12 +515,12 @@ public class SNSLogClient implements LogClient
         )
         {
             elog.addAttachment(logId, local.getName(), "", new FileInputStream(local));
-        } 
+        }
         catch (Exception e)
         {
             e.printStackTrace();
         }
-        
+
         return null;
     }
 
@@ -528,12 +535,12 @@ public class SNSLogClient implements LogClient
         {
             ELogEntry elogEntry = elog.getEntry(logId);
             return new SNSLogEntry(elogEntry);
-        } 
+        }
         catch (Exception e)
         {
             e.printStackTrace();
         }
-        
+
         return null;
     }
 
@@ -541,13 +548,13 @@ public class SNSLogClient implements LogClient
     /** @{inheritDoc} */
     public List<LogEntry> findLogsBySearch(String pattern)
     {
-        /* 
+        /*
          *  Thus far there is no way to perform such searches in ELog without creating the code first.
-         *  
-         *  So just ignore the search string and return the last days worth of logs regardless of what the pattern is. 
-         *  This will allow the code that uses this method to at least work. 
+         *
+         *  So just ignore the search string and return the last days worth of logs regardless of what the pattern is.
+         *  This will allow the code that uses this method to at least work.
          */
-        
+
         try
         (
             final ELog elog = new ELog(url, user, password);
@@ -555,19 +562,19 @@ public class SNSLogClient implements LogClient
         {
             Instant now = Instant.now();
             Instant yesterday = Instant.ofEpochSecond(now.getEpochSecond() - seconds24Hours);
-            
+
             // Get every log entry from the last 48 hours.
             List<ELogEntry> elogEntries = elog.getEntries( Date.from(yesterday), Date.from(Instant.now()));
-            
+
             // Create a list of SNSLogEntries
-            List<LogEntry> entries = new ArrayList<LogEntry>();
+            List<LogEntry> entries = new ArrayList<>();
             for (ELogEntry entry : elogEntries)
             {
                 entries.add(new SNSLogEntry(entry));
             }
-            
+
             return entries;
-        } 
+        }
         catch (Exception e)
         {
             e.printStackTrace();
@@ -630,7 +637,7 @@ public class SNSLogClient implements LogClient
     @Override
     public void deleteProperty(String property)
     {
-        logger.log(Level.WARNING, "delete operations not supported by SNSLogClient."); 
+        logger.log(Level.WARNING, "delete operations not supported by SNSLogClient.");
     }
 
     @Override
