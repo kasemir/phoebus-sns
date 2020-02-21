@@ -33,7 +33,7 @@
 
 @java -version
 
-@set V=4.6.0
+@set V=4.6.1
 
 @IF EXIST product-sns-%V%.jar (
     SET JAR=product-sns-%V%.jar
@@ -41,4 +41,8 @@
     SET JAR=product-sns-%V%-SNAPSHOT.jar
 )
 
+
 @java -jar %JAR% %*
+
+@REM   Add in case of problems
+@REM pause
