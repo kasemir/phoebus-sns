@@ -3,13 +3,13 @@
 
   <!-- If the manual has been built... -->
   <target name="-check-doc">
-    <available property="have.doc" file="../../phoebus-doc/build/html/index.html"/>
+    <available property="have.doc" file="../../phoebus/docs/build/html/index.html"/>
   </target>
   
   <!-- .. copy manual into product/doc -->
   <target name="copy-doc" depends="-check-doc" if="have.doc">
     <copy todir="${build}/doc">
-      <fileset dir="../../phoebus-doc/build/html"/>
+      <fileset dir="../../phoebus/docs/build/html"/>
     </copy>
   </target>
 
