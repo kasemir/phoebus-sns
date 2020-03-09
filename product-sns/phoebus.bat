@@ -33,14 +33,10 @@
 
 @java -version
 
-@set V=4.6.1
-
-@IF EXIST product-sns-%V%.jar (
-    SET JAR=product-sns-%V%.jar
-) ELSE (
-    SET JAR=product-sns-%V%-SNAPSHOT.jar
-)
-
+@REM Locate product-sns jar file, any version
+echo off
+FOR /F "tokens=* USEBACKQ" %%F IN (`dir /B product-sns*.jar`) DO (SET JAR=%%F)
+echo on
 
 @java -jar %JAR% %*
 
