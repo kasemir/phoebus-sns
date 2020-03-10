@@ -4,13 +4,14 @@
 
 # When deploying, change "TOP"
 # to the absolute installation path
-TOP="."
+THIS_SCRIPT="$(realpath "$0")";
+TOP="${THIS_SCRIPT%/*}";
 
 # Ideally, assert that Java is found
 # export JAVA_HOME=/opt/jdk-9
 # export PATH="$JAVA_HOME/bin:$PATH"
 
-if [ -d ${TOP}/target ]
+if [ -d "${TOP}/target" ]
 then
   TOP="${TOP}/target"
 fi
@@ -51,7 +52,7 @@ OPT=""
 # To get one instance, use server mode
 # OPT+=" -server 4918"
 
-if [ "x$1" == "x-main" ]
+if [ "x$1" == "x-main"  -o  "x$1" == "x-help" ]
 then
   # Run MEDM converter etc. in foreground
   java -jar $JAR $OPT "$@"
