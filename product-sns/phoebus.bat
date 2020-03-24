@@ -38,7 +38,8 @@ echo off
 FOR /F "tokens=* USEBACKQ" %%F IN (`dir /B product-sns*.jar`) DO (SET JAR=%%F)
 echo on
 
-@java -jar %JAR% %*
+
+@java -DCA_DISABLE_REPEATER=true -jar %JAR% %*
 
 @REM   Add in case of problems
 @REM pause
