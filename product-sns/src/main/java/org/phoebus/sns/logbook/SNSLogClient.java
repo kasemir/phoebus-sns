@@ -27,6 +27,7 @@ import org.phoebus.logbook.Attachment;
 import org.phoebus.logbook.LogClient;
 import org.phoebus.logbook.LogEntry;
 import org.phoebus.logbook.Logbook;
+import org.phoebus.logbook.LogbookException;
 import org.phoebus.logbook.Property;
 import org.phoebus.logbook.Tag;
 import org.phoebus.sns.logbook.elog.ELog;
@@ -266,7 +267,7 @@ public class SNSLogClient implements LogClient
 
     @Override
     /** @{inheritDoc} */
-    public LogEntry set(LogEntry log)
+    public LogEntry set(LogEntry log) throws LogbookException
     {
         try
         (
@@ -329,19 +330,10 @@ public class SNSLogClient implements LogClient
 
             return log;
         }
-        catch (Exception e)
+        catch (Exception ex)
         {
-            e.printStackTrace();
+            throw new LogbookException(ex);
         }
-        return null;
-    }
-
-    @Override
-    /** @{inheritDoc} */
-    public Collection<LogEntry> set(Collection<LogEntry> logEntries)
-    {
-        logger.log(Level.WARNING, "set(Collection<LogEntry>) not supported by SNSLogClient.");
-        return null;
     }
 
     @Override

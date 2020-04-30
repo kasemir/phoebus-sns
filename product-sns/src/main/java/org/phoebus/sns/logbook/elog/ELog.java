@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010 Oak Ridge National Laboratory.
+ * Copyright (c) 2010-2020 Oak Ridge National Laboratory.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -68,8 +68,15 @@ public class ELog implements Closeable
     public ELog(final String url, final String user, final String password)
             throws Exception
     {
-        this.rdb = new RDBConnectionPool(url, user, password);
-        badge_number = getBadgeNumber(user);
+        try
+        {
+            this.rdb = new RDBConnectionPool(url, user, password);
+            badge_number = getBadgeNumber(user);
+        }
+        catch (Exception ex)
+        {
+            throw new Exception("Cannot connect, check user/password or network", ex);
+        }
         MAX_TITLE_SIZE = getMaxEntryColumnLength("TITLE");
         MAX_TEXT_SIZE = getMaxEntryColumnLength("CONTENT");
         // Only initialize logbooks and categories once per JVM
@@ -199,10 +206,10 @@ public class ELog implements Closeable
         )
         {
             final ResultSet result = statement.executeQuery(
-                    "SELECT lc.logbook_id, l.logbook_nm, lc.cat_id, c.cat_nm FROM logbook.logbook_log_categories_v lc" + 
-                    " join logbook.log_categories_v c" + 
-                    " ON lc.cat_id = c.cat_id" + 
-                    " join logbook.logbook_v l" + 
+                    "SELECT lc.logbook_id, l.logbook_nm, lc.cat_id, c.cat_nm FROM logbook.logbook_log_categories_v lc" +
+                    " join logbook.log_categories_v c" +
+                    " ON lc.cat_id = c.cat_id" +
+                    " join logbook.logbook_v l" +
                     " ON l.logbook_id = lc.logbook_id");
             while (result.next())
             {
@@ -745,7 +752,7 @@ public class ELog implements Closeable
             rdb.releaseConnection(connection);
         }
     }
-    
+
     /**
      * Get the category name from a string containing a category name and logbook name that are delimited by a colon.
      * @param logbook_and_category
@@ -755,22 +762,22 @@ public class ELog implements Closeable
     public static String getCategoryFromLogbookCategoryString(final String logbook_and_category) throws Exception
     {
         final String[] tokens = logbook_and_category.split(":");
-        
+
         if (tokens.length < 2)
             throw new Exception("Logbook and Category string missing element or delimiter.");
-        
+
         final String logbook_name  = tokens[0].trim();
         final String category_name = tokens[1].trim();
-        
+
         if (null == logbook_name || logbook_name.isEmpty())
             throw new Exception("Logbook is not in logbook and category string.");
-        
+
         if (null == category_name || category_name.isEmpty())
             throw new Exception("Category is not in logbook and category string.");
-        
+
         return category_name;
     }
-    
+
     /** @param category_name Category name
      *  @return Category ID
      *  @throws Exception when category not known
