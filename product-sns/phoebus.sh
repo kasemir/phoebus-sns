@@ -34,6 +34,9 @@ export MALLOC_ARENA_MAX=4
 # Memory
 export JDK_JAVA_OPTIONS="-Xms500M -Xmx2G"
 
+# When using Java 14+:
+JDK_JAVA_OPTIONS+=" -XX:+ShowCodeDetailsInExceptionMessages "
+
 # Don't start a CA Repeater
 JDK_JAVA_OPTIONS+=" -DCA_DISABLE_REPEATER=true "
 
