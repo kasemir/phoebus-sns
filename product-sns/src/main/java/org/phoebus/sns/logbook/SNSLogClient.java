@@ -497,14 +497,6 @@ public class SNSLogClient implements LogClient
 
     @Override
     /** @{inheritDoc} */
-    public LogEntry update(Property property, Long logId)
-    {
-        logger.log(Level.WARNING, "update(Property, Long) not supported by SNSLogClient.");
-        return null;
-    }
-
-    @Override
-    /** @{inheritDoc} */
     public Attachment add(File local, Long logId)
     {
         try
@@ -582,119 +574,9 @@ public class SNSLogClient implements LogClient
 
     @Override
     /** @{inheritDoc} */
-    public List<LogEntry> findLogsByTag(String pattern)
-    {
-        // TODO Implement in ELog then implement method.
-        return null;
-    }
-
-    @Override
-    /** @{inheritDoc} */
-    public List<LogEntry> findLogsByLogbook(String logbook)
-    {
-        // TODO Implement in ELog then implement method.
-        return null;
-    }
-
-    @Override
-    /** @{inheritDoc} */
-    public List<LogEntry> findLogsByProperty(String propertyName, String attributeName, String attributeValue)
-    {
-        logger.log(Level.WARNING, "findLogsByProperty method not supported by SNSLogClient.");
-        return null;
-    }
-
-    @Override
-    /** @{inheritDoc} */
-    public List<LogEntry> findLogsByProperty(String propertyName)
-    {
-        logger.log(Level.WARNING, "findLogsByProperty method not supported by SNSLogClient.");
-        return null;
-    }
-
-    @Override
-    /** @{inheritDoc} */
     public List<LogEntry> findLogs(Map<String, String> map)
     {
         // TODO What's supposed to be in the map?
         return null;
-    }
-
-    @Override
-    public void deleteTag(String tag)
-    {
-        logger.log(Level.WARNING, "delete operations not supported by SNSLogClient.");
-    }
-
-    @Override
-    public void deleteLogbook(String logbook)
-    {
-        logger.log(Level.WARNING, "delete operations not supported by SNSLogClient.");
-    }
-
-    @Override
-    public void deleteProperty(String property)
-    {
-        logger.log(Level.WARNING, "delete operations not supported by SNSLogClient.");
-    }
-
-    @Override
-    public void delete(LogEntry log)
-    {
-        logger.log(Level.WARNING, "delete operations not supported by SNSLogClient.");
-    }
-
-    @Override
-    public void delete(Long logId)
-    {
-        logger.log(Level.WARNING, "delete operations not supported by SNSLogClient.");
-    }
-
-    @Override
-    public void delete(Collection<LogEntry> logs)
-    {
-        logger.log(Level.WARNING, "delete operations not supported by SNSLogClient.");
-    }
-
-    @Override
-    public void delete(Tag tag, Long logId)
-    {
-        logger.log(Level.WARNING, "delete operations not supported by SNSLogClient.");
-    }
-
-    @Override
-    public void delete(Tag tag, Collection<Long> logIds)
-    {
-        logger.log(Level.WARNING, "delete operations not supported by SNSLogClient.");
-    }
-
-    @Override
-    public void delete(Logbook logbook, Long logId)
-    {
-        logger.log(Level.WARNING, "delete operations not supported by SNSLogClient.");
-    }
-
-    @Override
-    public void delete(Logbook logbook, Collection<Long> logIds)
-    {
-        logger.log(Level.WARNING, "delete operations not supported by SNSLogClient.");
-    }
-
-    @Override
-    public void delete(Property property, Long logId)
-    {
-        logger.log(Level.WARNING, "delete operations not supported by SNSLogClient.");
-    }
-
-    @Override
-    public void delete(Property property, Collection<Long> logIds)
-    {
-        logger.log(Level.WARNING, "delete operations not supported by SNSLogClient.");
-    }
-
-    @Override
-    public void delete(String fileName, Long logId)
-    {
-        logger.log(Level.WARNING, "delete operations not supported by SNSLogClient.");
     }
 }
