@@ -8,14 +8,14 @@
 CONTENTS="$( cd "$(dirname "$0")" ; pwd -P )"
 BASE=${CONTENTS%/*/*}
 
-# Phoebus TOP
-TOP=`echo "$BASE/product-sns-*"`
+# Phoebus TOP: phoebus-.. or product-..
+TOP=`echo "$BASE/p*"`
 
 if [ -d ${TOP}/update ]
 then
   echo "Installing update..."
   cd ${TOP}
-  rm -rf doc lib product-sns-*.jar
+  rm -rf doc lib p*.jar
   mv update/* .
   rmdir update
   echo "Updated."
@@ -25,7 +25,7 @@ export JAVA_HOME="$BASE/jdk/Contents/Home"
 
 export PATH="$JAVA_HOME/bin:$PATH"
 
-JAR=`echo "${TOP}/product-sns-*.jar"`
+JAR=`echo "${TOP}/p*.jar"`
 
 # To get one instance, use server mode
 # OPT="-server 4918"
