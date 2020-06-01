@@ -24,7 +24,7 @@ fi
 
 # Leaving original ZIP, creating new ZIP here
 DEST=`basename $PROD`
-echo "Turning $PROD into Mac OS app $DEST"
+echo "Turning ZIP-distro $PROD into Mac OS app $DEST"
 
 if [ "$PROD" = "$DEST" ]
 then
@@ -35,6 +35,7 @@ fi
 APP=CSS_Phoebus.app
 
 # *.app skeleton w/ launch script
+echo "Creating app skeleton $APP"
 rm -rf $APP
 cp -r app_template $APP
 
@@ -42,7 +43,7 @@ cp -r app_template $APP
 JDK="${JAVA_HOME%/*/*}"
 if [ -d "$JDK/Contents/Home" ]
 then
-  echo "Adding $JDK"
+  echo "Adding JRE $JDK"
   cp -r $JDK $APP/jdk
 else
   echo "Missing $JAVA_HOME set to JDK/Contents/Home"
@@ -52,7 +53,7 @@ fi
 # Add product
 if [ -r "$PROD" ]
 then
-  echo "Adding $PROD"
+  echo "Adding contents of ZIP-distro $PROD"
   unzip -q $PROD -d $APP
 else
   echo "Cannot locate product-sns-*-mac.zip"
