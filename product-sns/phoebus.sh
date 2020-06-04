@@ -4,8 +4,8 @@
 
 # When deploying, change "TOP"
 # to the absolute installation path
-THIS_SCRIPT="$(realpath "$0")";
-TOP="${THIS_SCRIPT%/*}";
+TOP="$( cd "$(dirname "$0")" ; pwd -P )"
+echo $TOP
 
 # Ideally, assert that Java is found
 # export JAVA_HOME=/opt/jdk-9
