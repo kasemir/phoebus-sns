@@ -25,6 +25,8 @@ export JAVA_HOME="$BASE/jdk/Contents/Home"
 
 export PATH="$JAVA_HOME/bin:$PATH"
 
+export HOSTNAME=`/bin/hostname`
+
 JAR=`echo "${TOP}/p*.jar"`
 
 # To get one instance, use server mode
