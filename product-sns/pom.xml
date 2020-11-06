@@ -151,6 +151,23 @@
       <version>${phoebus.version}</version>
     </dependency>
 
+    <!-- Channel Finder Support -->
+    <dependency>
+      <groupId>org.phoebus</groupId>
+      <artifactId>app-channel-channelfinder</artifactId>
+      <version>${phoebus.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.phoebus</groupId>
+      <artifactId>app-channel-utility</artifactId>
+      <version>${phoebus.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.phoebus</groupId>
+      <artifactId>app-channel-views</artifactId>
+      <version>${phoebus.version}</version>
+    </dependency>
+
     <!-- Add JDBC drivers etc. which may not be used by generic product -->
     <dependency>
       <groupId>com.oracle.jdbc</groupId>

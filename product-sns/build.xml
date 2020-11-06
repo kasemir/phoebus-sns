@@ -25,7 +25,6 @@
       <fileset dir="../../phoebus">
         <include name="app/**/*.jar"/>
       	<exclude name="app/**/app-greeting*.jar"/>
-      	<exclude name="app/**/*channel*.jar"/>
       	<exclude name="app/**/app-alarm-server*.jar"/>
       	<exclude name="app/**/app-scan-server*.jar"/>
         <include name="phoebus-product/target/*.jar"/>
