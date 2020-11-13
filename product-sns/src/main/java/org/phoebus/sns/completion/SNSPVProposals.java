@@ -16,7 +16,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.phoebus.framework.autocomplete.Proposal;
-import org.phoebus.framework.preferences.PreferencesReader;
+import org.phoebus.framework.preferences.AnnotatedPreferences;
+import org.phoebus.framework.preferences.Preference;
 import org.phoebus.framework.rdb.RDBConnectionPool;
 import org.phoebus.framework.spi.PVProposalProvider;
 
@@ -29,27 +30,25 @@ public class SNSPVProposals implements PVProposalProvider
     public static final String NAME = "SNS PVs";
 
     /** URL, user, pass, URL, user, pass, ... */
-    private static final List<String> infos;
+    @Preference(name="sources") private static String[] infos;
 
     /** Limit the number of results to return */
-    private static final int limit;
+    @Preference private static int limit;
 
     static
     {
-        final PreferencesReader prefs = new PreferencesReader(SNSPVProposals.class, "/pv_proposals_preferences.properties");
-        infos = List.of(prefs.get("sources").split(","));
-        limit = prefs.getInt("limit");
+    	AnnotatedPreferences.initialize(SNSPVProposals.class, "/pv_proposals_preferences.properties");
     }
 
     private final List<RDBConnectionPool> pools;
 
     public SNSPVProposals()
     {
-        pools = new ArrayList<>(infos.size() / 3);
-        for (int i=0; i<infos.size(); i+=3)
+        pools = new ArrayList<>(infos.length / 3);
+        for (int i=0; i<infos.length; i+=3)
             try
             {
-                final RDBConnectionPool pool = new RDBConnectionPool(infos.get(i), infos.get(i+1), infos.get(i+2));
+                final RDBConnectionPool pool = new RDBConnectionPool(infos[i], infos[i+1], infos[i+2]);
                 pool.setTimeout(10);
                 pools.add(pool);
             }
