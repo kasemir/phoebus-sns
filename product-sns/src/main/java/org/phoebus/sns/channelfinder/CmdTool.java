@@ -94,6 +94,9 @@ public class CmdTool
     private void importChannels(final String pattern) throws Exception
     {
         System.out.println("Reading IRMIS channels from " + infos[0] + " as " + infos[1] + "/" + infos[2]);
+
+        final boolean all = pattern.equals("%");
+
         try
         (
             Connection connection = new RDBInfo(infos[0], infos[1], infos[2]).connect();
@@ -103,10 +106,13 @@ public class CmdTool
                 "  JOIN irmisbase.ioc_boot b ON b.ioc_boot_id = r.ioc_boot_id" +
                 "  JOIN irmisbase.ioc i      ON b.ioc_id = i.ioc_id" +
                 "  WHERE b.current_load = 1" +
-                " AND r.rec_nm LIKE ?");
+                (all ? "" : " AND r.rec_nm LIKE ?"));
         )
         {
-            statement.setString(1, pattern);
+            if (! all)
+                statement.setString(1, pattern);
+            statement.setFetchDirection(ResultSet.FETCH_FORWARD);
+            statement.setFetchSize(10000);
 
             int i = 0;
             try
@@ -127,7 +133,7 @@ public class CmdTool
                     final String channel = result.getString(1);
                     final String ioc = result.getString(2);
                     final Instant boot_time = result.getTimestamp(3).toInstant();
-                    final String boot_stamp =  TimestampFormats.FULL_FORMAT.format(boot_time);
+                    final String boot_stamp =  TimestampFormats.SECONDS_FORMAT.format(boot_time);
                     System.out.println(i + ": " + channel + " on " + ioc + " at " + boot_stamp);
 
                     cf.set(Channel.Builder
