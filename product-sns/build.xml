@@ -14,8 +14,14 @@
   </target>
 
   <target name="module-sns" depends="copy-doc" description="Assemble product">
-    <mkdir dir="${classes}"/>
-    <javac srcdir="${src}" destdir="${classes}" classpathref="app-classpath" debug="${debug}"/>
+    <mkdir dir="${classes}"/>  	
+    <javac destdir="${classes}" debug="${debug}">
+      <src path="${src}"/>
+      <classpath>
+        <pathelement path="../../phoebus/app/channel/channelfinder/${build}/app-channel-channelfinder-${version}.jar"/>        
+        <path refid="app-classpath"/>
+      </classpath>
+    </javac>
 
     <!-- Assemble lib/ -->
     <copy todir="${build}/lib" flatten="true">
