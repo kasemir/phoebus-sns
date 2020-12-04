@@ -1,9 +1,19 @@
+/*******************************************************************************
+ * Copyright (c) 2020 Oak Ridge National Laboratory.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *******************************************************************************/
 package org.phoebus.sns.channelfinder;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 import org.phoebus.channelfinder.Channel;
 import org.phoebus.channelfinder.ChannelFinderClient;
@@ -15,8 +25,13 @@ import org.phoebus.framework.rdb.RDBInfo;
 import org.phoebus.sns.completion.SNSPVProposals;
 import org.phoebus.util.time.TimestampFormats;
 
+/** 'Main' for channel finder maintenance
+ *
+ *  <p>Invoke via "phoebus.sh -main org.phoebus.sns.channelfinder.CmdTool -help"
+ *  @author Kay Kasemir
+ */
 @SuppressWarnings("nls")
-public class IrmisImport
+public class CmdTool
 {
     private final ChannelFinderClient cf;
 
@@ -25,17 +40,22 @@ public class IrmisImport
 
     private final String owner = "admin"; // System.getProperty("user.name") ?
 
-    public IrmisImport() throws Exception
+    public CmdTool() throws Exception
     {
         cf = ChannelFinderService.getInstance().getClient();
 
-        AnnotatedPreferences.initialize(SNSPVProposals.class, IrmisImport.class, "/pv_proposals_preferences.properties");
+        AnnotatedPreferences.initialize(SNSPVProposals.class, CmdTool.class, "/pv_proposals_preferences.properties");
     }
 
-    private void test() throws Exception
+    private void list(final String pattern) throws Exception
     {
-        for (Channel channel : cf.findByName("BR:C001-PS:1{HC}O*"))
-            System.out.println(channel.getName());
+        System.out.println("Channels matching pattern '" + pattern + "'");
+        int i = 0;
+        for (Channel channel : cf.findByName(pattern))
+        {
+            ++i;
+            System.out.format("%4d : %s\n", i, channel.getName());
+        }
     }
 
     /*
@@ -71,7 +91,7 @@ public class IrmisImport
            WHERE b.current_load = 1
              AND r.rec_nm LIKE '%_LLRF:IOC%:Load';
    */
-    private void importChannels() throws Exception
+    private void importChannels(final String pattern) throws Exception
     {
         System.out.println("Reading IRMIS channels from " + infos[0] + " as " + infos[1] + "/" + infos[2]);
         try
@@ -86,7 +106,7 @@ public class IrmisImport
                 " AND r.rec_nm LIKE ?");
         )
         {
-            statement.setString(1, "%_LLRF:IOC%:Load");
+            statement.setString(1, pattern);
 
             int i = 0;
             try
@@ -155,15 +175,80 @@ public class IrmisImport
         cf.close();
     }
 
-    public static void main(String[] args) throws Exception
+    private static void help()
     {
-        final IrmisImport imp = new IrmisImport();
-        imp.test();
-        imp.add("DemoChannel");
-        imp.delete("DemoChannel");
-        imp.deleteByPattern("BR:*");
+        System.out.println("Usage: -main " + CmdTool.class.getName() + " [options]");
+        System.out.println();
+        System.out.println("Channel Finder command line tool");
+        System.out.println();
+        System.out.println("-help                           -  This text");
+        System.out.println("-list pattern                   -  List channel names for pattern");
+        System.out.println("-delete pattern                 -  Delete channel names for pattern");
+        System.out.println("-import rdb_pattern             -  Import IRMIS channels for RDB pattern");
+        System.out.println();
+        System.out.println("Patterns:     '*', 'DTL_LLRF:*:Load, ...");
+        System.out.println("RDB Patterns: '%', 'DTL_LLRF:%:Load, ...");
+    }
 
-        imp.importChannels();
-        imp.close();
+    public static void main(String[] original_args) throws Exception
+    {
+        final List<String> args = new ArrayList<>(List.of(original_args));
+        if (args.isEmpty())
+        {
+            help();
+            return;
+        }
+
+        final CmdTool imp = new CmdTool();
+        try
+        {
+            final Iterator<String> iter = args.iterator();
+            while (iter.hasNext())
+            {
+                final String cmd = iter.next();
+                if (cmd.startsWith("-h"))
+                {
+                    help();
+                    return;
+                }
+                else if (cmd.startsWith("-list"))
+                {
+                    if (! iter.hasNext())
+                        throw new Exception("Missing -list pattern");
+                    iter.remove();
+                    final String pattern = iter.next();
+                    iter.remove();
+                    imp.list(pattern);
+                }
+                else if (cmd.startsWith("-delete"))
+                {
+                    if (! iter.hasNext())
+                        throw new Exception("Missing -delete pattern");
+                    iter.remove();
+                    final String pattern = iter.next();
+                    iter.remove();
+                    imp.deleteByPattern(pattern);
+                }
+                else if (cmd.startsWith("-import"))
+                {
+                    if (! iter.hasNext())
+                        throw new Exception("Missing -import pattern");
+                    iter.remove();
+                    final String pattern = iter.next();
+                    iter.remove();
+                    imp.importChannels(pattern);
+                }
+                else
+                {
+                    System.out.println("Unknown parameters " + args);
+                    help();
+                    return;
+                }
+            }
+        }
+        finally
+        {
+            imp.close();
+        }
     }
 }
