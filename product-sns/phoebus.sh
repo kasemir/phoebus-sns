@@ -7,9 +7,14 @@
 TOP="$( cd "$(dirname "$0")" ; pwd -P )"
 echo $TOP
 
-# Ideally, assert that Java is found
-# export JAVA_HOME=/opt/jdk-9
-# export PATH="$JAVA_HOME/bin:$PATH"
+# Look for Java in a parallel 'jdk' folder.
+# Alternatively, define JAVA_HOME as desired.
+if [ -d "${TOP}/../jdk" ]
+then
+  export JAVA_HOME=`(cd "${TOP}/../jdk"; pwd)`
+  export PATH="$JAVA_HOME/bin:$PATH"
+  echo "Using JDK $JAVA_HOME"
+fi
 
 if [ -d "${TOP}/target" ]
 then
