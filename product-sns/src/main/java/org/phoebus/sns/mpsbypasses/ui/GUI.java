@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2019 Oak Ridge National Laboratory.
+ * Copyright (c) 2019-2021 Oak Ridge National Laboratory.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -137,11 +137,11 @@ public class GUI extends GridPane implements BypassModelListener
     private Node createSelector()
     {
         sel_mode.getItems().addAll(MachineMode.values());
-        sel_mode.setValue(MachineMode.Site);
+        sel_mode.setValue(model.getMachineMode());
         sel_state.getItems().addAll(BypassState.values());
-        sel_state.setValue(BypassState.All);
+        sel_state.setValue(model.getBypassFilter());
         sel_req.getItems().addAll(RequestState.values());
-        sel_req.setValue(RequestState.All);
+        sel_req.setValue(model.getRequestFilter());
 
         reload.setTooltip(new Tooltip("Re-load bypass information from Relational Database"));
 
