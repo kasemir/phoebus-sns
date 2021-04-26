@@ -25,6 +25,15 @@ if [ -d "${TOP}/update" ]
 then
   echo "Installing update..."
   cd ${TOP}
+  
+  if [ -d jdk ]
+  then
+      echo "Updating JDK"
+      rm -rf ../jdk
+      mv update/jdk ..
+      chmod +x ../jdk/bin/*
+  fi
+  
   rm -rf doc lib product*.jar
   mv update/* .
   rmdir update
