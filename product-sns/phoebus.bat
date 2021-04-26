@@ -21,6 +21,13 @@
 
 @if EXIST "update" (
     @ECHO Installing update...
+    
+    @IF EXIST "update\jdk" (
+        @ECHO Update JDK
+        @rd /S/Q ..\jdk
+        @move /Y update\jdk ..
+    )
+    
     @rd /S/Q doc
     @rd /S/Q lib
     @del product*.jar
