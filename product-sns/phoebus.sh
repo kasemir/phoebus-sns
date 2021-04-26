@@ -26,7 +26,7 @@ then
   echo "Installing update..."
   cd ${TOP}
   
-  if [ -d jdk ]
+  if [ -d update/jdk ]
   then
       echo "Updating JDK"
       rm -rf ../jdk

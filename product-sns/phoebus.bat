@@ -34,7 +34,7 @@
     @move /Y update\*.* .
     @move /Y update\doc .
     @move /Y update\lib .
-    @rmdir update
+    @rmdir /s update
     @ECHO Updated.
 )
 
