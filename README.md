@@ -1,6 +1,6 @@
 # phoebus-sns
 
-Phoebus (https://github.com/shroffk/phoebus) product for SNS
+Phoebus (https://github.com/ControlSystemStudio/phoebus) product for SNS
 
  * Site-specific PVProposalProvider (SNSPVProposals).
  * Distribution created by `ant dist` includes site-specific `settings.ini`
