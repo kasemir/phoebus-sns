@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010-2020 Oak Ridge National Laboratory.
+ * Copyright (c) 2010-2022 Oak Ridge National Laboratory.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -29,6 +29,22 @@ import org.phoebus.framework.util.IOUtils;
 import oracle.jdbc.OracleTypes;
 
 /** SNS 'ELog' support
+ * 
+ *  Note mismatch between SNS logbook and generic logbook API.
+ *  The generic API allows adding "Tags" to any entry.
+ *  The SNS logbook started out with "Categories" which were like Tags.
+ *  But by now the same category name ("Electrical") may be used with more
+ *  than one ID ("ELEC", "FAC10", ...),
+ *  and that ID may then be used with more than one logbook.
+ *  
+ *  In principle, a category should only be used with those more-than-one but
+ *  specific logbooks, but we cannot enforce that in the generic GUI.
+ *  We list categories as tags named "logbook : category" and user should only
+ *  select tags that match the selected logbook.
+ *  When we submit the tag, we look for one that has the correct category as well
+ *  as logbook name, but if that fails, we submit just by matching category name,
+ *  since that shows up in the logbook web page. 
+ *  
  *  @author Delphy Nypaver Armstrong - Original version
  *  @author Kay Kasemir
  *  @author Evan Smith - Adapted to use RDBCollectionPool
@@ -207,16 +223,15 @@ public class ELog implements Closeable
         {
             final ResultSet result = statement.executeQuery(
                     "SELECT lc.logbook_id, l.logbook_nm, lc.cat_id, c.cat_nm FROM logbook.logbook_log_categories_v lc" +
-                    " join logbook.log_categories_v c" +
-                    " ON lc.cat_id = c.cat_id" +
-                    " join logbook.logbook_v l" +
-                    " ON l.logbook_id = lc.logbook_id");
+                    " JOIN logbook.log_categories_v c ON lc.cat_id = c.cat_id" +
+                    " JOIN logbook.logbook_v l        ON l.logbook_id = lc.logbook_id");
             while (result.next())
             {
                 final String category_id = result.getString(3);
                 final String logbook_name = result.getString(2);
                 final String category_name = result.getString(4);
-                tags.add(new ELogCategory(category_id, logbook_name + " : " + category_name));
+                final ELogCategory cat = new ELogCategory(category_id, logbook_name, category_name);
+                tags.add(cat);
             }
         }
         rdb.releaseConnection(connection);
@@ -370,17 +385,26 @@ public class ELog implements Closeable
         final Connection connection = rdb.getConnection();
         try
         (
+            // Example entry:
+            // SELECT e.cat_id, le.logbook_id, lb.logbook_nm, c.cat_nm
+            // FROM LOGBOOK.LOG_ENTRY_CATEGORIES e
+            // JOIN LOGBOOK.entry_logbook   le ON le.log_entry_id = e.log_entry_id
+            // JOIN LOGBOOK.logbook_v       lb ON lb.logbook_id = le.logbook_id
+            // JOIN LOGBOOK.log_categories_v c ON e.cat_id = c.cat_id
+            // WHERE e.log_entry_id = 756476;
             final PreparedStatement statement = connection.prepareStatement(
-                "SELECT e.cat_id, c.cat_nm" +
-                " FROM LOGBOOK.log_categories_v c" +
-                " JOIN LOGBOOK.LOG_ENTRY_CATEGORIES e ON e.cat_id = c.cat_id" +
-                " AND e.log_entry_id = ?");
+                    "SELECT e.cat_id, lb.logbook_nm, c.cat_nm" +
+                    " FROM LOGBOOK.LOG_ENTRY_CATEGORIES e" +
+                    " JOIN LOGBOOK.entry_logbook   le ON le.log_entry_id = e.log_entry_id" +
+                    " JOIN LOGBOOK.logbook_v       lb ON lb.logbook_id = le.logbook_id" +
+                    " JOIN LOGBOOK.log_categories_v c ON e.cat_id = c.cat_id" +
+                    " WHERE e.log_entry_id = ?");
         )
         {
             statement.setLong(1, entry_id);
             final ResultSet result = statement.executeQuery();
             while (result.next())
-                logbooks.add(new ELogCategory(result.getString(1), result.getString(2)));
+                logbooks.add(new ELogCategory(result.getString(1), result.getString(2), result.getString(3)));
             result.close();
         }
         finally
@@ -733,8 +757,8 @@ public class ELog implements Closeable
      */
     public void addCategory(final long entry_id, final String logbook_and_category) throws Exception
     {
-        final String category_name = getCategoryFromLogbookCategoryString(logbook_and_category);
-        final String tag_id = getTagID(category_name);
+        final String[] logbook_category_names = getCategoryFromLogbookCategoryString(logbook_and_category);
+        final String tag_id = getTagID(logbook_category_names[0], logbook_category_names[1]);
         final Connection connection = rdb.getConnection();
         try
         (
@@ -755,39 +779,61 @@ public class ELog implements Closeable
 
     /**
      * Get the category name from a string containing a category name and logbook name that are delimited by a colon.
-     * @param logbook_and_category
-     * @return category_name
+     * @param logbook_and_category "Logbook : Category"
+     * @return Array with logbook, category
      * @throws Exception if logbook name, category name, or delimiter are missing.
      */
-    public static String getCategoryFromLogbookCategoryString(final String logbook_and_category) throws Exception
+    public static String[] getCategoryFromLogbookCategoryString(final String logbook_and_category) throws Exception
     {
         final String[] tokens = logbook_and_category.split(":");
 
         if (tokens.length < 2)
-            throw new Exception("Logbook and Category string missing element or delimiter.");
+            throw new Exception("Expected 'Logbook : Category', got '" + logbook_and_category + "'");
 
         final String logbook_name  = tokens[0].trim();
         final String category_name = tokens[1].trim();
 
-        if (null == logbook_name || logbook_name.isEmpty())
-            throw new Exception("Logbook is not in logbook and category string.");
+        if (logbook_name.isEmpty())
+            throw new Exception("Empty Logbook in '" + logbook_and_category + "'");
 
-        if (null == category_name || category_name.isEmpty())
-            throw new Exception("Category is not in logbook and category string.");
+        if (category_name.isEmpty())
+            throw new Exception("Empty Category in '" + logbook_and_category + "'");
 
-        return category_name;
+        return new String[] { logbook_name, category_name };
     }
 
-    /** @param category_name Category name
+    /** @param logbook_name Logbook name
+     *  @param category_name Category name
      *  @return Category ID
      *  @throws Exception when category not known
      */
-    private String getTagID(final String category_name) throws Exception
+    private String getTagID(final String logbook_name, final String category_name) throws Exception
     {
+        // The same category name might be defined with different IDs.
+        // Check if there is an exact match of the cat.name for that logbook.
+        // Otherwise use the last one found
+
+        // System.out.println("Looking for " + logbook_name + " : " + category_name);
+
+        String id = null;
         for (ELogCategory category : categories)
-            if (category.getName().equalsIgnoreCase(category_name))
-                return category.getID();
-        throw new Exception("Unknown logbook category '" + category_name + "'");
+        {
+            if (category.getCategory().equalsIgnoreCase(category_name))
+            {
+                id = category.getID();
+                // System.out.println("Found " + id + " = " + category);
+
+                if (category.getLogbook().equalsIgnoreCase(logbook_name))
+                {
+                    // System.out.println("Perfect match!");
+                    return id;
+                }
+            }
+        }
+        if (id == null)
+            throw new Exception("Unknown logbook category '" + category_name + "'");
+        // Category name is known, albeit not for the requested logbook...
+        return id;
     }
 
     /** Close RDB connection. Must be called when done using the logbook. */

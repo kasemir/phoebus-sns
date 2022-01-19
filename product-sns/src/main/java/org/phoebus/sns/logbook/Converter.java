@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2012 Oak Ridge National Laboratory.
+ * Copyright (c) 2012-2022 Oak Ridge National Laboratory.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -42,10 +42,10 @@ public class Converter
     {
         final List<Tag> result = new ArrayList<>(categories.size());
         for (ELogCategory category : categories)
-            result.add(new SNSTag(category.getName()));
+            result.add(new SNSTag(category.toString()));
         return result;
     }
-    
+
     /** Convert/wrap attachment from ELog to Logbook API
      *  @param attachment {@link ELogAttachment}
      *  @return {@link Attachment}
