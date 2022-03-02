@@ -48,6 +48,8 @@ export MALLOC_ARENA_MAX=4
 # Memory
 export JDK_JAVA_OPTIONS="-Xms500M -Xmx2G"
 
+JDK_JAVA_OPTIONS+=" -Dfile.encoding=UTF-8 "
+
 # When using Java 14+:
 JDK_JAVA_OPTIONS+=" -XX:+ShowCodeDetailsInExceptionMessages "
 
