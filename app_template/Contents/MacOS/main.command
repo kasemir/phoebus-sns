@@ -41,4 +41,4 @@ JAR=`echo "${TOP}/p*.jar"`
 # To get one instance, use server mode
 # OPT="-server 4918"
 
-java -Xdock:icon="$BASE/Contents/Resources/cmd.icns" -Dprism.lcdtext=false -jar $JAR $OPT "$@" &
+java -Xdock:icon="$BASE/Contents/Resources/cmd.icns" -Dprism.lcdtext=false -DCA_DISABLE_REPEATER=true -jar $JAR $OPT "$@" &
