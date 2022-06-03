@@ -8,10 +8,6 @@
     <version>0.0.1-SNAPSHOT</version>
   </parent>
 
-  <properties>
-    <phoebus.version>4.6.6-SNAPSHOT</phoebus.version>
-  </properties>
-  
   <dependencies>
     <dependency>
       <groupId>junit</groupId>

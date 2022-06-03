@@ -10,7 +10,11 @@
     <maven.repo.local>${project.build.directory}/.m2</maven.repo.local>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+
+    <!-- Update when phoebus version is changed -->
+    <phoebus.version>4.6.10-SNAPSHOT</phoebus.version>
   </properties>
+
   <build>
     <plugins>
       <plugin>
