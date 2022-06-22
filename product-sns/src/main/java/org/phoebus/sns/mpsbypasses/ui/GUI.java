@@ -14,11 +14,13 @@ import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
+import java.util.prefs.Preferences;
 
 import org.phoebus.core.types.ProcessVariable;
 import org.phoebus.framework.jobs.Job;
 import org.phoebus.framework.jobs.JobManager;
 import org.phoebus.framework.persistence.Memento;
+import org.phoebus.framework.preferences.PhoebusPreferenceService;
 import org.phoebus.framework.selection.SelectionService;
 import org.phoebus.sns.mpsbypasses.MPSBypasses;
 import org.phoebus.sns.mpsbypasses.model.Bypass;
@@ -75,6 +77,11 @@ import javafx.scene.text.FontWeight;
 @SuppressWarnings("nls")
 public class GUI extends GridPane implements BypassModelListener
 {
+    // Sort settings are saved to preferences to keep them
+    // when user closes and then re-opens the MPS table.
+    // Memento is used to persist instance via restarts.
+    private Preferences prefs = PhoebusPreferenceService.userNodeForClass(GUI.class);
+
     private static final Border BORDER = new Border(new BorderStroke(Color.GRAY, BorderStrokeStyle.SOLID, new CornerRadii(5), BorderWidths.DEFAULT, new Insets(5)));
     private static final Insets BORDER_INSETS = new Insets(10);
     private static final Font BOLD = Font.font(Font.getDefault().getFamily(), FontWeight.BOLD, FontPosture.REGULAR, Font.getDefault().getSize());
@@ -128,6 +135,8 @@ public class GUI extends GridPane implements BypassModelListener
         add(createCounts(), 0, 1);
         add(new HBox(createOpState(), createLegend()), 0, 2);
         bypass_table = createTable();
+        configureSort(prefs.getInt("sort_col", -1),
+                      prefs.getBoolean("sort_up", true));
         add(bypass_table, 0, 3);
 
         createContextMenu();
@@ -340,6 +349,24 @@ public class GUI extends GridPane implements BypassModelListener
         GridPane.setHgrow(table, Priority.ALWAYS);
         GridPane.setVgrow(table, Priority.ALWAYS);
 
+        // Save sort settings to preferences
+        table.comparatorProperty().addListener(obs ->
+        {
+            int sort_col = -1;
+            boolean sort_up = true;
+            final ObservableList<TableColumn<BypassRow, ?>> cols = bypass_table.getColumns();
+            for (TableColumn<BypassRow, ?> c : bypass_table.getSortOrder())
+                for (int i=0; i<cols.size(); ++i)
+                    if (cols.get(i) == c)
+                    {
+                        sort_col = i;
+                        sort_up = c.getSortType() == SortType.ASCENDING;
+                        break;
+                    }
+            prefs.putInt("sort_col", sort_col);
+            prefs.putBoolean("sort_up", sort_up);
+        });
+
         return table;
     }
 
@@ -475,6 +502,18 @@ public class GUI extends GridPane implements BypassModelListener
         });
     }
 
+    private void configureSort(final int sort_col, final boolean sort_up)
+    {
+        if (sort_col < 0)
+            bypass_table.getSortOrder().clear();
+        else
+        {
+            final TableColumn<BypassRow, ?> col = bypass_table.getColumns().get(sort_col);
+            bypass_table.getSortOrder().setAll(List.of(col));
+            col.setSortType(sort_up ? SortType.ASCENDING : SortType.DESCENDING);
+        }
+    }
+
     public void restore(Memento memento)
     {
         final Job safe = initial_load;
@@ -485,14 +524,8 @@ public class GUI extends GridPane implements BypassModelListener
         memento.getString("request").ifPresent(req -> sel_req.setValue(RequestState.fromString(req)));
 
         // Restore optional sort
-        final int sort_col = memento.getNumber("sort_col").orElse(-1).intValue();
-        if (sort_col >= 0)
-        {
-            boolean sort_up = memento.getBoolean("sort_up").orElse(true);
-            final TableColumn<BypassRow, ?> col = bypass_table.getColumns().get(sort_col);
-            bypass_table.getSortOrder().setAll(List.of(col));
-            col.setSortType(sort_up ? SortType.ASCENDING : SortType.DESCENDING);
-        }
+        configureSort(memento.getNumber("sort_col").orElse(-1).intValue(),
+                      memento.getBoolean("sort_up").orElse(true));
 
         logger.log(Level.FINE, "Restoring from memento");
         model.setFilter(sel_state.getValue(), sel_req.getValue());
