@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2019-2021 Oak Ridge National Laboratory.
+ * Copyright (c) 2019-2022 Oak Ridge National Laboratory.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -35,6 +35,7 @@ import org.phoebus.ui.dialog.ExceptionDetailsErrorDialog;
 import org.phoebus.ui.javafx.UpdateThrottle;
 
 import javafx.application.Platform;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
@@ -47,6 +48,7 @@ import javafx.scene.control.MenuItem;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableColumn.SortType;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Tooltip;
@@ -279,6 +281,7 @@ public class GUI extends GridPane implements BypassModelListener
         col.setCellFactory(c -> new RowIndexCell());
         col.setPrefWidth(300);
         col.setMaxWidth(300);
+        col.setSortable(false);
         bypasses.getColumns().add(col);
 
         col = new TableColumn<>("Bypass");
@@ -446,6 +449,16 @@ public class GUI extends GridPane implements BypassModelListener
         memento.getString("state").ifPresent(req -> sel_state.setValue(BypassState.fromString(req)));
         memento.getString("request").ifPresent(req -> sel_req.setValue(RequestState.fromString(req)));
 
+        // Restore optional sort
+        final int sort_col = memento.getNumber("sort_col").orElse(-1).intValue();
+        if (sort_col >= 0)
+        {
+            boolean sort_up = memento.getBoolean("sort_up").orElse(true);
+            final TableColumn<BypassRow, ?> col = bypasses.getColumns().get(sort_col);
+            bypasses.getSortOrder().setAll(List.of(col));
+            col.setSortType(sort_up ? SortType.ASCENDING : SortType.DESCENDING);
+        }
+
         logger.log(Level.FINE, "Restoring from memento");
         model.setFilter(sel_state.getValue(), sel_req.getValue());
 
@@ -457,6 +470,22 @@ public class GUI extends GridPane implements BypassModelListener
         memento.setString("mode", sel_mode.getValue().name());
         memento.setString("state", sel_state.getValue().name());
         memento.setString("request", sel_req.getValue().name());
+
+        // Determine if a column is used to sort, up or down
+        int sort_col = -1;
+        boolean sort_up = true;
+        final ObservableList<TableColumn<BypassRow, ?>> sorted = bypasses.getSortOrder();
+        final ObservableList<TableColumn<BypassRow, ?>> cols = bypasses.getColumns();
+        for (TableColumn<BypassRow, ?> c : sorted)
+            for (int i=0; i<cols.size(); ++i)
+                if (cols.get(i) == c)
+                {
+                    sort_col = i;
+                    sort_up = c.getSortType() == SortType.ASCENDING;
+                    break;
+                }
+        memento.setNumber("sort_col", sort_col);
+        memento.setBoolean("sort_up", sort_up);
     }
 
     public void dispose()
