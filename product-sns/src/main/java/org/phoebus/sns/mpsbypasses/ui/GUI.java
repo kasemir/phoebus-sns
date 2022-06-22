@@ -35,6 +35,7 @@ import org.phoebus.ui.dialog.ExceptionDetailsErrorDialog;
 import org.phoebus.ui.javafx.UpdateThrottle;
 
 import javafx.application.Platform;
+import javafx.beans.Observable;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.SortedList;
@@ -98,7 +99,15 @@ public class GUI extends GridPane implements BypassModelListener
     private final TextField machine_switch = new TextField();
 
     /** Actual data, see createTable() for sorted list wrapper etc. */
-    private final ObservableList<BypassRow> bypasses = FXCollections.observableArrayList(); // TODO Extractor...
+    private final ObservableList<BypassRow> bypasses = FXCollections.observableArrayList(
+            // ObservableList calls this 'extractor' to know which properties to monitor for changes
+            // Bypass and request don't change at runtime, they'll be re-loaded
+            // as part of a complete 'bypasses' update.
+            // But state can change whenever the PV sends a new value
+            row -> new Observable[]
+            {
+                row.state
+            });
     /** Table that shows 'bypasses' */
     private final TableView<BypassRow> bypass_table;
     /** Map from bypass in model to GUI row */
@@ -288,8 +297,8 @@ public class GUI extends GridPane implements BypassModelListener
         // when elements are added/removed in the original data.
         // https://stackoverflow.com/questions/34889111/how-to-sort-a-tableview-programmatically
         //
-        // Adding a callback to the observableArrayList 'bypasses' instructs the list to also
-        // trigger a re-sort when properties of the existing rows change.
+        // The 'extractor' of the 'bypasses' instructs the list to also
+        // trigger a re-sort when properties of existing rows change.
         // https://rterp.wordpress.com/2015/05/08/automatically-sort-a-javafx-tableview/
         final SortedList<BypassRow> sorted = new SortedList<>(bypasses);
         final TableView<BypassRow> table = new TableView<>(sorted);
