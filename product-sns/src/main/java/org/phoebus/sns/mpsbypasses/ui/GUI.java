@@ -35,7 +35,9 @@ import org.phoebus.ui.dialog.ExceptionDetailsErrorDialog;
 import org.phoebus.ui.javafx.UpdateThrottle;
 
 import javafx.application.Platform;
+import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.collections.transformation.SortedList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
@@ -95,7 +97,11 @@ public class GUI extends GridPane implements BypassModelListener
     private final TextField machine_rtdl = new TextField();
     private final TextField machine_switch = new TextField();
 
-    private final TableView<BypassRow> bypasses = new TableView<>();
+    /** Actual data, see createTable() for sorted list wrapper etc. */
+    private final ObservableList<BypassRow> bypasses = FXCollections.observableArrayList(); // TODO Extractor...
+    /** Table that shows 'bypasses' */
+    private final TableView<BypassRow> bypass_table;
+    /** Map from bypass in model to GUI row */
     private final ConcurrentHashMap<Bypass, BypassRow> model2gui = new ConcurrentHashMap<>();
 
     private final BeamModeMonitor beam_monitor;
@@ -112,7 +118,8 @@ public class GUI extends GridPane implements BypassModelListener
         add(createSelector(), 0, 0);
         add(createCounts(), 0, 1);
         add(new HBox(createOpState(), createLegend()), 0, 2);
-        add(createTable(), 0, 3);
+        bypass_table = createTable();
+        add(bypass_table, 0, 3);
 
         createContextMenu();
 
@@ -270,11 +277,30 @@ public class GUI extends GridPane implements BypassModelListener
         return grid;
     }
 
-    private Node createTable()
+    private TableView<BypassRow> createTable()
     {
-        bypasses.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
-        bypasses.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
-        bypasses.setPlaceholder(new Label("No Bypasses"));
+        // Sorting:
+        //
+        // TableView supports sorting as a default when user clicks on columns,
+        // but order is lost when data is added/removed.
+        //
+        // Wrapping the raw data into a SortedList persists the sort order
+        // when elements are added/removed in the original data.
+        // https://stackoverflow.com/questions/34889111/how-to-sort-a-tableview-programmatically
+        //
+        // Adding a callback to the observableArrayList 'bypasses' instructs the list to also
+        // trigger a re-sort when properties of the existing rows change.
+        // https://rterp.wordpress.com/2015/05/08/automatically-sort-a-javafx-tableview/
+        final SortedList<BypassRow> sorted = new SortedList<>(bypasses);
+        final TableView<BypassRow> table = new TableView<>(sorted);
+
+        // Ensure that the sorted rows are always updated as the column sorting
+        // of the TableView is changed by the user clicking on table headers.
+        sorted.comparatorProperty().bind(table.comparatorProperty());
+
+        table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+        table.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+        table.setPlaceholder(new Label("No Bypasses"));
 
         TableColumn<BypassRow, String> col = new TableColumn<>("#");
         col.setCellValueFactory(cell -> cell.getValue().name);
@@ -282,57 +308,57 @@ public class GUI extends GridPane implements BypassModelListener
         col.setPrefWidth(300);
         col.setMaxWidth(300);
         col.setSortable(false);
-        bypasses.getColumns().add(col);
+        table.getColumns().add(col);
 
         col = new TableColumn<>("Bypass");
         col.setCellValueFactory(cell -> cell.getValue().name);
-        bypasses.getColumns().add(col);
+        table.getColumns().add(col);
 
         col = new TableColumn<>("State");
         col.setCellValueFactory(cell -> cell.getValue().state);
         col.setCellFactory(c -> new StateCell());
-        bypasses.getColumns().add(col);
+        table.getColumns().add(col);
 
         col = new TableColumn<>("Requestor");
         col.setCellValueFactory(cell -> cell.getValue().requestor);
-        bypasses.getColumns().add(col);
+        table.getColumns().add(col);
 
         col = new TableColumn<>("Request Date");
         col.setCellValueFactory(cell -> cell.getValue().date);
-        bypasses.getColumns().add(col);
+        table.getColumns().add(col);
 
-        bypasses.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
-        GridPane.setHgrow(bypasses, Priority.ALWAYS);
-        GridPane.setVgrow(bypasses, Priority.ALWAYS);
+        table.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
+        GridPane.setHgrow(table, Priority.ALWAYS);
+        GridPane.setVgrow(table, Priority.ALWAYS);
 
-        return bypasses;
+        return table;
     }
 
     private void createContextMenu()
     {
-        final MenuItem info = new ShowInfo(bypasses);
+        final MenuItem info = new ShowInfo(bypass_table);
         final MenuItem enter_request = new OpenWeb("Enter Bypass Request", MPSBypasses.url_enter_bypass);
         final MenuItem display_request = new OpenWeb("Bypass Display", MPSBypasses.url_view_bypass);
 
         final ContextMenu menu = new ContextMenu(info, enter_request, display_request);
-        bypasses.setOnContextMenuRequested(event ->
+        bypass_table.setOnContextMenuRequested(event ->
         {
             menu.getItems().setAll(info, enter_request, display_request);
             // Publish PVs of selected rows
             final List<ProcessVariable> pvs = new ArrayList<>();
-            for (BypassRow row : bypasses.getSelectionModel().getSelectedItems())
+            for (BypassRow row : bypass_table.getSelectionModel().getSelectedItems())
             {
                 pvs.add(new ProcessVariable(row.bypass.getJumperPVName()));
                 pvs.add(new ProcessVariable(row.bypass.getMaskPVName()));
             }
-            SelectionService.getInstance().setSelection(bypasses, pvs);
+            SelectionService.getInstance().setSelection(bypass_table, pvs);
 
             // Add PV entries
-            if (ContextMenuHelper.addSupportedEntries(bypasses, menu))
+            if (ContextMenuHelper.addSupportedEntries(bypass_table, menu))
                 menu.getItems().add(3, new SeparatorMenuItem());
 
 
-            menu.show(bypasses.getScene().getWindow(), event.getScreenX(), event.getScreenY());
+            menu.show(bypass_table.getScene().getWindow(), event.getScreenX(), event.getScreenY());
         });
     }
 
@@ -434,7 +460,7 @@ public class GUI extends GridPane implements BypassModelListener
 
         Platform.runLater(() ->
         {
-            bypasses.getItems().setAll(rows);
+            bypasses.setAll(rows);
             displayCount(cnt_total, model.getTotal());
             displayCounts();
         });
@@ -454,8 +480,8 @@ public class GUI extends GridPane implements BypassModelListener
         if (sort_col >= 0)
         {
             boolean sort_up = memento.getBoolean("sort_up").orElse(true);
-            final TableColumn<BypassRow, ?> col = bypasses.getColumns().get(sort_col);
-            bypasses.getSortOrder().setAll(List.of(col));
+            final TableColumn<BypassRow, ?> col = bypass_table.getColumns().get(sort_col);
+            bypass_table.getSortOrder().setAll(List.of(col));
             col.setSortType(sort_up ? SortType.ASCENDING : SortType.DESCENDING);
         }
 
@@ -474,8 +500,8 @@ public class GUI extends GridPane implements BypassModelListener
         // Determine if a column is used to sort, up or down
         int sort_col = -1;
         boolean sort_up = true;
-        final ObservableList<TableColumn<BypassRow, ?>> sorted = bypasses.getSortOrder();
-        final ObservableList<TableColumn<BypassRow, ?>> cols = bypasses.getColumns();
+        final ObservableList<TableColumn<BypassRow, ?>> sorted = bypass_table.getSortOrder();
+        final ObservableList<TableColumn<BypassRow, ?>> cols = bypass_table.getColumns();
         for (TableColumn<BypassRow, ?> c : sorted)
             for (int i=0; i<cols.size(); ++i)
                 if (cols.get(i) == c)
