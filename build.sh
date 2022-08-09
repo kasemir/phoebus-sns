@@ -1,8 +1,13 @@
-# Get sources
-git clone https://github.com/ControlSystemStudio/phoebus.git
-git clone https://github.com/kasemir/phoebus-sns.git
-
-cd phoebus
+if [ -d product-sns ]
+then
+    echo "Invoked in phoebus-sns"
+    cd ../phoebus
+else
+    echo "Fetching sources"
+    git clone https://github.com/ControlSystemStudio/phoebus.git
+    git clone https://github.com/kasemir/phoebus-sns.git
+    cd phoebus
+fi
 
 if [ "x$WORKSPACE" = "x" ]
 then
@@ -55,6 +60,9 @@ git checkout -- core/ui/src/main/resources/org/phoebus/ui/application/messages.p
 sed -i "s/\${version}/$VERSION/" core/ui/src/main/resources/org/phoebus/ui/application/messages.properties
 git diff core/ui/src/main/resources/org/phoebus/ui/application/messages.properties
 
+# TODO Re-enable alarm-logger, https://github.com/ControlSystemStudio/phoebus/pull/2332
+sed -i 's/<ant target="service-alarm-logger" dir="services\/alarm-logger"\/>//' build.xml
+sed -i 's/<ant target="dist" dir="services\/alarm-logger"\/>//' build.xml
 
 cd ../phoebus-sns
 
@@ -67,7 +75,9 @@ git checkout -- product-sns/settings.ini
 sh ../phoebus/app/update/mk_update_settings.sh $URL >> product-sns/settings.ini
 git diff product-sns/settings.ini
 
-# Windows ---------------------------------------
+echo "============================================="
+echo " Windows ------------------------------------"
+echo "============================================="
 
 # Get deps for windows
 ( cd ../phoebus/dependencies; mvn -Djavafx.platform=win clean install )
@@ -93,7 +103,10 @@ then
 fi
 
 
-# Mac  ---------------------------------------
+echo "============================================="
+echo " Mac  ---------------------------------------"
+echo "============================================="
+
 ( cd ../phoebus/dependencies; mvn -Djavafx.platform=mac clean install )
 rm -f ../phoebus/dependencies/phoebus-target/target/lib/*log4j*
 # Zip phoebus-target
@@ -110,7 +123,10 @@ ant clean dist
   sh make_app.sh product-sns/target/product-sns-*-mac.zip )
 
 
-# Linux  ---------------------------------------
+echo "============================================="
+echo " Linux  -------------------------------------"
+echo "============================================="
+
 # Build the SNS product with maven to test one complete maven build
 mvn -DskipTests -Djavafx.platform=linux clean install
 rm -f ../phoebus/dependencies/phoebus-target/target/lib/*log4j*
@@ -147,7 +163,7 @@ zip -d product-sns-[0-9].[0-9].[0-9]*-mac.zip '*app-trends-rich-adapters*'
 echo Show command line options
 ( cd ../phoebus/phoebus-product; ./phoebus.sh -help )
 ( cd ../phoebus/services/alarm-server; ./alarm-server.sh -help )
-( cd ../phoebus/services/alarm-logger; ./alarm-logger.sh -help )
+# TODO Re-include ( cd ../phoebus/services/alarm-logger; ./alarm-logger.sh -help )
 ( cd ../phoebus/services/scan-server; ./scan-server.sh -help )
 ( cd ../phoebus/services/archive-engine; sh archive-engine.sh -help )
 
@@ -161,7 +177,7 @@ mv product-sns-[0-9].[0-9].[0-9]*-win.zip                         product-sns-wi
 mv product-sns-[0-9].[0-9].[0-9]*-mac.zip                         product-sns-mac.zip
 mv ../phoebus/services/scan-server/target/scan-server-*.zip       scan-server.zip
 mv ../phoebus/services/alarm-server/target/alarm-server-*.zip     alarm-server.zip
-mv ../phoebus/services/alarm-logger/target/alarm-logger-*.zip     alarm-logger.zip
+# TODO Re-include mv ../phoebus/services/alarm-logger/target/alarm-logger-*.zip     alarm-logger.zip
 mv ../phoebus/services/archive-engine/target/archive-engine-*.zip archive-engine.zip
 
 
