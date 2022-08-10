@@ -60,9 +60,9 @@ git checkout -- core/ui/src/main/resources/org/phoebus/ui/application/messages.p
 sed -i "s/\${version}/$VERSION/" core/ui/src/main/resources/org/phoebus/ui/application/messages.properties
 git diff core/ui/src/main/resources/org/phoebus/ui/application/messages.properties
 
-# TODO Re-enable alarm-logger, https://github.com/ControlSystemStudio/phoebus/pull/2332
-sed -i 's/<ant target="service-alarm-logger" dir="services\/alarm-logger"\/>//' build.xml
-sed -i 's/<ant target="dist" dir="services\/alarm-logger"\/>//' build.xml
+# Example for removing a build target
+#sed -i 's/<ant target="service-alarm-logger" dir="services\/alarm-logger"\/>//'  build.xml
+#sed -i 's/<ant target="dist" dir="services\/alarm-logger"\/>//'                  build.xml
 
 cd ../phoebus-sns
 
@@ -163,7 +163,7 @@ zip -d product-sns-[0-9].[0-9].[0-9]*-mac.zip '*app-trends-rich-adapters*'
 echo Show command line options
 ( cd ../phoebus/phoebus-product; ./phoebus.sh -help )
 ( cd ../phoebus/services/alarm-server; ./alarm-server.sh -help )
-# TODO Re-include ( cd ../phoebus/services/alarm-logger; ./alarm-logger.sh -help )
+( cd ../phoebus/services/alarm-logger; ./alarm-logger.sh -help )
 ( cd ../phoebus/services/scan-server; ./scan-server.sh -help )
 ( cd ../phoebus/services/archive-engine; sh archive-engine.sh -help )
 
@@ -177,7 +177,7 @@ mv product-sns-[0-9].[0-9].[0-9]*-win.zip                         product-sns-wi
 mv product-sns-[0-9].[0-9].[0-9]*-mac.zip                         product-sns-mac.zip
 mv ../phoebus/services/scan-server/target/scan-server-*.zip       scan-server.zip
 mv ../phoebus/services/alarm-server/target/alarm-server-*.zip     alarm-server.zip
-# TODO Re-include mv ../phoebus/services/alarm-logger/target/alarm-logger-*.zip     alarm-logger.zip
+mv ../phoebus/services/alarm-logger/target/alarm-logger-*.zip     alarm-logger.zip
 mv ../phoebus/services/archive-engine/target/archive-engine-*.zip archive-engine.zip
 
 
