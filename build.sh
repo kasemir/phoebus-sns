@@ -17,7 +17,7 @@ then
     ANT_HOME=$HOME/Eclipse/apache-ant
     JAVA_HOME=$HOME/Eclipse/jdk
 else
-    echo "Jenkins"
+    echo "Running under Jenkins"
     B=`echo $GIT_BRANCH | sed 's/.*\///'`
     M2_HOME=/opt/apache-maven
     ANT_HOME=/opt/apache-ant
@@ -55,7 +55,7 @@ URL='https://controlssoftware.sns.ornl.gov/css_phoebus/nightly/phoebus-$(arch).z
 sh app/update/mk_update_settings.sh $URL > phoebus-product/settings.ini
 
 
-# Set 'version'
+echo "## Setting 'version'"
 git checkout -- core/ui/src/main/resources/org/phoebus/ui/application/messages.properties
 sed -i "s/\${version}/$VERSION/" core/ui/src/main/resources/org/phoebus/ui/application/messages.properties
 git diff core/ui/src/main/resources/org/phoebus/ui/application/messages.properties
@@ -69,7 +69,7 @@ cd ../phoebus-sns
 # Cleanup
 rm -f *.zip
 
-# Update
+echo "## Setting Update URL"
 URL='https://controlssoftware.sns.ornl.gov/css_phoebus/nightly/product-sns-$(arch).zip'
 git checkout -- product-sns/settings.ini
 sh ../phoebus/app/update/mk_update_settings.sh $URL >> product-sns/settings.ini
@@ -99,7 +99,7 @@ zip -d $PROD-win.zip $PROD/phoebus.sh
 if [ -d /opt/jdks/windows ]
 then
     WS=`pwd`
-    ( cd /opt/jdks/windows; zip -r $WS/product-sns-*-win.zip jdk )
+    ( cd /opt/jdks/windows; zip -q -r $WS/product-sns-*-win.zip jdk )
 fi
 
 
@@ -149,7 +149,7 @@ mv product-sns/target/product-sns-*-linux.zip .
 if [ -d /opt/jdks/linux ]
 then
     WS=`pwd`
-    ( cd /opt/jdks/linux; zip -r $WS/product-sns-*-linux.zip jdk )
+    ( cd /opt/jdks/linux; zip -q -r $WS/product-sns-*-linux.zip jdk )
 fi
 
 # Delete stuff we don't need
@@ -181,3 +181,8 @@ mv ../phoebus/services/alarm-server/target/alarm-server-*.zip     alarm-server.z
 mv ../phoebus/services/archive-engine/target/archive-engine-*.zip archive-engine.zip
 
 
+echo "============================================="
+echo " Build Results ------------------------------"
+echo "============================================="
+
+ls *.zip
