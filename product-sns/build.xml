@@ -37,6 +37,10 @@
       </fileset>
     </copy>
 
+  	<!-- Create settings_template.ini -->
+  	<exec executable="python3" failonerror="true">
+  	    <arg line="../../phoebus/phoebus-product/create_settings_template.py -c -v ${build}/lib" />
+  	</exec>
     <!-- Create classpath for lib/*jar -->
     <manifestclasspath property="manifest-classpath"
                        jarfile="${build}/product-sns-${version}.jar">
@@ -66,6 +70,7 @@
     <zip destfile="${build}/product-sns-${version}-${jfxarch}.zip">
       <zipfileset dir="${build}" includes="**/*.jar" prefix="product-sns-${version}"/>
       <zipfileset dir="." includes="settings.ini" fullpath="product-sns-${version}/settings.ini"/>
+      <zipfileset dir="." includes="settings_template.ini" fullpath="product-sns-${version}/settings_template.ini"/>
       <zipfileset dir="." includes="phoebus.sh" fullpath="product-sns-${version}/phoebus.sh" filemode="755"/>
       <zipfileset dir="." includes="phoebus.bat" fullpath="product-sns-${version}/phoebus.bat"/>
       <zipfileset dir="." includes="site_splash.png" fullpath="product-sns-${version}/site_splash.png"/>
