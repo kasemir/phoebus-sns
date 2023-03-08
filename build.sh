@@ -144,7 +144,8 @@ ant clean dist
 java -jar product-sns/target/product-sns-*.jar -help
 
 # Create 'all widgets' file
-(cd ../phoebus/app/display/model; ant all_widgets; mv /tmp/all_widgets.bob .)
+(cd ../phoebus/app/display/model; ant all_widgets)
+mv /tmp/all_widgets.bob .
 
 mv ../phoebus/phoebus-product/target/phoebus-*-linux.zip .
 mv product-sns/target/product-sns-*-linux.zip .
