@@ -12,8 +12,10 @@ fi
 if [ "x$WORKSPACE" = "x" ]
 then
     echo "Plain Linux setup"
+    B=`git rev-parse --abbrev-ref HEAD`
 else
     echo "Running under Jenkins"
+    B=`echo $GIT_BRANCH | sed 's/.*\///'`
     M2_HOME=/opt/apache-maven
     ANT_HOME=/opt/apache-ant
     JAVA_HOME=/opt/jdk11
@@ -27,7 +29,6 @@ echo "ORACLE_JDBC_JAR=$ORACLE_JDBC_JAR"
 
 export PATH="$M2_HOME/bin:$ANT_HOME/bin:$JAVA_HOME/bin:$PATH"
 
-B=`git rev-parse --abbrev-ref HEAD`
 D=`date +'%Y-%m-%d %H:%M'`
 VERSION="$B $D"
 
@@ -40,7 +41,7 @@ then
     mkdir -p dependencies/install-jars/lib/ojdbc
     cp $ORACLE_JDBC_JAR dependencies/install-jars/lib/ojdbc
 else
-    echo "MISSING ORACLE_JDBC_JAR!"
+    echo "MISSING ORACLE_JDBC_JAR"
 fi
 
 java -version
