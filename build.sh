@@ -12,21 +12,22 @@ fi
 if [ "x$WORKSPACE" = "x" ]
 then
     echo "Plain Linux setup"
-    B=`git branch | sed 's/[*] //'`
-    M2_HOME=$HOME/Eclipse/apache-maven
-    ANT_HOME=$HOME/Eclipse/apache-ant
-    JAVA_HOME=$HOME/Eclipse/jdk
 else
     echo "Running under Jenkins"
-    B=`echo $GIT_BRANCH | sed 's/.*\///'`
     M2_HOME=/opt/apache-maven
     ANT_HOME=/opt/apache-ant
     JAVA_HOME=/opt/jdk11
+    export ORACLE_JDBC_JAR=/opt/Oracle/ojdbc8-12.2.0.1.jar
 fi
 
-export ORACLE_JDBC_JAR=/opt/Oracle/ojdbc8-12.2.0.1.jar
+echo "M2_HOME=$M2_HOME"
+echo "ANT_HOME=$ANT_HOME"
+echo "JAVA_HOME=$JAVA_HOME"
+echo "ORACLE_JDBC_JAR=$ORACLE_JDBC_JAR"
+
 export PATH="$M2_HOME/bin:$ANT_HOME/bin:$JAVA_HOME/bin:$PATH"
 
+B=`git rev-parse --abbrev-ref HEAD`
 D=`date +'%Y-%m-%d %H:%M'`
 VERSION="$B $D"
 
@@ -34,8 +35,13 @@ echo "============================================="
 echo "VERSION: $VERSION"
 echo "============================================="
 
-mkdir -p dependencies/install-jars/lib/ojdbc
-cp $ORACLE_JDBC_JAR dependencies/install-jars/lib/ojdbc
+if [ -r "$ORACLE_JDBC_JAR" ]
+then
+    mkdir -p dependencies/install-jars/lib/ojdbc
+    cp $ORACLE_JDBC_JAR dependencies/install-jars/lib/ojdbc
+else
+    echo "MISSING ORACLE_JDBC_JAR!"
+fi
 
 java -version
 mvn -version
@@ -104,7 +110,7 @@ fi
 
 
 echo "============================================="
-echo " Mac  ---------------------------------------"
+echo " Mac  (Intel) -------------------------------"
 echo "============================================="
 
 ( cd ../phoebus/dependencies; mvn -Djavafx.platform=mac clean install )
@@ -121,6 +127,26 @@ ant clean dist
   sh make_app.sh ../phoebus/phoebus-product/target/phoebus-*-mac.zip )
 ( export JAVA_HOME=/opt/jdks/mac/jdk/Contents/Home;
   sh make_app.sh product-sns/target/product-sns-*-mac.zip )
+
+
+echo "============================================="
+echo " Mac-aarch64 (Apple M2) ---------------------"
+echo "============================================="
+
+( cd ../phoebus/dependencies; mvn -Djavafx.platform=mac-aarch64 clean install )
+rm -f ../phoebus/dependencies/phoebus-target/target/lib/*log4j*
+# Zip phoebus-target
+rm -f phoebus-target-mac-aarch64.zip
+zip -qr phoebus-target-mac-aarch64.zip ../phoebus/dependencies/phoebus-target/target/lib/
+
+# Build Mac products
+ant clean dist
+
+# Bundle as Mac app (plain as well as SNS product)
+( export JAVA_HOME=/opt/jdks/mac-aarch64/jdk/Contents/Home;
+  sh make_app.sh ../phoebus/phoebus-product/target/phoebus-*-mac-aarch64.zip )
+( export JAVA_HOME=/opt/jdks/mac-aarch64/jdk/Contents/Home;
+  sh make_app.sh product-sns/target/product-sns-*-mac-aarch64.zip )
 
 
 echo "============================================="
