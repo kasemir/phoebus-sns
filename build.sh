@@ -187,9 +187,11 @@ fi
 zip -d phoebus-[0-9].[0-9].[0-9]*-linux.zip '*app-trends-rich-adapters*'
 zip -d phoebus-[0-9].[0-9].[0-9]*-win.zip '*app-trends-rich-adapters*'
 zip -d phoebus-[0-9].[0-9].[0-9]*-mac.zip '*app-trends-rich-adapters*'
+zip -d phoebus-[0-9].[0-9].[0-9]*-mac-aarch64.zip '*app-trends-rich-adapters*'
 zip -d product-sns-[0-9].[0-9].[0-9]*-linux.zip '*app-trends-rich-adapters*'
 zip -d product-sns-[0-9].[0-9].[0-9]*-win.zip '*app-trends-rich-adapters*'
 zip -d product-sns-[0-9].[0-9].[0-9]*-mac.zip '*app-trends-rich-adapters*'
+zip -d product-sns-[0-9].[0-9].[0-9]*-mac-aarch64.zip '*app-trends-rich-adapters*'
 
 echo Show command line options
 ( cd ../phoebus/phoebus-product; ./phoebus.sh -help )
@@ -203,9 +205,11 @@ echo Show command line options
 mv phoebus-[0-9].[0-9].[0-9]*-linux.zip                           phoebus-linux.zip
 mv phoebus-[0-9].[0-9].[0-9]*-win.zip                             phoebus-win.zip
 mv phoebus-[0-9].[0-9].[0-9]*-mac.zip                             phoebus-mac.zip
+mv phoebus-[0-9].[0-9].[0-9]*-mac-aarch64.zip                     phoebus-mac-aarch64.zip
 mv product-sns-[0-9].[0-9].[0-9]*-linux.zip                       product-sns-linux.zip
 mv product-sns-[0-9].[0-9].[0-9]*-win.zip                         product-sns-win.zip
 mv product-sns-[0-9].[0-9].[0-9]*-mac.zip                         product-sns-mac.zip
+mv product-sns-[0-9].[0-9].[0-9]*-mac-aarch64.zip                 product-sns-mac-aarch64.zip
 mv ../phoebus/services/scan-server/target/scan-server-*.zip       scan-server.zip
 mv ../phoebus/services/alarm-server/target/alarm-server-*.zip     alarm-server.zip
 mv ../phoebus/services/alarm-logger/target/alarm-logger-*.zip     alarm-logger.zip
