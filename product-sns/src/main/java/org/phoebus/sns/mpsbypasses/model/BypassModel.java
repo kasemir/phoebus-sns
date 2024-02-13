@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2019 Oak Ridge National Laboratory.
+ * Copyright (c) 2019-2024 Oak Ridge National Laboratory.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -11,6 +11,8 @@ import static org.phoebus.sns.mpsbypasses.MPSBypasses.logger;
 
 import java.sql.CallableStatement;
 import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.Struct;
 import java.sql.Types;
 import java.util.ArrayList;
@@ -295,7 +297,81 @@ public class BypassModel implements BypassListener
 		return request_filter;
 	}
 
-	/** Read bypass info from RDB
+   /** Read bypass info from RDB using MPS tables
+    *
+    *  @param monitor Progress monitor
+    *  @param connection RDB connection
+    *  @param mode {@link MachineMode}
+    *  @return {@link Bypass} array
+    *  @throws Exception on error
+    */
+   private Bypass[] readBypassInfo(final JobMonitor monitor, final Connection connection, final MachineMode mode) throws Exception
+   {
+       monitor.beginTask("Read bypass requests");
+       final RequestLookup requestors = new RequestLookup(monitor, connection);
+
+       monitor.beginTask("Fetching bypass details from RDB...");
+       final List<Bypass> bypasses = new ArrayList<>();
+
+       try (PreparedStatement statement = connection.prepareStatement(
+               "SELECT m.MPS_DVC_ID, m.DVC_ID, m.CHANNEL_NBR, c.MPS_CHAIN_ID, c.FPAR_FPL_CONFIG " +
+               "FROM EPICS.machine_mode m " +
+               "JOIN EPICS.mps_sgnl_param c ON m.DVC_ID = c.DVC_ID " +
+               "WHERE m.chan_in_use_ind = 'Y'"  +
+               " AND m.MPS_DVC_ID IS NOT NULL " +
+               "ORDER BY m.MPS_DVC_ID"))
+       {
+           try (ResultSet result = statement.executeQuery())
+           {
+               int i = 0;
+
+               while (result.next())
+               {
+                   if (i % 100 == 0)
+                       monitor.beginTask("Read details for " + i + " bypasses");
+
+                   final String device_id = result.getString(1);
+                   final int port = result.getInt(3);
+                   final String chain = result.getString(4);
+                   final String ar_l_config = result.getString(5);
+                   final boolean latch;
+                   if (ar_l_config.equalsIgnoreCase("16FPAR"))
+                       latch = false;
+                   else if (ar_l_config.equalsIgnoreCase("16L"))
+                       latch = true;
+                   else if (ar_l_config.equalsIgnoreCase("8L8AR"))
+                       latch = port >= 8;
+                   else
+                       throw new Exception("Unknown FPAR_FPL_CONFIG '" + ar_l_config + "' for '" + device_id + "'");
+
+                   // Get request info
+                   final Request request = requestors.getRequestor(device_id);
+
+                   // For a signal ID 'Ring_Vac:SGV_AB:FPL_Ring_mm',
+                   // the base name of the bypass PVs is
+                   // 'Ring_Vac:SGV_AB:FPL_Ring',
+                   // resulting in Bypass PVs
+                   // 'Ring_Vac:SGV_AB:FPL_Ring_sw_jump_status' and
+                   // 'Ring_Vac:SGV_AB:FPL_Ring_swmask'
+                   final String pv_basename = device_id +
+                                              (latch ? ":FPL_" : ":FPAR_") +
+                                              chain;
+                   final Bypass bypass = new Bypass(pv_basename, request, this);
+                   bypasses.add(bypass);
+
+                   ++i;
+               }
+           }
+       }
+
+       return bypasses.toArray(new Bypass[bypasses.size()]);
+   }
+
+
+	/** Read bypass info from RDB using stored procedure
+	 *
+	 *  Stored procedure looks for "*_mm" records in EPICS.sgnl_rec
+	 *  It thus relies on the "crawler" to parse the records from MPS IOCs.
 	 *
 	 *  @param monitor Progress monitor
 	 *  @param connection RDB connection
@@ -303,7 +379,7 @@ public class BypassModel implements BypassListener
 	 *  @return {@link Bypass} array
 	 *  @throws Exception on error
 	 */
-	private Bypass[] readBypassInfo(final JobMonitor monitor, final Connection connection, final MachineMode mode) throws Exception
+	private Bypass[] readBypassInfoOld(final JobMonitor monitor, final Connection connection, final MachineMode mode) throws Exception
     {
 		monitor.beginTask("Read bypass requests");
 		final RequestLookup requestors = new RequestLookup(monitor, connection);

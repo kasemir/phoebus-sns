@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2019-2022 Oak Ridge National Laboratory.
+ * Copyright (c) 2019-2024 Oak Ridge National Laboratory.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -173,7 +173,9 @@ public class GUI extends GridPane implements BypassModelListener
         reload.setTooltip(new Tooltip("Re-load bypass information from Relational Database"));
 
         final HBox row = new HBox(5,
-                new Label("Machine Mode:"), sel_mode,
+                // "Mode", which really was the MPS "Chain" is no longer used.
+                // Always displaying "all chains"
+                // new Label("Machine Mode:"), sel_mode,
                 new Label("State:"),        sel_state,
                 new Label("Requested:"),    sel_req,
                 reload
