@@ -344,6 +344,12 @@ public class BypassModel implements BypassListener
                    else
                        throw new Exception("Unknown FPAR_FPL_CONFIG '" + ar_l_config + "' for '" + device_id + "'");
 
+                   if (device_id.contains("_MPS:FPL_")  ||  device_id.contains("_MPS:FPAR_"))
+                   {
+                       logger.log(Level.WARNING, "Skipping legacy interlink " + device_id);
+                       continue;
+                   }
+
                    // Get request info
                    final Request request = requestors.getRequestor(device_id);
 
