@@ -34,6 +34,7 @@ import org.phoebus.sns.mpsbypasses.modes.MachineMode;
 import org.phoebus.sns.mpsbypasses.modes.MachineModeMonitor;
 import org.phoebus.ui.application.ContextMenuHelper;
 import org.phoebus.ui.dialog.ExceptionDetailsErrorDialog;
+import org.phoebus.ui.focus.FocusUtility;
 import org.phoebus.ui.javafx.UpdateThrottle;
 
 import javafx.application.Platform;
@@ -392,7 +393,7 @@ public class GUI extends GridPane implements BypassModelListener
             SelectionService.getInstance().setSelection(bypass_table, pvs);
 
             // Add PV entries
-            if (ContextMenuHelper.addSupportedEntries(bypass_table, menu))
+            if (ContextMenuHelper.addSupportedEntries(FocusUtility.setFocusOn(bypass_table), menu))
                 menu.getItems().add(3, new SeparatorMenuItem());
 
 
