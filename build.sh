@@ -18,7 +18,7 @@ else
     B=`echo $GIT_BRANCH | sed 's/.*\///'`
     M2_HOME=/opt/apache-maven
     ANT_HOME=/opt/apache-ant
-    JAVA_HOME=/opt/jdk11
+    JAVA_HOME=/opt/jdk-17
     export ORACLE_JDBC_JAR=/opt/Oracle/ojdbc8-12.2.0.1.jar
 fi
 
