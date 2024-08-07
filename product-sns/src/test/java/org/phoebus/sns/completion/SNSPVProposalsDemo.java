@@ -1,11 +1,11 @@
 package org.phoebus.sns.completion;
 
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.junit.Assert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.phoebus.framework.autocomplete.PVProposalService;
 import org.phoebus.framework.autocomplete.ProposalService.Handler;
 
@@ -31,11 +31,11 @@ public class SNSPVProposalsDemo
         got_SNS_response.set(false);
         PVProposalService.INSTANCE.lookup("", response_handler);
         PVProposalService.INSTANCE.waitForCompletion();
-        assertThat(got_SNS_response.get(), equalTo(false));
+        assertFalse(got_SNS_response.get());
 
         got_SNS_response.set(false);
         PVProposalService.INSTANCE.lookup("DTL_LLRF", response_handler);
         PVProposalService.INSTANCE.waitForCompletion();
-        assertThat(got_SNS_response.get(), equalTo(true));
+        assertTrue(got_SNS_response.get());
     }
 }

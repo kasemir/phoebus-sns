@@ -1,10 +1,10 @@
 package org.phoebus.sns.mpsbypasses;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.phoebus.framework.jobs.BasicJobMonitor;
 import org.phoebus.sns.mpsbypasses.model.Bypass;
 import org.phoebus.sns.mpsbypasses.model.BypassModel;

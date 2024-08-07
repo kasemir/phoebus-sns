@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2017-2018 Oak Ridge National Laboratory.
+ * Copyright (c) 2017-2024 Oak Ridge National Laboratory.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,8 +7,7 @@
  ******************************************************************************/
 package org.phoebus.archive.reader.rdb;
 
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.junit.Assert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -16,8 +15,8 @@ import java.util.Collection;
 import java.util.prefs.Preferences;
 
 import org.epics.vtype.VType;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.phoebus.archive.reader.ArchiveReader;
 import org.phoebus.archive.reader.ArchiveReaders;
 import org.phoebus.archive.reader.ValueIterator;
@@ -25,7 +24,7 @@ import org.phoebus.archive.reader.ValueIterator;
 @SuppressWarnings("nls")
 public class RDBArchiveReaderDemo
 {
-    @Before
+    @BeforeEach
     public void setup()
     {
         final Preferences prefs = Preferences.userNodeForPackage(RDBArchiveReader.class);
@@ -43,7 +42,7 @@ public class RDBArchiveReaderDemo
 
         Collection<String> names = reader.getNamesByPattern("");
         System.out.println(names);
-        assertThat(names.size(), equalTo(0));
+        assertEquals(0, names.size());
 
         names = reader.getNamesByPattern("BL7:Mot:*X");
         System.out.println(names);

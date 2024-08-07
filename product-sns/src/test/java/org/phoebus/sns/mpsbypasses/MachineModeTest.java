@@ -1,11 +1,11 @@
 package org.phoebus.sns.mpsbypasses;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.phoebus.sns.mpsbypasses.modes.MachineMode;
 import org.phoebus.sns.mpsbypasses.modes.MachineModeListener;
 import org.phoebus.sns.mpsbypasses.modes.MachineModeMonitor;

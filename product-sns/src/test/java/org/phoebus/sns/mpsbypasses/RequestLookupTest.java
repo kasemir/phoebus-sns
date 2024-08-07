@@ -1,6 +1,6 @@
 package org.phoebus.sns.mpsbypasses;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.phoebus.framework.jobs.BasicJobMonitor;
 import org.phoebus.framework.rdb.RDBConnectionPool;
 import org.phoebus.sns.mpsbypasses.model.RequestLookup;

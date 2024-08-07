@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2017-2021 Oak Ridge National Laboratory.
+ * Copyright (c) 2017-2024 Oak Ridge National Laboratory.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,9 +7,8 @@
  ******************************************************************************/
 package org.phoebus.archive.reader.rdb;
 
-import static org.hamcrest.CoreMatchers.not;
-import static org.hamcrest.CoreMatchers.sameInstance;
-import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertNotSame;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -19,8 +18,8 @@ import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.phoebus.framework.rdb.RDBConnectionPool;
 
 /** Demo of the {@link RDBConnectionPool}
@@ -38,7 +37,7 @@ public class RDBConnectionDemo
             "(ADDRESS=(PROTOCOL=TCP)(HOST=snsappb.sns.ornl.gov)(PORT=1610))" +
             "(CONNECT_DATA=(SERVICE_NAME=prod_controls)))";
 
-    @Before
+    @BeforeEach
     public void setup()
     {
         Logger logger = Logger.getLogger("");
@@ -79,18 +78,18 @@ public class RDBConnectionDemo
     @Test
     public void testPooling() throws Exception
     {
-        final RDBConnectionPool pool = new RDBConnectionPool(MYSQL_URL, USER, PASS);
+        final RDBConnectionPool pool = new RDBConnectionPool(ORACLE_URL, USER, PASS);
 
         // Get two connections
         Connection connection1 = pool.getConnection();
         Connection connection2 = pool.getConnection();
-        assertThat(connection2, not(sameInstance(connection1)));
+        assertNotSame(connection1, connection2);
 
         // Release the first connection
         pool.releaseConnection(connection1);
         // It should now be re-used
         Connection connection = pool.getConnection();
-        assertThat(connection, sameInstance(connection1));
+        assertSame(connection, connection1);
         pool.releaseConnection(connection);
 
         // Release the second connection
@@ -104,7 +103,7 @@ public class RDBConnectionDemo
         pool.releaseConnection(connection1);
         // Will NOT get it back because it's been closed
         connection = pool.getConnection();
-        assertThat(connection, not(sameInstance(connection1)));
+        assertNotSame(connection, connection1);
         pool.releaseConnection(connection);
         pool.clear();
     }
@@ -113,7 +112,7 @@ public class RDBConnectionDemo
     public void testTimeout() throws Exception
     {
         System.out.println("Timeout Test");
-        final RDBConnectionPool pool = new RDBConnectionPool(MYSQL_URL, USER, PASS);
+        final RDBConnectionPool pool = new RDBConnectionPool(ORACLE_URL, USER, PASS);
         pool.setTimeout(2);
 
         Connection connection1 = pool.getConnection();
@@ -121,14 +120,14 @@ public class RDBConnectionDemo
 
         // 'Right now', get the same connection again
         Connection connection = pool.getConnection();
-        assertThat(connection, sameInstance(connection1));
+        assertSame(connection, connection1);
         pool.releaseConnection(connection);
         System.out.println("Re-used existing connection");
 
         // After the expiration time, get a new connection
         TimeUnit.SECONDS.sleep(pool.getTimeoutSeconds() * 2);
         connection = pool.getConnection();
-        assertThat(connection, not(sameInstance(connection1)));
+        assertNotSame(connection, connection1);
         pool.releaseConnection(connection);
         System.out.println("Existing connection closed after timeout");
 
@@ -138,7 +137,7 @@ public class RDBConnectionDemo
         for (int check=0; check < pool.getTimeoutSeconds() * 3; ++check)
         {
             connection = pool.getConnection();
-            assertThat(connection, sameInstance(connection1));
+            assertSame(connection, connection1);
             pool.releaseConnection(connection);
             TimeUnit.SECONDS.sleep(1);
             System.out.println("Existing connection kept open");
