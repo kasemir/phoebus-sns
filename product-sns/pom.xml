@@ -21,6 +21,16 @@
      <version>${phoebus.version}</version>
     </dependency>
     <dependency>
+     <groupId>org.phoebus</groupId>
+     <artifactId>core-pv-ca</artifactId>
+     <version>${phoebus.version}</version>
+    </dependency>
+    <dependency>
+     <groupId>org.phoebus</groupId>
+     <artifactId>core-pv-pva</artifactId>
+     <version>${phoebus.version}</version>
+    </dependency>
+    <dependency>
       <groupId>org.phoebus</groupId>
       <artifactId>app-diag</artifactId>
       <version>${phoebus.version}</version>
