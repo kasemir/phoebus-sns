@@ -6,8 +6,15 @@
   <version>0.0.1-SNAPSHOT</version>
   <packaging>pom</packaging>
 
+  <!-- A few issues:
+       This includes ../phoebus and thus rebuilds everything.
+       Should it just assume ../phoebus has been built?
+
+       There are 'antrun' calls which will fail with maven-3.9.9
+    -->
+
   <properties>
-    <maven.repo.local>${project.build.directory}/.m2</maven.repo.local>
+    <!-- <maven.repo.local>${project.build.directory}/.m2</maven.repo.local> -->
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
