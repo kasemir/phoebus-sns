@@ -15,12 +15,6 @@ package org.phoebus.sns.mpsbypasses.modes;
 @SuppressWarnings("nls")
 public enum MachineMode
 {
-	/** Site, the first element, will be used by default in the GUI.
-	 *  It will also be skipped when monitoring PVs.
-	 */
-	Site("Site"),
-	// Rest are valid machine modes, their name matches sections
-	// of associated PVs
 	MEBT_BS("MEBT Beam Stop"),
 	CCL_BS("CCL Beam Stop"),
 	LinDmp("Linac Dump"),
@@ -46,27 +40,4 @@ public enum MachineMode
 	{
 		return label;
 	}
-
-	/** Return the enum machine mode of the input String's machine mode enum
-	 *
-	 * @param name of the machine mode
-	 * @return enum of the machine mode, defaulting to Site for invalid name
-	 */
-	public static MachineMode fromString(final String name)
-	{
-		for (MachineMode mode : MachineMode.values())
-			if (mode.toString().equalsIgnoreCase(name))
-				return mode;
-		return Site;
-	}
-
-	/** @return Machine mode names */
-	public static String[] getNames()
-    {
-		final MachineMode[] values = MachineMode.values();
-		final String[] names = new String[values.length];
-		for (int i=0; i<names.length; ++i)
-			names[i] = values[i].toString();
-	    return names;
-    }
 }
