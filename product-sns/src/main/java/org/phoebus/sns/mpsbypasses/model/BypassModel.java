@@ -9,12 +9,9 @@ package org.phoebus.sns.mpsbypasses.model;
 
 import static org.phoebus.sns.mpsbypasses.MPSBypasses.logger;
 
-import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.Struct;
-import java.sql.Types;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -23,7 +20,6 @@ import java.util.logging.Level;
 import org.phoebus.framework.jobs.JobMonitor;
 import org.phoebus.framework.rdb.RDBConnectionPool;
 import org.phoebus.sns.mpsbypasses.MPSBypasses;
-import org.phoebus.sns.mpsbypasses.modes.MachineMode;
 
 /** Model of all the bypass infos
  *
@@ -37,9 +33,6 @@ public class BypassModel implements BypassListener
 {
 	/** Listeners */
 	final private List<BypassModelListener> listeners = new CopyOnWriteArrayList<>();
-
-	/** Currently selected machine mode */
-	private MachineMode machine_mode = MachineMode.Site;
 
 	/** All bypasses for the selected machine mode */
 	private Bypass[] mode_bypasses = new Bypass[0];
@@ -154,13 +147,11 @@ public class BypassModel implements BypassListener
 	 */
 	public synchronized void selectMachineMode(final JobMonitor monitor)
 	{
-		final MachineMode mode = MachineMode.Site;
-	    logger.log(Level.FINE, "Select " + mode);
+	    logger.log(Level.FINE, "Read bypasses");
 		monitor.beginTask("Clearing old information");
 		stop();
 
-		machine_mode = mode;
-        mode_bypasses = new Bypass[] { new Bypass("Reading Bypass Info", mode.toString()) };
+        mode_bypasses = new Bypass[] { new Bypass("Reading Bypass Info", "") };
 		filtered_bypasses = mode_bypasses;
 		updateCounts();
 
@@ -175,8 +166,7 @@ public class BypassModel implements BypassListener
 		try
 		{
 	        rdb = new RDBConnectionPool(MPSBypasses.url, MPSBypasses.user, MPSBypasses.password);
-			final Bypass[] new_bypasses = readBypassInfo(monitor, rdb.getConnection(), mode);
-			machine_mode = mode;
+			final Bypass[] new_bypasses = readBypassInfo(monitor, rdb.getConnection());
             mode_bypasses = new_bypasses;
 		}
 		catch (Exception ex)
@@ -204,12 +194,6 @@ public class BypassModel implements BypassListener
 
 		start();
 	}
-
-	/** @return Currently selected machine mode of this model */
-	public synchronized MachineMode getMachineMode()
-    {
-        return machine_mode;
-    }
 
 	/** Filter the <code>mode_bypasses</code>
 	 *  by <code>state_filter</code>
@@ -301,11 +285,10 @@ public class BypassModel implements BypassListener
     *
     *  @param monitor Progress monitor
     *  @param connection RDB connection
-    *  @param mode {@link MachineMode}
     *  @return {@link Bypass} array
     *  @throws Exception on error
     */
-   private Bypass[] readBypassInfo(final JobMonitor monitor, final Connection connection, final MachineMode mode) throws Exception
+   private Bypass[] readBypassInfo(final JobMonitor monitor, final Connection connection) throws Exception
    {
        monitor.beginTask("Read bypass requests");
        final RequestLookup requestors = new RequestLookup(monitor, connection);
@@ -371,95 +354,6 @@ public class BypassModel implements BypassListener
        }
 
        return bypasses.toArray(new Bypass[bypasses.size()]);
-   }
-
-
-	/** Read bypass info from RDB using stored procedure
-	 *
-	 *  Stored procedure looks for "*_mm" records in EPICS.sgnl_rec
-	 *  It thus relies on the "crawler" to parse the records from MPS IOCs.
-	 *
-	 *  @param monitor Progress monitor
-	 *  @param connection RDB connection
-	 *  @param mode {@link MachineMode}
-	 *  @return {@link Bypass} array
-	 *  @throws Exception on error
-	 */
-	private Bypass[] readBypassInfoOld(final JobMonitor monitor, final Connection connection, final MachineMode mode) throws Exception
-    {
-		monitor.beginTask("Read bypass requests");
-		final RequestLookup requestors = new RequestLookup(monitor, connection);
-
-		String rdb_mode = mode.name();
-
-		// if the machMode is Site, tell the RDB it's Tgt and don't add the 2nd input of "Y"
-		if (mode == MachineMode.Site)
-			rdb_mode = "Tgt";
-
-		String sql = "{ ? = call epics.epics_mps_pkg.mps_signals_to_audit(?";
-		if(mode != MachineMode.Site)
-			sql=sql+",?) }";
-		else
-			sql=sql+") }";
-		final CallableStatement procedure = connection.prepareCall(sql);
-
-		// Request the array of the MPS Mode Mask Table, based on the input Machine Mode
-		procedure.registerOutParameter(1, Types.ARRAY,"EPICS.MPS_MODE_MASK_TAB");
-		procedure.setString(2, rdb_mode);
-		if(mode != MachineMode.Site)
-			procedure.setString(3, "Y");
-
-		monitor.beginTask("Fetching bypass details from RDB...");
-		procedure.execute();
-
-		// Store the retrieved MPS Mode Mask Table array
-		final List<Bypass> bypasses = new ArrayList<>();
-		final Object[] result = (Object[]) procedure.getArray(1).getArray();
-		// retrieve the signal id read from the RDB array for gathering bypass information
-		for (int index = 0; index < result.length; index++)
-		{
-			if (index % 100 == 0)
-				monitor.beginTask("Read details for " + index + " bypasses");
-
-			final Struct element = (Struct) result[index];
-			final Object[] attributes = element.getAttributes();
-			if (attributes.length < 1)
-				continue;
-
-			final Object sig_id_obj = attributes[0];
-			if (sig_id_obj == null)
-				continue;
-
-			// The 'signal ID' will be 'Ring_Vac:SGV_AB:FPL_Ring_mm'
-			// Get device ID 'Ring_Vac:SGV_AB'
-			final String signal_id = sig_id_obj.toString();
-			final int sep = signal_id.lastIndexOf(':');
-			final String device_id;
-			if (sep > 0)
-				device_id = signal_id.substring(0, sep);
-			else
-				device_id = signal_id;
-
-			// Get request info
-			final Request request = requestors.getRequestor(device_id);
-
-			// For a signal ID 'Ring_Vac:SGV_AB:FPL_Ring_mm',
-			// the base name of the bypass PVs is
-			// 'Ring_Vac:SGV_AB:FPL_Ring',
-			// resulting in Bypass PVs
-			// 'Ring_Vac:SGV_AB:FPL_Ring_sw_jump_status' and
-			// 'Ring_Vac:SGV_AB:FPL_Ring_swmask'
-			final int mm = signal_id.lastIndexOf("_mm");
-			if (mm <= 0)
-				continue;
-			final String pv_basename = signal_id.substring(0, mm);
-			final Bypass bypass = new Bypass(pv_basename, request, this);
-			bypasses.add(bypass);
-			// System.out.println(bypass);
-		}
-		procedure.close();
-
-		return bypasses.toArray(new Bypass[bypasses.size()]);
     }
 
 	/** Update the counts for bypassed ... error */
@@ -533,7 +427,7 @@ public class BypassModel implements BypassListener
 	{
 	    final StringBuilder buf = new StringBuilder();
 
-	    buf.append("BypassModel ").append(machine_mode).append(": ");
+	    buf.append("BypassModel: ");
 	    buf.append(mode_bypasses.length).append(" bypasses @ ").append(System.identityHashCode(mode_bypasses));
 	    if (running)
 	        buf.append(" (running)");

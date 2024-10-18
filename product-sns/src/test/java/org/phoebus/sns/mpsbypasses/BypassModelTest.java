@@ -39,7 +39,7 @@ public class BypassModelTest implements BypassModelListener
             {
                 System.out.println(task_name);
             }
-		}, MachineMode.Site);
+		});
 
 		// Allow model to 'run' for a while, connect to PVs and send updates
 		Thread.sleep(5000);
