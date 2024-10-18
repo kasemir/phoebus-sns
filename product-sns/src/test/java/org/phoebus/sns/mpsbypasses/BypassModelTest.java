@@ -11,7 +11,6 @@ import org.phoebus.sns.mpsbypasses.model.BypassModel;
 import org.phoebus.sns.mpsbypasses.model.BypassModelListener;
 import org.phoebus.sns.mpsbypasses.model.BypassState;
 import org.phoebus.sns.mpsbypasses.model.RequestState;
-import org.phoebus.sns.mpsbypasses.modes.MachineMode;
 
 /** [Headless] JUnit Plug-in test of the {@link BypassModel}
  *  @author Kay Kasemir

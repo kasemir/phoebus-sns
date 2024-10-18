@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2019-2021 Oak Ridge National Laboratory.
+ * Copyright (c) 2019-2024 Oak Ridge National Laboratory.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -126,13 +126,13 @@ public class Bypass
     /** @return Name of the Jumper PV, for example "Ring_Vac:SGV_AB:FPL_Ring_sw_jump_status" */
     public String getJumperPVName()
     {
-        return jumper_pv.getName();
+        return pv_basename + "_sw_jump_status";
     }
 
     /** @return Name of the Mask PV, for example "Ring_Vac:SGV_AB:FPL_Ring_swmask" */
     public String getMaskPVName()
     {
-        return mask_pv.getName();
+        return pv_basename + "_swmask";
     }
 
 	/** @return Request for this bypass or <code>null</code> */
@@ -155,7 +155,7 @@ public class Bypass
 
 		try
 		{
-    		jumper_pv = PVPool.getPV(pv_basename + "_sw_jump_status");
+    		jumper_pv = PVPool.getPV(getJumperPVName());
     		jumper_pv_listener = jumper_pv.onValueEvent()
     		                              .throttleLatest(MPSBypasses.update_throttle_ms, TimeUnit.MILLISECONDS)
     		                              .subscribe(value ->
@@ -169,7 +169,7 @@ public class Bypass
                     updateState(value, mask);
             });
 
-    		mask_pv = PVPool.getPV(pv_basename + "_swmask");
+    		mask_pv = PVPool.getPV(getMaskPVName());
     		mask_pv_listener = mask_pv.onValueEvent()
                         		      .throttleLatest(MPSBypasses.update_throttle_ms, TimeUnit.MILLISECONDS)
                                       .subscribe(value ->
@@ -261,6 +261,8 @@ public class Bypass
     public String toString()
     {
 	    return "Bypass " + name + ", state " + state +
+	        ", Jumper " + getJumperPVName() +
+	        ", Mask " + getMaskPVName() +	        
 	        ", requested by " + (request != null ? request : "nobody");
     }
 }

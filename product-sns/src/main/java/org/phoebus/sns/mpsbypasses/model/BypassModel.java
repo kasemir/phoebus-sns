@@ -17,9 +17,14 @@ import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Level;
 
+import javax.xml.parsers.DocumentBuilderFactory;
+
 import org.phoebus.framework.jobs.JobMonitor;
+import org.phoebus.framework.persistence.XMLUtil;
 import org.phoebus.framework.rdb.RDBConnectionPool;
 import org.phoebus.sns.mpsbypasses.MPSBypasses;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 /** Model of all the bypass infos
  *
@@ -294,6 +299,38 @@ public class BypassModel implements BypassListener
        final RequestLookup requestors = new RequestLookup(monitor, connection);
 
        monitor.beginTask("Fetching bypass details from RDB...");
+       
+        // TODO Read bypasses
+		try
+		{
+			final Document doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(MPSBypasses.mps_config_file);
+			doc.getDocumentElement().normalize();
+	        final Element root_node = doc.getDocumentElement();
+
+	        if (! root_node.getNodeName().equals("mps"))
+	        	throw new Exception("Expected <mps>, got <" + root_node.getNodeName());
+	        
+	        int count = 0;
+	        for (Element pe : XMLUtil.getChildElements(root_node, "processor"))
+		        for (Element ne : XMLUtil.getChildElements(pe, "node"))
+			        for (Element ce : XMLUtil.getChildElements(ne, "channel"))
+			        {
+			        	final String name = ce.getAttribute("name");
+			        	if (name.isBlank())
+			        		continue;
+			        	++count;
+			        	
+			        	// TODO Create Bypass(name, requester, ...) without ":bogus"
+			        	Bypass bypass = new Bypass(name + ":bogus", requestors.getRequestor(name), this);
+			        	System.out.format("%4d %s\n", count, bypass.toString());
+			        }
+		}
+		catch (Exception ex)
+		{
+            logger.log(Level.SEVERE, "Error reading MPS config file '" + MPSBypasses.mps_config_file + "'", ex);
+            return new Bypass[0];
+		}
+       
        final List<Bypass> bypasses = new ArrayList<>();
 
        try (PreparedStatement statement = connection.prepareStatement(
