@@ -150,11 +150,11 @@ public class BypassModel implements BypassListener
 	 *  stopped, RDB read, model started.
 	 *
 	 *  @param monitor Progress monitor
-	 *  @param mode
 	 *  @see BypassModelListener#modelLoaded(BypassModel)
 	 */
-	public synchronized void selectMachineMode(final JobMonitor monitor, final MachineMode mode)
+	public synchronized void selectMachineMode(final JobMonitor monitor)
 	{
+		final MachineMode mode = MachineMode.Site;
 	    logger.log(Level.FINE, "Select " + mode);
 		monitor.beginTask("Clearing old information");
 		stop();
