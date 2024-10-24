@@ -12,6 +12,7 @@ import static org.phoebus.sns.mpsbypasses.MPSBypasses.logger;
 import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Level;
 
@@ -310,9 +311,14 @@ public class BypassModel implements BypassListener
             
             int count = 0;
             for (Element pe : XMLUtil.getChildElements(root_node, "processor"))
+            {
+                final int np = Integer.parseInt(pe.getAttribute("id"));
                 for (Element ne : XMLUtil.getChildElements(pe, "node"))
+                {
+                    final int fn = Integer.parseInt(ne.getAttribute("id")) % 10;
                     for (Element ce : XMLUtil.getChildElements(ne, "channel"))
                     {
+                        final int ch = Integer.parseInt(ce.getAttribute("id"));
                         final String name = ce.getAttribute("name");
                         if (name.isBlank())
                             continue;
@@ -322,9 +328,11 @@ public class BypassModel implements BypassListener
 
                         // Get request info
                         final Request request = requestors.getRequestor(name);
-                        final Bypass bypass = new Bypass(name, request, this);
+                        final Bypass bypass = new Bypass(np, fn, ch, name, request, this);
                         bypasses.add(bypass);
                     }
+                }
+            }
         }
         catch (Exception ex)
         {

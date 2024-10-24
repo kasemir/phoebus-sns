@@ -34,7 +34,7 @@ public class BypassTest implements BypassListener
 	{
 		// Prepare to check simulated PVs
 		final Request request = new Request("Fred", new Date());
-		final Bypass info = new Bypass("loc://Test_Sys:Bypass1:FPLX", request, this);
+		final Bypass info = new Bypass(0, 0, 0, "loc://Test_Sys:Bypass1:FPLX", request, this);
 		assertEquals("loc://Test_Sys:Bypass1", info.getName());
 
 		// Initially disconnected

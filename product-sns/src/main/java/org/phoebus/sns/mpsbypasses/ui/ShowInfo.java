@@ -37,6 +37,7 @@ public class ShowInfo extends MenuItem
                     buf.append("\n");
                 buf.append(bypass.getName()).append("\n");
                 buf.append("-----------------------------------\n");
+                buf.append(bypass.getInfo()).append("\n");
                 buf.append("Jumper PV: ").append(bypass.getJumperPVName()).append("\n");
                 buf.append("Mask PV: ").append(bypass.getMaskPVName()).append("\n");
             }
