@@ -11,7 +11,6 @@ import org.phoebus.sns.mpsbypasses.model.BypassModel;
 import org.phoebus.sns.mpsbypasses.model.BypassModelListener;
 import org.phoebus.sns.mpsbypasses.model.BypassState;
 import org.phoebus.sns.mpsbypasses.model.RequestState;
-import org.phoebus.sns.mpsbypasses.modes.MachineMode;
 
 /** [Headless] JUnit Plug-in test of the {@link BypassModel}
  *  @author Kay Kasemir
@@ -39,7 +38,7 @@ public class BypassModelTest implements BypassModelListener
             {
                 System.out.println(task_name);
             }
-		}, MachineMode.Site);
+		});
 
 		// Allow model to 'run' for a while, connect to PVs and send updates
 		Thread.sleep(5000);

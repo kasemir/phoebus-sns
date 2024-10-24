@@ -89,7 +89,6 @@ public class GUI extends GridPane implements BypassModelListener
 
     private final BypassModel model;
 
-    private final ComboBox<MachineMode> sel_mode = new ComboBox<>();
     private final ComboBox<BypassState> sel_state = new ComboBox<>();
     private final ComboBox<RequestState> sel_req = new ComboBox<>();
     private final Button reload = new Button("Reload");
@@ -164,8 +163,6 @@ public class GUI extends GridPane implements BypassModelListener
 
     private Node createSelector()
     {
-        sel_mode.getItems().addAll(MachineMode.values());
-        sel_mode.setValue(model.getMachineMode());
         sel_state.getItems().addAll(BypassState.values());
         sel_state.setValue(model.getBypassFilter());
         sel_req.getItems().addAll(RequestState.values());
@@ -174,9 +171,6 @@ public class GUI extends GridPane implements BypassModelListener
         reload.setTooltip(new Tooltip("Re-load bypass information from Relational Database"));
 
         final HBox row = new HBox(5,
-                // "Mode", which really was the MPS "Chain" is no longer used.
-                // Always displaying "all chains"
-                // new Label("Machine Mode:"), sel_mode,
                 new Label("State:"),        sel_state,
                 new Label("Requested:"),    sel_req,
                 reload
@@ -185,7 +179,6 @@ public class GUI extends GridPane implements BypassModelListener
             if (n instanceof Label)
                 ((Label)n).setMaxHeight(Double.MAX_VALUE);
 
-        sel_mode.setOnAction(event -> reload());
         reload.setOnAction(event -> reload());
 
         row.setPadding(new Insets(5, 0, 0, 15));
@@ -326,8 +319,8 @@ public class GUI extends GridPane implements BypassModelListener
         TableColumn<BypassRow, String> col = new TableColumn<>("#");
         col.setCellValueFactory(cell -> cell.getValue().name);
         col.setCellFactory(c -> new RowIndexCell());
-        col.setPrefWidth(300);
-        col.setMaxWidth(300);
+        col.setPrefWidth(60);
+        col.setMaxWidth(60);
         col.setSortable(false);
         table.getColumns().add(col);
 
@@ -450,7 +443,7 @@ public class GUI extends GridPane implements BypassModelListener
     {
         JobManager.schedule("MPS Bypasses", monitor ->
         {
-            model.selectMachineMode(monitor, sel_mode.getValue());
+            model.selectMachineMode(monitor);
             initial_load = null;
         });
     }
@@ -522,7 +515,6 @@ public class GUI extends GridPane implements BypassModelListener
         final Job safe = initial_load;
         if (safe != null)
             safe.cancel();
-        memento.getString("mode").ifPresent(req -> sel_mode.setValue(MachineMode.fromString(req)));
         memento.getString("state").ifPresent(req -> sel_state.setValue(BypassState.fromString(req)));
         memento.getString("request").ifPresent(req -> sel_req.setValue(RequestState.fromString(req)));
 
@@ -538,7 +530,6 @@ public class GUI extends GridPane implements BypassModelListener
 
     public void save(final Memento memento)
     {
-        memento.setString("mode", sel_mode.getValue().name());
         memento.setString("state", sel_state.getValue().name());
         memento.setString("request", sel_req.getValue().name());
 

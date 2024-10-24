@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2019-2020 Oak Ridge National Laboratory.
+ * Copyright (c) 2019-2024 Oak Ridge National Laboratory.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -24,6 +24,7 @@ public class MPSBypasses implements AppDescriptor
     public static final String DISPLAY_NAME = "MPS Bypasses";
 
     public static final long update_throttle_ms = 500;
+    @Preference public static String mps_config_file;
     @Preference public static String url, user, password;
     @Preference public static String url_enter_bypass, url_view_bypass;
 
