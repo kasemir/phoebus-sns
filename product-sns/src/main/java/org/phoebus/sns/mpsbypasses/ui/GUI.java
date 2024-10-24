@@ -319,8 +319,8 @@ public class GUI extends GridPane implements BypassModelListener
         TableColumn<BypassRow, String> col = new TableColumn<>("#");
         col.setCellValueFactory(cell -> cell.getValue().name);
         col.setCellFactory(c -> new RowIndexCell());
-        col.setPrefWidth(300);
-        col.setMaxWidth(300);
+        col.setPrefWidth(60);
+        col.setMaxWidth(60);
         col.setSortable(false);
         table.getColumns().add(col);
 
