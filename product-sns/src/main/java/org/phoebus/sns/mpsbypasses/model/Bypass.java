@@ -26,9 +26,9 @@ import io.reactivex.rxjava3.disposables.Disposable;
  *  <p>Combines the 'live' info from PVs with the 'static'
  *  info from the RDB
  *
- *  <p>Given a base PV name like 'Ring_Vac:SGV_AB:FPL_Ring',
- *  it will connect to the PVs 'Ring_Vac:SGV_AB:FPL_Ring_sw_jump_status'
- *  and 'Ring_Vac:SGV_AB:FPL_Ring_swmask'
+ *  <p>Given a base PV name like 'Ring_Vac:SGV_AB',
+ *  it will connect to the PVs 'Ring_Vac:SGV_AB:sw_jump_status'
+ *  and 'Ring_Vac:SGV_AB:swmask'
  *  to determine if the bypass is possible (jumper)
  *  and actually masked (software mask),
  *  summarizing that as the live {@link BypassState}
@@ -39,9 +39,7 @@ import io.reactivex.rxjava3.disposables.Disposable;
 @SuppressWarnings("nls")
 public class Bypass
 {
-    final private String pv_basename;
 	final private String name;
-	final private String chain;
 	final private Request request;
 	final private BypassListener listener;
 
@@ -52,30 +50,15 @@ public class Bypass
 	private volatile BypassState state = BypassState.Disconnected;
 
 	/** Initialize
-	 *  @param pv_basename Base name, e.g. "Ring_Vac:SGV_AB:FPL_Ring"
+	 *  @param name Name, e.g. "Ring_Vac:SGV_AB"
 	 *  @param request Who requested the bypass? <code>null</code> if not requested.
 	 *  @param listener {@link BypassListener}
 	 *  @throws Exception on error
 	 */
-	public Bypass(final String pv_basename, final Request request,
+	public Bypass(final String name, final Request request,
 			final BypassListener listener) throws Exception
 	{
-	    this.pv_basename = pv_basename;
-		// Given a name like "Ring_Vac:SGV_AB:FPL_Ring",
-		// extract the bypass name "Ring_Vac:SGV_AB"
-		// and the MPS chain "FPL Ring"
-		final int last_sep = pv_basename.lastIndexOf(":");
-		if (last_sep > 0)
-		{
-			name = pv_basename.substring(0, last_sep);
-			chain = pv_basename.substring(last_sep+1).replace('_', ' ');
-		}
-		else
-		{
-			name = pv_basename;
-			chain = "?";
-		}
-
+		this.name = name;
 		this.request = request;
 		this.listener = listener;
 	}
@@ -87,9 +70,7 @@ public class Bypass
 	 */
 	public Bypass(final String message, final String detail)
 	{
-	    pv_basename = null;
-		name = message;
-		chain = detail;
+		name = message + " (" + detail + ")";
 		request = null;
 		listener = null;
 		jumper_pv = null;
@@ -102,37 +83,16 @@ public class Bypass
 		return name;
 	}
 
-	/** @return MPS chain, for example "FPL_Ring" */
-	public String getMPSChain()
-	{
-		return chain;
-	}
-
-	/** @return MPS "signal" name used in RDB or <code>null</code> */
-	public String getRDBSignalName()
-	{
-	    if (listener == null)
-	        return null; // No real bypass, only message to display
-	    // Re-construct the RDB signal name
-	    return name + ":" + chain.replace(' ', '_') + "_mm";
-	}
-
-	/** @return Bypass name and chain, for example "Ring_Vac:SGV_AB (FPL Ring)" */
-	public String getFullName()
-	{
-		return name + " (" + chain + ")";
-	}
-
-    /** @return Name of the Jumper PV, for example "Ring_Vac:SGV_AB:FPL_Ring_sw_jump_status" */
+    /** @return Name of the Jumper PV, for example "Ring_Vac:SGV_AB:sw_jump_status" */
     public String getJumperPVName()
     {
-        return pv_basename + "_sw_jump_status";
+        return name + ":sw_jump_status";
     }
 
-    /** @return Name of the Mask PV, for example "Ring_Vac:SGV_AB:FPL_Ring_swmask" */
+    /** @return Name of the Mask PV, for example "Ring_Vac:SGV_AB:swmask" */
     public String getMaskPVName()
     {
-        return pv_basename + "_swmask";
+        return name + ":swmask";
     }
 
 	/** @return Request for this bypass or <code>null</code> */
@@ -150,7 +110,7 @@ public class Bypass
 	/** Connect to PVs */
 	public void start()
 	{
-		if (pv_basename == null)
+		if (name == null)
 			return;
 
 		try
@@ -192,7 +152,7 @@ public class Bypass
 	/** Disconnect PVs */
 	public void stop()
 	{
-		if (pv_basename == null)
+		if (name == null)
 			return;
 
 		mask_pv_listener.dispose();

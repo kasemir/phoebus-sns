@@ -10,8 +10,6 @@ package org.phoebus.sns.mpsbypasses.model;
 import static org.phoebus.sns.mpsbypasses.MPSBypasses.logger;
 
 import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -300,7 +298,7 @@ public class BypassModel implements BypassListener
 
        monitor.beginTask("Fetching bypass details from RDB...");
        
-        // TODO Read bypasses
+        final List<Bypass> bypasses = new ArrayList<>();
 		try
 		{
 			final Document doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(MPSBypasses.mps_config_file);
@@ -318,11 +316,14 @@ public class BypassModel implements BypassListener
 			        	final String name = ce.getAttribute("name");
 			        	if (name.isBlank())
 			        		continue;
+	                   if (count % 100 == 0)
+	                       monitor.beginTask("Read details for " + count + " bypasses");
 			        	++count;
 			        	
-			        	// TODO Create Bypass(name, requester, ...) without ":bogus"
-			        	Bypass bypass = new Bypass(name + ":bogus", requestors.getRequestor(name), this);
-			        	System.out.format("%4d %s\n", count, bypass.toString());
+	                   // Get request info
+	                   final Request request = requestors.getRequestor(name);
+			        	final Bypass bypass = new Bypass(name, request, this);
+		                   bypasses.add(bypass);
 			        }
 		}
 		catch (Exception ex)
@@ -330,66 +331,7 @@ public class BypassModel implements BypassListener
             logger.log(Level.SEVERE, "Error reading MPS config file '" + MPSBypasses.mps_config_file + "'", ex);
             return new Bypass[0];
 		}
-       
-       final List<Bypass> bypasses = new ArrayList<>();
-
-       try (PreparedStatement statement = connection.prepareStatement(
-               "SELECT m.MPS_DVC_ID, m.DVC_ID, m.CHANNEL_NBR, c.MPS_CHAIN_ID, c.FPAR_FPL_CONFIG " +
-               "FROM EPICS.machine_mode m " +
-               "JOIN EPICS.mps_sgnl_param c ON m.DVC_ID = c.DVC_ID " +
-               "WHERE m.chan_in_use_ind = 'Y'"  +
-               " AND m.MPS_DVC_ID IS NOT NULL " +
-               "ORDER BY m.MPS_DVC_ID"))
-       {
-           try (ResultSet result = statement.executeQuery())
-           {
-               int i = 0;
-
-               while (result.next())
-               {
-                   if (i % 100 == 0)
-                       monitor.beginTask("Read details for " + i + " bypasses");
-
-                   final String device_id = result.getString(1);
-                   final int port = result.getInt(3);
-                   final String chain = result.getString(4);
-                   final String ar_l_config = result.getString(5);
-                   final boolean latch;
-                   if (ar_l_config.equalsIgnoreCase("16FPAR"))
-                       latch = false;
-                   else if (ar_l_config.equalsIgnoreCase("16L"))
-                       latch = true;
-                   else if (ar_l_config.equalsIgnoreCase("8L8AR"))
-                       latch = port >= 8;
-                   else
-                       throw new Exception("Unknown FPAR_FPL_CONFIG '" + ar_l_config + "' for '" + device_id + "'");
-
-                   if (device_id.contains("_MPS:FPL_")  ||  device_id.contains("_MPS:FPAR_"))
-                   {
-                       logger.log(Level.WARNING, "Skipping legacy interlink " + device_id);
-                       continue;
-                   }
-
-                   // Get request info
-                   final Request request = requestors.getRequestor(device_id);
-
-                   // For a signal ID 'Ring_Vac:SGV_AB:FPL_Ring_mm',
-                   // the base name of the bypass PVs is
-                   // 'Ring_Vac:SGV_AB:FPL_Ring',
-                   // resulting in Bypass PVs
-                   // 'Ring_Vac:SGV_AB:FPL_Ring_sw_jump_status' and
-                   // 'Ring_Vac:SGV_AB:FPL_Ring_swmask'
-                   final String pv_basename = device_id +
-                                              (latch ? ":FPL_" : ":FPAR_") +
-                                              chain;
-                   final Bypass bypass = new Bypass(pv_basename, request, this);
-                   bypasses.add(bypass);
-
-                   ++i;
-               }
-           }
-       }
-
+		       
        return bypasses.toArray(new Bypass[bypasses.size()]);
     }
 
