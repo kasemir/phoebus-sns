@@ -51,7 +51,8 @@ public class CmdTool
     {
         System.out.println("Channels matching pattern '" + pattern + "'");
         int i = 0;
-        for (Channel channel : cf.findByName(pattern))
+//        for (Channel channel : cf.findByName(pattern))
+        for (Channel channel : cf.find(pattern))
         {
             ++i;
             System.out.format("%4d : %s\n", i, channel.getName());
@@ -121,12 +122,12 @@ public class CmdTool
             )
             {
                 // Properties must exist before they're assigned
-                cf.set(Property.Builder
-                        .property("iocName")
-                        .owner(owner));
-                cf.set(Property.Builder
-                        .property("time")
-                        .owner(owner));
+//                cf.set(Property.Builder
+//                        .property("iocName")
+//                        .owner(owner));
+//                cf.set(Property.Builder
+//                        .property("time")
+//                        .owner(owner));
                 while (result.next())
                 {
                     ++i;
@@ -136,49 +137,41 @@ public class CmdTool
                     final String boot_stamp =  TimestampFormats.SECONDS_FORMAT.format(boot_time);
                     System.out.println(i + ": " + channel + " on " + ioc + " at " + boot_stamp);
 
-                    cf.set(Channel.Builder
-                                  .channel(channel)
-                                  .with(Property.Builder.property("iocName", ioc))
-                                  .with(Property.Builder.property("time", boot_stamp))
-                                  .owner(owner));
+//                    cf.set(Channel.Builder
+//                                  .channel(channel)
+//                                  .with(Property.Builder.property("iocName", ioc))
+//                                  .with(Property.Builder.property("time", boot_stamp))
+//                                  .owner(owner));
+                    cf.update(Property.Builder.property("iocName").value(ioc), List.of(channel));
+                    cf.update(Property.Builder.property("time").value(boot_stamp), List.of(channel));
                 }
             }
         }
     }
 
-    private void add(final String name) throws Exception
-    {
-        // Properties must exist before they're assigned
-        cf.set(Property.Builder
-                       .property("iocName")
-                       .owner(owner));
-        cf.set(Channel.Builder
-                      .channel(name)
-                      .with(Property.Builder.property("family", "42"))
-                      .with(Property.Builder.property("iocName", "example"))
-                      .owner(owner));
-    }
 
     private void delete(final String name) throws Exception
     {
-        cf.deleteChannel(name);
+        // cf.deleteChannel(name);
+    	// TODO??
     }
 
     private void deleteByPattern(final String pattern) throws Exception
     {
         int i = 0;
-        for (Channel channel : cf.findByName(pattern))
+        // for (Channel channel : cf.findByName(pattern))
+        for (Channel channel : cf.find(pattern))
         {
             ++i;
             final String name = channel.getName();
             System.out.println("Deleting " + i + ": " + name);
-            cf.deleteChannel(name);
+            delete(name);
         }
     }
 
     private void close()
     {
-        cf.close();
+        // cf.close();
     }
 
     private static void help()
