@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2020 Oak Ridge National Laboratory.
+ * Copyright (c) 2020-2025 Oak Ridge National Laboratory.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -40,10 +40,9 @@ public class CmdTool
 
     private final String owner = "admin"; // System.getProperty("user.name") ?
 
-    public CmdTool() throws Exception
+    public CmdTool(final ChannelFinderClient cf) throws Exception
     {
-        cf = ChannelFinderService.getInstance().getClient();
-
+        this.cf = cf;
         AnnotatedPreferences.initialize(SNSPVProposals.class, CmdTool.class, "/pv_proposals_preferences.properties");
     }
 
@@ -51,8 +50,7 @@ public class CmdTool
     {
         System.out.println("Channels matching pattern '" + pattern + "'");
         int i = 0;
-//        for (Channel channel : cf.findByName(pattern))
-        for (Channel channel : cf.find(pattern))
+        for (Channel channel : cf.findByName(pattern))
         {
             ++i;
             System.out.format("%4d : %s\n", i, channel.getName());
@@ -122,12 +120,12 @@ public class CmdTool
             )
             {
                 // Properties must exist before they're assigned
-//                cf.set(Property.Builder
-//                        .property("iocName")
-//                        .owner(owner));
-//                cf.set(Property.Builder
-//                        .property("time")
-//                        .owner(owner));
+                cf.set(Property.Builder
+                        .property("iocName")
+                        .owner(owner));
+                cf.set(Property.Builder
+                        .property("time")
+                        .owner(owner));
                 while (result.next())
                 {
                     ++i;
@@ -137,41 +135,31 @@ public class CmdTool
                     final String boot_stamp =  TimestampFormats.SECONDS_FORMAT.format(boot_time);
                     System.out.println(i + ": " + channel + " on " + ioc + " at " + boot_stamp);
 
-//                    cf.set(Channel.Builder
-//                                  .channel(channel)
-//                                  .with(Property.Builder.property("iocName", ioc))
-//                                  .with(Property.Builder.property("time", boot_stamp))
-//                                  .owner(owner));
-                    cf.update(Property.Builder.property("iocName").value(ioc), List.of(channel));
-                    cf.update(Property.Builder.property("time").value(boot_stamp), List.of(channel));
+                    cf.set(Channel.Builder
+                                  .channel(channel)
+                                  .with(Property.Builder.property("iocName", ioc))
+                                  .with(Property.Builder.property("time", boot_stamp))
+                                  .owner(owner));
                 }
             }
         }
     }
 
-
     private void delete(final String name) throws Exception
     {
-        // cf.deleteChannel(name);
-    	// TODO??
+        cf.deleteChannel(name);
     }
 
     private void deleteByPattern(final String pattern) throws Exception
     {
         int i = 0;
-        // for (Channel channel : cf.findByName(pattern))
-        for (Channel channel : cf.find(pattern))
+        for (Channel channel : cf.findByName(pattern))
         {
             ++i;
             final String name = channel.getName();
             System.out.println("Deleting " + i + ": " + name);
             delete(name);
         }
-    }
-
-    private void close()
-    {
-        // cf.close();
     }
 
     private static void help()
@@ -198,9 +186,9 @@ public class CmdTool
             return;
         }
 
-        final CmdTool imp = new CmdTool();
-        try
+        try (ChannelFinderClient cf = ChannelFinderService.getInstance().getClient())
         {
+        	final CmdTool imp = new CmdTool(cf);
             final Iterator<String> iter = args.iterator();
             while (iter.hasNext())
             {
@@ -244,10 +232,6 @@ public class CmdTool
                     return;
                 }
             }
-        }
-        finally
-        {
-            imp.close();
         }
     }
 }
