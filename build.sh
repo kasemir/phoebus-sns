@@ -184,14 +184,23 @@ then
 fi
 
 # Delete stuff we don't need
-zip -d phoebus-[0-9].[0-9].[0-9]*-linux.zip '*app-trends-rich-adapters*'
-zip -d phoebus-[0-9].[0-9].[0-9]*-win.zip '*app-trends-rich-adapters*'
-zip -d phoebus-[0-9].[0-9].[0-9]*-mac.zip '*app-trends-rich-adapters*'
-zip -d phoebus-[0-9].[0-9].[0-9]*-mac-aarch64.zip '*app-trends-rich-adapters*'
-zip -d product-sns-[0-9].[0-9].[0-9]*-linux.zip '*app-trends-rich-adapters*'
-zip -d product-sns-[0-9].[0-9].[0-9]*-win.zip '*app-trends-rich-adapters*'
-zip -d product-sns-[0-9].[0-9].[0-9]*-mac.zip '*app-trends-rich-adapters*'
+for Z in phoebus-[0-9].[0-9].[0-9]*.zip product-sns-[0-9].[0-9].[0-9]*.zip
+do
+   echo "Delete from $Z"
+done
+zip -d phoebus-[0-9].[0-9].[0-9]*-linux.zip           '*app-trends-rich-adapters*'
+zip -d phoebus-[0-9].[0-9].[0-9]*-win.zip             '*app-trends-rich-adapters*'
+zip -d phoebus-[0-9].[0-9].[0-9]*-mac.zip             '*app-trends-rich-adapters*'
+zip -d phoebus-[0-9].[0-9].[0-9]*-mac-aarch64.zip     '*app-trends-rich-adapters*'
+zip -d product-sns-[0-9].[0-9].[0-9]*-linux.zip       '*app-trends-rich-adapters*'
+zip -d product-sns-[0-9].[0-9].[0-9]*-win.zip         '*app-trends-rich-adapters*'
+zip -d product-sns-[0-9].[0-9].[0-9]*-mac.zip         '*app-trends-rich-adapters*'
 zip -d product-sns-[0-9].[0-9].[0-9]*-mac-aarch64.zip '*app-trends-rich-adapters*'
+zip -d product-sns-[0-9].[0-9].[0-9]*-linux.zip       '*app-alarm-logging-ui-*'
+zip -d product-sns-[0-9].[0-9].[0-9]*-win.zip         '*app-alarm-logging-ui-*'
+zip -d product-sns-[0-9].[0-9].[0-9]*-mac.zip         '*app-alarm-logging-ui-*'
+zip -d product-sns-[0-9].[0-9].[0-9]*-mac-aarch64.zip '*app-alarm-logging-ui-*'
+
 
 echo Show command line options
 ( cd ../phoebus/phoebus-product; ./phoebus.sh -help )
