@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2018-2020 Oak Ridge National Laboratory.
+ * Copyright (c) 2018-2025 Oak Ridge National Laboratory.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -26,6 +26,7 @@ import java.util.logging.Level;
 import org.phoebus.logbook.Attachment;
 import org.phoebus.logbook.LogClient;
 import org.phoebus.logbook.LogEntry;
+import org.phoebus.logbook.LogEntryLevel;
 import org.phoebus.logbook.Logbook;
 import org.phoebus.logbook.LogbookException;
 import org.phoebus.logbook.Property;
@@ -108,9 +109,11 @@ public class SNSLogClient implements LogClient
     }
 
     @Override
-    public Collection<String> listLevels()
+    public Collection<LogEntryLevel> listLevels()
     {
-        return List.of("Normal", "High", "Urgent");
+        return List.of(new LogEntryLevel("Normal", true),
+                       new LogEntryLevel("High",   false),
+                       new LogEntryLevel("Urgent", false));
     }
 
     @Override
