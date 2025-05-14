@@ -9,7 +9,17 @@ else
     cd phoebus
 fi
 
-if [ "x$WORKSPACE" = "x" ]
+PARENT_VERSION=`xpath -q -e '/project/version/text()'  ../phoebus/pom.xml`
+THIS_VERSION=`xpath -q -e '/project/properties/phoebus.version/text()' pom.xml`
+if [ "$PARENT_VERSION" == "$THIS_VERSION" ]
+then
+    echo "Both phoebus and the SNS additions use version $PARENT_VERSION"
+else
+    echo "Phoebus version $PARENT_VERSION differs from SNS additions which use $THIS_VERSION"
+    exit -1
+fi
+
+if [ -z "$WORKSPACE" ]
 then
     echo "Plain Linux setup"
     B=`git rev-parse --abbrev-ref HEAD`
