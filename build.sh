@@ -172,9 +172,14 @@ rm -f ../phoebus/dependencies/phoebus-target/target/lib/*log4j*
 rm -f phoebus-target-linux.zip
 zip -qr phoebus-target-linux.zip ../phoebus/dependencies/phoebus-target/target/lib/
 
-
 # Show command-line options, basic test that it 'runs'
 java -jar product-sns/target/product-sns-*-SNAPSHOT.jar -help
+
+# alarm logger only builds with maven, so use this one
+( cd ../phoebus/services/alarm-logger/;
+  ./alarm-logger.sh -help;
+)
+mv ../phoebus/services/alarm-logger/target/service-alarm-logger-*.zip alarm-logger.zip
 
 # Build with ant (online help, dist)
 ant clean dist
@@ -215,7 +220,7 @@ zip -d product-sns-[0-9].[0-9].[0-9]*-mac-aarch64.zip '*app-alarm-logging-ui-*'
 echo Show command line options
 ( cd ../phoebus/phoebus-product; ./phoebus.sh -help )
 ( cd ../phoebus/services/alarm-server; ./alarm-server.sh -help )
-( cd ../phoebus/services/alarm-logger; ./alarm-logger.sh -help )
+#( cd ../phoebus/services/alarm-logger; ./alarm-logger.sh -help )
 ( cd ../phoebus/services/scan-server; ./scan-server.sh -help )
 ( cd ../phoebus/services/archive-engine; sh archive-engine.sh -help )
 
@@ -231,7 +236,7 @@ mv product-sns-[0-9].[0-9].[0-9]*-mac.zip                         product-sns-ma
 mv product-sns-[0-9].[0-9].[0-9]*-mac-aarch64.zip                 product-sns-mac-aarch64.zip
 mv ../phoebus/services/scan-server/target/scan-server-*.zip       scan-server.zip
 mv ../phoebus/services/alarm-server/target/alarm-server-*.zip     alarm-server.zip
-mv ../phoebus/services/alarm-logger/target/alarm-logger-*.zip     alarm-logger.zip
+#mv ../phoebus/services/alarm-logger/target/alarm-logger-*.zip     alarm-logger.zip
 mv ../phoebus/services/archive-engine/target/archive-engine-*.zip archive-engine.zip
 
 
