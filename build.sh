@@ -29,7 +29,6 @@ else
     M2_HOME=/opt/apache-maven
     ANT_HOME=/opt/apache-ant
     JAVA_HOME=/opt/jdk-17
-    export ORACLE_JDBC_JAR=/opt/Oracle/ojdbc8-12.2.0.1.jar
 fi
 
 echo "M2_HOME=$M2_HOME"
@@ -46,14 +45,6 @@ echo "============================================="
 echo "VERSION: $VERSION"
 echo "============================================="
 
-if [ -r "$ORACLE_JDBC_JAR" ]
-then
-    mkdir -p dependencies/install-jars/lib/ojdbc
-    cp $ORACLE_JDBC_JAR dependencies/install-jars/lib/ojdbc
-else
-    echo "MISSING ORACLE_JDBC_JAR"
-fi
-
 java -version
 mvn -version
 
@@ -62,8 +53,8 @@ rm -f *.zip
 # Create Javadoc
 ( cd app/display/editor;  ant -f javadoc.xml clean all )
 
-# Create documentation
-( cd docs; make clean html )
+# TODO Fix Create documentation
+#( cd docs; make clean html )
 # The following 'ant clean' steps will remove the javadoc,
 # but we now have it copied into the documentation, so no problem.
 
