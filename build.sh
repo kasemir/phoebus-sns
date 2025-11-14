@@ -53,8 +53,10 @@ rm -f *.zip
 # Create Javadoc
 ( cd app/display/editor;  ant -f javadoc.xml clean all )
 
-# TODO Fix Create documentation
-#( cd docs; make clean html )
+# Create documentation
+# Relies in pixi, https://pixi.sh/latest/
+( cd docs; pixi run clean )
+( cd docs; pixi run build )
 # The following 'ant clean' steps will remove the javadoc,
 # but we now have it copied into the documentation, so no problem.
 
