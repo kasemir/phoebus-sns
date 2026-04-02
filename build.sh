@@ -70,6 +70,9 @@ git checkout -- core/ui/src/main/resources/org/phoebus/ui/application/messages.p
 sed -i "s/\${version}/$VERSION/" core/ui/src/main/resources/org/phoebus/ui/application/messages.properties
 git diff core/ui/src/main/resources/org/phoebus/ui/application/messages.properties
 
+# Disable SETTINGS_SNAPSHOT which causes pref-too-large
+sed -i 's/.*put(SETTINGS_SNAPSHOT.*//' core/launcher/src/main/java/org/phoebus/product/Launcher.java
+
 # Example for removing a build target
 #sed -i 's/<ant target="service-alarm-logger" dir="services\/alarm-logger"\/>//'  build.xml
 #sed -i 's/<ant target="dist" dir="services\/alarm-logger"\/>//'                  build.xml
