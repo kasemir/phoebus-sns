@@ -173,6 +173,39 @@
       <groupId>com.oracle.database.jdbc</groupId>
       <artifactId>ojdbc8</artifactId>
       <version>12.2.0.1</version>
+      <!-- By default, ojdbc8 will drag in these, and then connections fail like this:
+           CONFIG [oracle.simplefan.FanManager] creating ONS: maxconnections.0001=0003
+           nodes.0001=...:6200
+           nodes.0002=...:6200
+           SEVERE [oracle.simplefan.FanManager] attempt to configure ONS in FanManager failed with oracle.ons.NoServersAvailable: Subscription time out
+           Avoid by excluding all but the basic ojdbc8
+        -->
+      <exclusions>
+        <exclusion>
+          <groupId>com.oracle.database.jdbc</groupId>
+          <artifactId>ucp</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>com.oracle.database.security</groupId>
+          <artifactId>oraclepki</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>com.oracle.database.security</groupId>
+          <artifactId>osdt_cert</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>com.oracle.database.security</groupId>
+          <artifactId>osdt_core</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>com.oracle.database.ha</groupId>
+          <artifactId>simplefan</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>com.oracle.database.ha</groupId>
+          <artifactId>ons</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
   </dependencies>
   <build>
