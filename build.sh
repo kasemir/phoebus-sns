@@ -28,7 +28,7 @@ else
     B=`echo $GIT_BRANCH | sed 's/.*\///'`
     M2_HOME=/opt/apache-maven
     ANT_HOME=/opt/apache-ant
-    JAVA_HOME=/opt/jdk-17
+    JAVA_HOME=/opt/jdk-21
 fi
 
 echo "M2_HOME=$M2_HOME"
