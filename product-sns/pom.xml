@@ -170,7 +170,7 @@
 
     <!-- Add JDBC drivers etc. which may not be used by generic product -->
     <dependency>
-      <groupId>com.oracle.jdbc</groupId>
+      <groupId>com.oracle.database.jdbc</groupId>
       <artifactId>ojdbc8</artifactId>
       <version>12.2.0.1</version>
     </dependency>
