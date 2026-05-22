@@ -3,7 +3,7 @@ phoebus-sns
 
 Phoebus (https://github.com/ControlSystemStudio/phoebus) product for SNS
 
- * Site-specific PVProposalProvider (SNSPVProposals).
+ * Site-specific `PVProposalProvider` (`SNSPVProposals`).
  * Distribution created by `ant dist` includes site-specific `settings.ini`
 
 ## Requirements
@@ -29,6 +29,19 @@ ant product
 ant run
 ant dist
 ```
+
+## Develop with IntelliJ IDEA
+ * Within IDE, clone from git
+   * https://github.com/ControlSystemStudio/phoebus
+   * https://github.com/kasemir/phoebus-sns
+ * Menu Run, Edit Configurations:
+   - '+ Application'
+   - Name "SNS Product"
+   - Select JDK like `...../jdk-21/Contents/Home`
+   - `-cp product-sns`
+   - Modify options to enable VM settings, then enter `-Dphoebus.install=/path/to/phoebus-sns/product-sns`
+   - Class `org.phoebus.product.Launcher`
+   - Working directory `/path/to/phoebus-sns`
 
 ## Develop with Eclipse
  * Import Generic phoebus projects as described in ../phoebus/README.md
