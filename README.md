@@ -39,6 +39,8 @@ ant dist
    
    When prompted for configuration, select "Maven project".
    Pick "in this window" when prompted how to open.
+  * Build may fail because of missing pbrawclient.
+    Needs manual `(cd ../phoebus; mvn clean verify -f dependencies/pom.xml)`
   * Menu Run, Edit Configurations:
     - '+ Application'
     - Name "SNS Product"
